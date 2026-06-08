@@ -739,10 +739,11 @@ function load(){
   return {studyLog:[], toefl:[], essays:[], qa:[], mocks:[], lessons:{}, tasks:{}, events:[], plan:{}};
 }
 function save(){ localStorage.setItem(KEY, JSON.stringify(S)); if(typeof scheduleSyncPush==="function") scheduleSyncPush(); }
-const APP_VERSION = "2026.06.08";
+const APP_VERSION = "2026.06.08b";
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
 function esc(s){ return (s||"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
-function today(){ const d=new Date(); return d.toISOString().slice(0,10); }
+function ymd(dt){ return dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0")+"-"+String(dt.getDate()).padStart(2,"0"); }
+function today(){ return ymd(new Date()); }
 function fmtD(s){ const d=new Date(s+"T00:00"); return `${d.getMonth()+1}/${d.getDate()}(${"日月火水木金土"[d.getDay()]})`; }
 function daysTo(s){ return Math.ceil((new Date(s+"T00:00") - new Date(today()+"T00:00"))/86400000); }
 function addStudy(d,subj,min,memo){ S.studyLog.push({d,subj,min:+min,memo}); }
@@ -808,7 +809,7 @@ function renderDash(){
 
   // Week summary
   const monday = new Date(); monday.setDate(monday.getDate() - (monday.getDay()+6)%7);
-  const mstr = monday.toISOString().slice(0,10);
+  const mstr = ymd(monday);
   const wk = {TOEFL:0,小論文:0,面接:0};
   S.studyLog.filter(l=>l.d>=mstr).forEach(l=>{ if(wk[l.subj]!=null) wk[l.subj]+=l.min; });
   const mx = Math.max(60, wk.TOEFL, wk.小論文, wk.面接);
@@ -1282,7 +1283,7 @@ function planFor(ds){
   const evToday = allEvents().filter(e=>e.d===ds);
   const exam = evToday.find(e=>e.t==="試験");
   const tomorrow = new Date(ds+"T00:00"); tomorrow.setDate(tomorrow.getDate()+1);
-  const tds = tomorrow.toISOString().slice(0,10);
+  const tds = ymd(tomorrow);
   const examTmr = allEvents().find(e=>e.d===tds && e.t==="試験");
   let note = evToday.length? "この日の予定：" + evToday.map(e=>e.l).join("／") : "";
   if(examTmr) note += (note?"　":"") + "★明日は本番（" + examTmr.l + "）。夜は詰め込まず早く寝る。";
@@ -1403,7 +1404,7 @@ function planDone(k, subj, ds){
 function planMove(d){
   const el = document.getElementById("planDate");
   const dt = new Date((el.value||today())+"T00:00"); dt.setDate(dt.getDate()+d);
-  el.value = dt.toISOString().slice(0,10); renderPlan();
+  el.value = ymd(dt); renderPlan();
 }
 function planToday(){ document.getElementById("planDate").value = today(); renderPlan(); }
 
