@@ -137,6 +137,7 @@ label.f{display:block;font-size:12px;color:var(--sub);font-weight:600;margin-bot
   <nav id="side">
     <h1>ことみの受験ナビ</h1>
     <div class="date" id="todayLabel"></div>
+    <div id="appVer" style="font-size:11px;color:var(--navink);opacity:.65;margin:2px 0 10px;letter-spacing:.3px"></div>
     <button class="navbtn active" data-page="dash"><span class="dot" style="background:#fff"></span>ダッシュボード</button>
     <button class="navbtn" data-page="plan"><span class="dot" style="background:#e8a13c"></span>日課プラン</button>
     <button class="navbtn" data-page="sched"><span class="dot" style="background:var(--sched)"></span>スケジュール</button>
@@ -209,6 +210,11 @@ label.f{display:block;font-size:12px;color:var(--sub);font-weight:600;margin-bot
   <section class="page" id="page-toefl">
     <h2 class="pagetitle">TOEFL対策</h2>
     <p class="pagesub">目標：7月受験で90点超え（横浜市立 +10点加点／上智で競争力）。横市へはETS直送（DIコード0416）が必須。</p>
+    <div class="subtabs" data-group="toefl">
+      <button class="subtab active" data-sub="tfrec">記録</button>
+      <button class="subtab" data-sub="tfbook">公式問題集ガイド</button>
+    </div>
+    <div class="subpage show" id="sub-tfrec">
     <div class="grid cols3">
       <div class="card"><h3>最新スコア</h3><div id="toeflLatest"></div></div>
       <div class="card"><h3>セクション別（最新）</h3><div id="toeflSections"></div></div>
@@ -239,6 +245,11 @@ label.f{display:block;font-size:12px;color:var(--sub);font-weight:600;margin-bot
         </div>
         <table id="lgTable"></table>
       </div>
+    </div>
+    </div>
+    <div class="subpage" id="sub-tfbook">
+      <div class="notice">『TOEFL iBT公式総合対策』（2026新形式対応・ETS公式）の使い方ガイドです。各レッスンを読み、終わったら<b>「完了にする ✓」</b>で進捗を記録できます（端末間で同期されます）。ページ数は本書のもの。音声は旺文社「英語の友」アプリで再生できます。</div>
+      <div id="toeflBook"></div>
     </div>
   </section>
 
@@ -728,6 +739,7 @@ function load(){
   return {studyLog:[], toefl:[], essays:[], qa:[], mocks:[], lessons:{}, tasks:{}, events:[], plan:{}};
 }
 function save(){ localStorage.setItem(KEY, JSON.stringify(S)); if(typeof scheduleSyncPush==="function") scheduleSyncPush(); }
+const APP_VERSION = "2026.06.08";
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
 function esc(s){ return (s||"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function today(){ const d=new Date(); return d.toISOString().slice(0,10); }
@@ -852,7 +864,87 @@ function addEvent(){
 function delEvent(id){ S.events=S.events.filter(e=>e.id!==id); save(); renderAll(); }
 
 /* ================= TOEFL ================= */
+const TOEFL_LESSONS = [
+{t:"この本の使い方と全体の進め方（最初に読む）", b:`
+<p>本書は3つのCHAPTERで「①知る→②解く→③復習する」の流れです。これに沿って進めれば、公式問題で本番感覚をつかめます。</p>
+<ul>
+<li><b>CHAPTER 1 攻略法</b>（p.20〜）＝ETS公認トレーナーが各セクションの形式とコツを解説。まず通読。</li>
+<li><b>CHAPTER 2 Practice Test</b>（p.71〜）＝本物のETS問題1セット。時間を計って解く。</li>
+<li><b>CHAPTER 3 解答解説</b>（p.114〜）＝答え合わせ。間違いを「なぜ」まで理解するまで復習。</li>
+</ul>
+<h4>80→90点の考え方</h4>
+<p>R・Lは<b>精度と時間配分</b>、W・Sは<b>型と採点基準の理解</b>が伸びしろです。ことみさんは英語力の土台があるので、TOEFL特有の形式に慣れることが得点アップの近道。本書最大の強みは、<b>W/Sの解答例にETS採点者の評価が付いている</b>こと（CHAPTER2-3）。「何点の答案か」を体感できます。</p>
+<div class="ex"><b>最初の1週間の進め方（目安）</b><br>
+① CHAPTER1の4セクションを通読（攻略法）<br>
+② CHAPTER2のPractice Testを<b>時間を計って</b>1セット通しで解く<br>
+③ CHAPTER3で採点＆復習。間違えた問題と聞き取れなかった箇所をノート化<br>
+④ 6/6のセクション別スコアが出たら、弱点セクションに時間を寄せる</div>
+<p class="muted">新タスク（Listen and Repeat / Take an Interview）はETS公式オンラインのサンプルでも形式に慣れておくと安心です。</p>
+`},
+
+{t:"Reading セクション 攻略（攻略法p.20／問題p.71／解説p.114）", b:`
+<p>50問・30分。研究用の<b>採点されない問題</b>も含まれます。3つのタスク形式：</p>
+<ul>
+<li><b>Complete the Words</b>（単語を完成）70-100語の文章、1つにつき10語。語の活用・前置詞・コロケーションが鍵。</li>
+<li><b>Read in Daily Life</b>（日常文）15-150語、1つにつき2-3問。メール・チャット・広告など実用文。<b>設問を先読み</b>して必要情報を拾う。</li>
+<li><b>Read an Academic Passage</b>（学術文）約200語、1つにつき5問。段落の<b>主張→具体例</b>の構造で読む。</li>
+</ul>
+<h4>2段階アダプティブに注意</h4>
+<p>Module1の正答率でModule2が<b>Upper（難・高得点域）／Lower（易）</b>に分かれます。前半で取りこぼさないことが上位モジュール＝高スコアの条件です。</p>
+<div class="ex"><b>80→90のコツ</b>　30分の時間配分を厳守／Complete the Wordsは『英単語3800』RANK2-3の語彙が直結／実用文は先読み・該当箇所照合で速く正確に。</div>
+`},
+
+{t:"Listening セクション 攻略（攻略法p.31／問題p.84／解説p.133）", b:`
+<p>47問・29分。こちらも2段階アダプティブ。4つのタスク：</p>
+<ul>
+<li><b>Listen and Choose a Response</b>（音声を聞いて応答を選ぶ）</li>
+<li><b>Listen to a Conversation</b>（会話）話者の<b>態度・言い換え</b>に注意。</li>
+<li><b>Listen to an Announcement</b>（アナウンス）目的・要点を素早く。</li>
+<li><b>Listen to an Academic Talk</b>（講義）サイン表現（however / for example / in conclusion）で構造を取る。</li>
+</ul>
+<div class="ex"><b>復習法（最重要）</b>　まず音声だけで解く→スクリプト（解説）で聞き取れなかった箇所を特定→<b>シャドーイング/ディクテーション</b>→track音声で再聴。これを1問1問やると精度が上がります。</div>
+<p class="muted">解説には和訳スクリプトとtrack番号が載っています（例：Listen to a conversation のtrack）。意味確認→再聴の順で。</p>
+`},
+
+{t:"Writing セクション 攻略（攻略法p.43／問題p.104／解説p.176）", b:`
+<p>12問・23分。3つのタスク：</p>
+<ul>
+<li><b>Build a Sentence</b>（文を作る）語順・文法の正確さ。</li>
+<li><b>Write an Email</b>（Eメール）目的→依頼/回答→締めの<b>型</b>で書く。</li>
+<li><b>Write for an Academic Discussion</b>（学術的ディスカッションに書く）「自分の立場→理由2つ＋具体例→相手意見への一言」の型を固定。</li>
+</ul>
+<h4>80→90のコツ</h4>
+<p>採点基準は<b>課題達成・展開（論理）・言語使用</b>。英語力を点に変えるには「型」を体に入れるのが最短です。本書の<b>ETS採点付き解答例</b>で、高得点答案の具体像をつかみましょう。23分で複数タスク＝時間管理も練習対象です。</p>
+`},
+
+{t:"Speaking セクション 攻略（攻略法p.57／問題p.110／解説p.191）", b:`
+<p>11問・8分。<b>2026新形式の新タスク</b>2種：</p>
+<ul>
+<li><b>Listen and Repeat</b>（聞いて繰り返す）発音・イントネーション・区切りを<b>忠実に再現</b>。自分の声を録音して聞き返すのが効果大。</li>
+<li><b>Take an Interview</b>（インタビューを受ける）質問の意図に<b>即答→理由→具体例</b>の短い型。録音形式なので、型を決めて落ち着いて話す。</li>
+</ul>
+<div class="ex"><b>注意</b>　この2タスクは新形式の新タスクです。市販の旧版では対策できないため、本書の攻略法＋<b>ETS公式オンライン</b>のサンプルで形式に必ず慣れてください。なおCHAPTER1のW/S解答例はETS採点を経ていません（CHAPTER2-3のPractice解説は本番同等）。</div>
+`},
+
+{t:"毎日メニュー（暫定）― 6/6のセクション結果が出たら最適化", b:`
+<p>セクション別スコア確定（6/12頃）までの<b>暫定メニュー</b>です。結果が出たら、弱点セクションに配分を寄せて調整します（アプリ内で反映します）。</p>
+<h4>平日（合計60〜90分）</h4>
+<ul>
+<li><b>単語</b>：『英単語3800』RANK2の総仕上げ→RANK3へ。1日50語＋前日分の復習（15分）</li>
+<li><b>弱点セクション</b>：公式問題集または手持ち問題を30〜45分（時間を計る）</li>
+<li><b>復習</b>：解説で「なぜ間違えたか」を15分</li>
+</ul>
+<h4>週末</h4>
+<ul>
+<li>Practice Test通し、またはセクション模試＋採点＋解説復習</li>
+</ul>
+<div class="ex"><b>事務手続きの注意</b>　横市はETS<b>直送（DIコード0416）</b>が必須。7月受験の申込時に直送設定を忘れずに。上智はiBT72（目安90）。</div>
+<p class="muted">「学習ログ（毎日つける）」タブに、その日やったTOEFL学習を分単位で記録しておくと、ダッシュボードの連続記録にも反映されます。</p>
+`}
+];
+
 function renderToefl(){
+  renderLessons("toeflBook", TOEFL_LESSONS, "t");
   const tf=[...S.toefl].sort((a,b)=>a.d.localeCompare(b.d));
   const last=tf[tf.length-1];
   document.getElementById("toeflLatest").innerHTML = last?
@@ -1461,6 +1553,7 @@ function ghDisconnect(){
   ghMsgSet("同期を解除しました。"); renderSyncStatus();
 }
 /* 同期の初期化 */
+(function(){ var ve=document.getElementById("appVer"); if(ve) ve.textContent="version "+APP_VERSION; })();
 renderSyncStatus();
 if(ghToken && ghGistId){ startAutoSync(); syncPull(true); }
 
