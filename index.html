@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>ことみの受験ナビ｜2027年度 帰国生入試</title>
+<style>
+:root{
+  --bg:#f4f6fa; --card:#fff; --ink:#1c2430; --sub:#67748a; --line:#e3e8f0;
+  --nav:#1d2a3d; --navink:#aab8cc;
+  --sched:#7c5cbf; --toefl:#2563eb; --essay:#d97706; --intv:#059669; --mock:#dc2626;
+  --ok:#16a34a; --warn:#d97706; --danger:#dc2626;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"Hiragino Sans","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.65}
+/* ---- layout ---- */
+#app{display:flex;min-height:100vh}
+#side{width:230px;background:var(--nav);color:var(--navink);padding:22px 14px;position:fixed;top:0;bottom:0;left:0;display:flex;flex-direction:column}
+#main{margin-left:230px;flex:1;padding:28px 36px;max-width:1700px}
+#side h1{color:#fff;font-size:19px;margin-bottom:2px}
+#side .date{font-size:12px;margin-bottom:24px}
+.navbtn{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:none;color:var(--navink);font-size:15px;padding:11px 12px;border-radius:9px;cursor:pointer;margin-bottom:3px;font-family:inherit}
+.navbtn:hover{background:rgba(255,255,255,.08)}
+.navbtn.active{background:rgba(255,255,255,.14);color:#fff;font-weight:600}
+.navbtn .dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+#side .foot{margin-top:auto;font-size:11px;line-height:1.5;opacity:.7}
+section.page{display:none}
+section.page.show{display:block}
+h2.pagetitle{font-size:23px;margin-bottom:4px}
+p.pagesub{color:var(--sub);font-size:13px;margin-bottom:20px}
+/* ---- cards & grid ---- */
+.grid{display:grid;gap:16px;margin-bottom:16px}
+.cols2{grid-template-columns:1fr 1fr}.cols3{grid-template-columns:1fr 1fr 1fr}.cols4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+.card h3{font-size:15px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.card h3 .chip{font-size:11px;padding:2px 8px;border-radius:99px;color:#fff;font-weight:600}
+.kpi{font-size:30px;font-weight:700;line-height:1.2}
+.kpi small{font-size:13px;font-weight:500;color:var(--sub)}
+.muted{color:var(--sub);font-size:12.5px}
+/* ---- countdown ---- */
+.cdcard{border-left:5px solid var(--sched)}
+.cdcard .days{font-size:26px;font-weight:700}
+.cdcard.urgent{border-left-color:var(--danger)}
+.cdcard.soon{border-left-color:var(--warn)}
+/* ---- progress bars ---- */
+.bar{background:#edf1f7;border-radius:99px;height:12px;overflow:hidden;margin:6px 0}
+.bar i{display:block;height:100%;border-radius:99px}
+.hbar{display:flex;align-items:center;gap:10px;margin:7px 0;font-size:13px}
+.hbar .lbl{width:72px;flex-shrink:0;color:var(--sub)}
+.hbar .bar{flex:1;margin:0}
+.hbar .val{width:70px;text-align:right;font-weight:600;font-size:12.5px}
+/* ---- tables ---- */
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{background:#f0f3f8;text-align:left;padding:8px 10px;font-size:12px;color:var(--sub);border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+tr.past{opacity:.45}
+tr.next{background:#fff8e6}
+.tag{display:inline-block;font-size:11px;padding:1px 8px;border-radius:99px;background:#eef2f8;color:#44546a;font-weight:600;white-space:nowrap}
+.tag.red{background:#fde8e8;color:#b91c1c}.tag.amber{background:#fdf0d9;color:#92400e}.tag.green{background:#e1f5e9;color:#166534}.tag.blue{background:#e3ecfd;color:#1d4ed8}.tag.purple{background:#efe9fa;color:#6d28d9}
+/* ---- forms ---- */
+input,select,textarea,button{font-family:inherit;font-size:14px}
+input,select,textarea{border:1px solid #cdd6e1;border-radius:8px;padding:8px 10px;background:#fff;color:var(--ink)}
+input:focus,select:focus,textarea:focus{outline:2px solid #bcd0f7;border-color:#7da2e8}
+textarea{width:100%;resize:vertical}
+label.f{display:block;font-size:12px;color:var(--sub);font-weight:600;margin-bottom:3px}
+.frow{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px}
+.btn{border:none;border-radius:9px;padding:9px 18px;font-weight:600;cursor:pointer;background:#2b3950;color:#fff}
+.btn:hover{filter:brightness(1.12)}
+.btn.sm{padding:5px 12px;font-size:12.5px}
+.btn.ghost{background:#eef2f8;color:#2b3950}
+.btn.danger{background:var(--danger)}
+.btn.toefl{background:var(--toefl)}.btn.essay{background:var(--essay)}.btn.intv{background:var(--intv)}.btn.mock{background:var(--mock)}.btn.sched{background:var(--sched)}
+/* ---- subtabs ---- */
+.subtabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.subtab{padding:8px 18px;border-radius:99px;border:1px solid var(--line);background:#fff;cursor:pointer;font-weight:600;font-size:13.5px;color:var(--sub)}
+.subtab.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.subpage{display:none}.subpage.show{display:block}
+/* ---- lessons ---- */
+.lesson{border:1px solid var(--line);border-radius:12px;background:#fff;margin-bottom:10px;overflow:hidden}
+.lesson>button.head{width:100%;display:flex;align-items:center;gap:12px;background:none;border:none;padding:14px 18px;cursor:pointer;text-align:left;font-size:15px;font-weight:600;color:var(--ink)}
+.lesson .num{width:30px;height:30px;border-radius:50%;background:#eef2f8;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#44546a;flex-shrink:0}
+.lesson.done .num{background:var(--ok);color:#fff}
+.lesson .body{display:none;padding:4px 22px 18px 60px;font-size:14.5px}
+.lesson.open .body{display:block}
+.lesson .body h4{margin:14px 0 5px;font-size:14px}
+.lesson .body ul,.lesson .body ol{margin:6px 0 10px 20px}
+.lesson .body li{margin-bottom:4px}
+.lesson .body .ex{background:#f6f8fb;border-left:4px solid #b9c6da;border-radius:0 8px 8px 0;padding:10px 14px;margin:10px 0;font-size:13.5px}
+.lesson .body .pt{background:#fdf6e7;border-left:4px solid var(--essay);border-radius:0 8px 8px 0;padding:10px 14px;margin:10px 0;font-size:13.5px}
+.lesson .donebtn{margin-top:10px}
+.caret{margin-left:auto;color:var(--sub);transition:.15s}
+.lesson.open .caret{transform:rotate(90deg)}
+/* ---- checklist ---- */
+.chk{display:flex;gap:10px;align-items:flex-start;padding:7px 4px;border-bottom:1px dashed var(--line);font-size:14px;cursor:pointer}
+.chk input{margin-top:4px;accent-color:var(--ok);width:16px;height:16px;flex-shrink:0}
+.chk.done span{text-decoration:line-through;color:#9aa6b8}
+.monthblock{margin-bottom:14px}
+.monthblock>button{width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:10px;padding:11px 16px;font-weight:700;font-size:14.5px;cursor:pointer;color:var(--ink)}
+.monthblock .items{display:none;padding:6px 14px;background:#fff;border:1px solid var(--line);border-top:none;border-radius:0 0 10px 10px}
+.monthblock.open .items{display:block}
+.monthblock.current>button{border-color:var(--essay);background:#fffaf0}
+/* ---- essay editor ---- */
+#essayTimer{font-size:44px;font-weight:700;font-variant-numeric:tabular-nums}
+#essayTimer.low{color:var(--danger)}
+#essayText{font-size:16px;line-height:2;min-height:420px}
+.editorbar{display:flex;align-items:center;gap:26px;flex-wrap:wrap;margin-bottom:12px}
+/* ---- mock interview ---- */
+#mockQ{font-size:34px;font-weight:700;line-height:1.5;margin:26px 0;min-height:110px}
+#mockStage .card{padding:30px 36px}
+.rate{display:flex;gap:6px}
+.rate button{width:38px;height:38px;border-radius:8px;border:1px solid #cdd6e1;background:#fff;cursor:pointer;font-weight:700;font-size:15px}
+.rate button.sel{background:var(--mock);color:#fff;border-color:var(--mock)}
+.raterow{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px dashed var(--line)}
+.raterow .nm{font-weight:600;font-size:14px}
+.raterow .ds{font-size:12px;color:var(--sub)}
+/* ---- qa notes ---- */
+.qaitem{border:1px solid var(--line);border-radius:12px;background:#fff;padding:14px 18px;margin-bottom:10px}
+.qaitem .q{font-weight:700;margin-bottom:6px;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.qaitem textarea{margin-top:6px;font-size:14px}
+.qbankq{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 4px;border-bottom:1px dashed var(--line);font-size:14px}
+/* ---- misc ---- */
+.flex{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.right{margin-left:auto}
+.hist{border:1px solid var(--line);border-radius:12px;background:#fff;padding:14px 18px;margin-bottom:10px}
+.hist .head{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;cursor:pointer}
+.hist .body{display:none;margin-top:10px}
+.hist.open .body{display:block}
+.essayview{white-space:pre-wrap;background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:14px;font-size:14.5px;line-height:1.9;max-height:380px;overflow:auto}
+.del{background:none;border:none;color:#b3bdcc;cursor:pointer;font-size:12px}
+.del:hover{color:var(--danger)}
+.empty{color:var(--sub);font-size:13.5px;padding:14px 4px}
+.notice{background:#eef4ff;border:1px solid #c8daf8;border-radius:10px;padding:10px 16px;font-size:13px;margin-bottom:16px}
+@media(max-width:1100px){.cols4{grid-template-columns:1fr 1fr}.cols3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="app">
+  <nav id="side">
+    <h1>ことみの受験ナビ</h1>
+    <div class="date" id="todayLabel"></div>
+    <button class="navbtn active" data-page="dash"><span class="dot" style="background:#fff"></span>ダッシュボード</button>
+    <button class="navbtn" data-page="plan"><span class="dot" style="background:#e8a13c"></span>日課プラン</button>
+    <button class="navbtn" data-page="sched"><span class="dot" style="background:var(--sched)"></span>スケジュール</button>
+    <button class="navbtn" data-page="toefl"><span class="dot" style="background:var(--toefl)"></span>TOEFL</button>
+    <button class="navbtn" data-page="essay"><span class="dot" style="background:var(--essay)"></span>小論文</button>
+    <button class="navbtn" data-page="intv"><span class="dot" style="background:var(--intv)"></span>面接</button>
+    <button class="navbtn" data-page="mock"><span class="dot" style="background:var(--mock)"></span>模擬面接</button>
+    <button class="navbtn" data-page="data"><span class="dot" style="background:#8895a8"></span>データ管理</button>
+    <div class="foot">2027年4月入学・帰国生入試<br>第1志望：横浜国立大学<br>データはこのMacに自動保存</div>
+  </nav>
+  <main id="main">
+
+  <!-- ============ ダッシュボード ============ -->
+  <section class="page show" id="page-dash">
+    <h2 class="pagetitle">ダッシュボード</h2>
+    <p class="pagesub" id="dashGreeting"></p>
+    <div class="grid cols4" id="cdGrid"></div>
+    <div class="card" style="margin-bottom:16px"><h3><span class="chip" style="background:#e8a13c">今日のプラン</span><span id="dashPlanPhase" class="muted" style="font-weight:400"></span></h3><div id="dashPlan"></div></div>
+    <div class="grid cols3">
+      <div class="card"><h3><span class="chip" style="background:var(--toefl)">TOEFL</span>目標 90点</h3><div id="dashToefl"></div></div>
+      <div class="card"><h3><span class="chip" style="background:var(--essay)">小論文</span>練習状況</h3><div id="dashEssay"></div></div>
+      <div class="card"><h3><span class="chip" style="background:var(--intv)">面接</span>準備状況</h3><div id="dashIntv"></div></div>
+    </div>
+    <div class="grid cols2">
+      <div class="card"><h3>今週の学習時間（保護者サマリー）</h3><div id="dashWeek"></div></div>
+      <div class="card"><h3>今月のやること（未完了）</h3><div id="dashTasks"></div></div>
+    </div>
+  </section>
+
+  <!-- ============ 日課プラン ============ -->
+  <section class="page" id="page-plan">
+    <h2 class="pagetitle">日課プラン</h2>
+    <p class="pagesub">毎日3コマ（午前2h・午後2h・夜2h）。本番までの全日程を、フェーズに合わせて自動で組んでいます。コマを終えたら「完了」→ 学習ログに自動記録されます。</p>
+    <div class="card" style="margin-bottom:16px">
+      <div class="flex">
+        <button class="btn ghost" onclick="planMove(-1)">◀ 前日</button>
+        <input type="date" id="planDate" onchange="renderPlan()">
+        <button class="btn ghost" onclick="planMove(1)">翌日 ▶</button>
+        <button class="btn sm" style="background:#e8a13c" onclick="planToday()">今日へ</button>
+        <span class="right tag amber" id="planPhase"></span>
+      </div>
+      <p class="muted" id="planNote" style="margin-top:8px"></p>
+    </div>
+    <div class="grid cols3" id="planBlocks"></div>
+    <div class="notice" style="margin-top:4px">体調がすぐれない日は無理せず削ってOK。プランは「理想形」であって、6割できれば十分前進です。TOEFL受験日などを「スケジュール」に追加すると、この画面の前日・当日にも注意書きが出ます。</div>
+  </section>
+
+  <!-- ============ スケジュール ============ -->
+  <section class="page" id="page-sched">
+    <h2 class="pagetitle">スケジュール</h2>
+    <p class="pagesub">出願・試験・発表のすべての日程。「目安」の日程は要項公表後に確定します（データ管理から編集可）。</p>
+    <div class="grid cols2" style="grid-template-columns:3fr 2fr">
+      <div class="card">
+        <h3>入試カレンダー</h3>
+        <table id="evtable"></table>
+        <div class="frow" style="margin-top:14px">
+          <div><label class="f">日付</label><input type="date" id="evDate"></div>
+          <div style="flex:1"><label class="f">予定の内容（TOEFL受験日・塾の予定なども追加できます）</label><input id="evLabel" style="width:100%"></div>
+          <button class="btn sched sm" onclick="addEvent()">追加</button>
+        </div>
+      </div>
+      <div class="card">
+        <h3>月別やることチェックリスト</h3>
+        <div id="taskList"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TOEFL ============ -->
+  <section class="page" id="page-toefl">
+    <h2 class="pagetitle">TOEFL対策</h2>
+    <p class="pagesub">目標：7月受験で90点超え（横浜市立 +10点加点／上智で競争力）。横市へはETS直送（DIコード0416）が必須。</p>
+    <div class="grid cols3">
+      <div class="card"><h3>最新スコア</h3><div id="toeflLatest"></div></div>
+      <div class="card"><h3>セクション別（最新）</h3><div id="toeflSections"></div></div>
+      <div class="card"><h3>スコア推移</h3><div id="toeflChart"></div></div>
+    </div>
+    <div class="grid cols2">
+      <div class="card">
+        <h3>スコアを記録する</h3>
+        <div class="frow">
+          <div><label class="f">受験日</label><input type="date" id="tfDate"></div>
+          <div><label class="f">種類</label><select id="tfType"><option>本番</option><option>模試(TPO等)</option></select></div>
+          <div><label class="f">R</label><input type="number" id="tfR" min="0" max="30" style="width:64px"></div>
+          <div><label class="f">L</label><input type="number" id="tfL" min="0" max="30" style="width:64px"></div>
+          <div><label class="f">S</label><input type="number" id="tfS" min="0" max="30" style="width:64px"></div>
+          <div><label class="f">W</label><input type="number" id="tfW" min="0" max="30" style="width:64px"></div>
+          <button class="btn toefl sm" onclick="addToefl()">記録</button>
+        </div>
+        <table id="tfTable"></table>
+      </div>
+      <div class="card">
+        <h3>学習ログ（毎日つける）</h3>
+        <div class="frow">
+          <div><label class="f">日付</label><input type="date" id="lgDate"></div>
+          <div><label class="f">科目</label><select id="lgSubj"><option>TOEFL</option><option>小論文</option><option>面接</option></select></div>
+          <div><label class="f">分</label><input type="number" id="lgMin" min="5" step="5" value="60" style="width:80px"></div>
+          <div style="flex:1"><label class="f">内容</label><input id="lgMemo" style="width:100%" placeholder="例：リスニング模試＋復習"></div>
+          <button class="btn toefl sm" onclick="addLog()">記録</button>
+        </div>
+        <table id="lgTable"></table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 小論文 ============ -->
+  <section class="page" id="page-essay">
+    <h2 class="pagetitle">小論文対策</h2>
+    <p class="pagesub">まず入門レッスンで「小論文とは何か」から。書く練習はエディタで日常練習→直前期は手書きに移行。</p>
+    <div class="subtabs" data-group="essay">
+      <button class="subtab active" data-sub="elesson">入門レッスン</button>
+      <button class="subtab" data-sub="ewrite">練習する</button>
+      <button class="subtab" data-sub="ehist">練習履歴</button>
+      <button class="subtab" data-sub="etheme">テーマバンク</button>
+      <button class="subtab" data-sub="eref">参考サイト</button>
+    </div>
+    <div class="subpage show" id="sub-elesson"><div id="essayLessons"></div></div>
+    <div class="subpage" id="sub-ewrite">
+      <div class="card">
+        <div class="frow">
+          <div style="flex:2"><label class="f">テーマ（テーマバンクから選ぶか、自由に入力）</label><input id="esTheme" style="width:100%" placeholder="例：少子高齢化が日本企業の経営に与える影響について論じなさい"></div>
+          <div><label class="f">志望校</label><select id="esUniv"></select></div>
+          <div><label class="f">目標字数</label><select id="esChars"><option>600</option><option selected>800</option><option>1000</option><option>1200</option><option>1600</option></select></div>
+          <div><label class="f">制限時間</label><select id="esMin"><option>40</option><option selected>60</option><option>90</option></select></div>
+          <button class="btn essay" id="esStartBtn" onclick="essayStart()">開始</button>
+        </div>
+        <div class="editorbar">
+          <div id="essayTimer">--:--</div>
+          <div><span class="kpi" id="esCount">0</span><small>字 / <span id="esTarget">800</span>字</small></div>
+          <div class="right flex">
+            <button class="btn ghost sm" onclick="essayPause()" id="esPauseBtn" disabled>一時停止</button>
+            <button class="btn essay sm" onclick="essayFinish()" id="esFinishBtn" disabled>書き終えて保存</button>
+          </div>
+        </div>
+        <textarea id="essayText" placeholder="「開始」を押すとタイマーが始まります。まず3〜5分で構成メモ（序論・本論・結論）を考えてから書き始めましょう。" disabled></textarea>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <h3>手書き練習を記録する（エディタを使わなかった日）</h3>
+        <div class="frow">
+          <div><label class="f">日付</label><input type="date" id="hwDate"></div>
+          <div style="flex:2"><label class="f">テーマ</label><input id="hwTheme" style="width:100%"></div>
+          <div><label class="f">志望校</label><select id="hwUniv"></select></div>
+          <div><label class="f">所要分</label><input type="number" id="hwMin" value="60" style="width:74px"></div>
+          <div><label class="f">字数</label><input type="number" id="hwChars" value="800" style="width:84px"></div>
+          <button class="btn essay sm" onclick="addHandwritten()">記録</button>
+        </div>
+      </div>
+    </div>
+    <div class="subpage" id="sub-ehist"><div id="essayHist"></div></div>
+    <div class="subpage" id="sub-etheme"><div id="themeBank"></div></div>
+    <div class="subpage" id="sub-eref"><div id="essayRefs"></div></div>
+  </section>
+
+  <!-- ============ 面接 ============ -->
+  <section class="page" id="page-intv">
+    <h2 class="pagetitle">面接対策</h2>
+    <p class="pagesub">入門レッスン→質問バンクから「想定問答ノート」を作る→模擬面接（元先生と実践）の順で進めます。</p>
+    <div class="subtabs" data-group="intv">
+      <button class="subtab active" data-sub="ilesson">入門レッスン</button>
+      <button class="subtab" data-sub="inote">想定問答ノート</button>
+      <button class="subtab" data-sub="ibank">質問バンク</button>
+      <button class="subtab" data-sub="iuniv">大学研究</button>
+      <button class="subtab" data-sub="iref">参考サイト</button>
+    </div>
+    <div class="subpage show" id="sub-ilesson"><div id="intvLessons"></div></div>
+    <div class="subpage" id="sub-inote">
+      <div class="notice">それぞれの質問に「話す内容の骨子」をメモします。丸暗記の文章ではなく、<b>キーワード＋エピソード</b>で書くのがコツ。ステータスを「完成」にすると模擬面接の出題に使われます。</div>
+      <div class="frow">
+        <div style="flex:1"><label class="f">自分で質問を追加</label><input id="qaNewQ" style="width:100%" placeholder="例：高校時代に一番悔しかったことは？"></div>
+        <div><label class="f">大学</label><select id="qaNewUniv"></select></div>
+        <button class="btn intv sm" onclick="addQA()">追加</button>
+      </div>
+      <div class="flex" style="margin:10px 0"><label class="f" style="margin:0">絞り込み：</label><select id="qaFilter" onchange="renderQA()"><option value="">すべて</option></select></div>
+      <div id="qaList"></div>
+    </div>
+    <div class="subpage" id="sub-ibank">
+      <div class="notice">大学別の頻出質問リストです。「ノートへ」を押すと想定問答ノートに追加されます。</div>
+      <div id="qBank"></div>
+    </div>
+    <div class="subpage" id="sub-iuniv"><div id="intvUniv"></div></div>
+    <div class="subpage" id="sub-iref"><div id="intvRefs"></div></div>
+  </section>
+
+  <!-- ============ 模擬面接 ============ -->
+  <section class="page" id="page-mock">
+    <h2 class="pagetitle">模擬面接モード</h2>
+    <p class="pagesub">元先生（面接官役）がこの画面を操作します。質問が1問ずつ大きく表示され、終了後に評価を記録できます。</p>
+    <div id="mockSetup" class="card">
+      <h3>セッション設定</h3>
+      <div class="frow">
+        <div><label class="f">想定する大学</label><select id="mockUniv"></select></div>
+        <div><label class="f">質問数</label><select id="mockN"><option>5</option><option selected>8</option><option>10</option><option>12</option></select></div>
+        <div><label class="f">共通質問を含める</label><select id="mockCommon"><option value="1" selected>含める</option><option value="0">大学別のみ</option></select></div>
+        <button class="btn mock" onclick="mockStart()">模擬面接を開始</button>
+      </div>
+      <p class="muted">※「完成」にした想定問答ノートの自作質問も出題に混ざります。本番同様、入室の挨拶から始めるのがおすすめです。</p>
+      <h3 style="margin-top:22px">過去のセッション</h3>
+      <div id="mockHist"></div>
+    </div>
+    <div id="mockStage" style="display:none">
+      <div class="card">
+        <div class="flex"><span class="tag red" id="mockProg"></span><span class="tag" id="mockUnivLabel"></span><span class="right kpi" id="mockTimer" style="font-size:24px">00:00</span></div>
+        <div id="mockQ"></div>
+        <div class="flex">
+          <button class="btn ghost" onclick="mockPrev()">← 前の質問</button>
+          <button class="btn mock" onclick="mockNext()">次の質問 →</button>
+          <button class="btn danger right" onclick="mockEnd()">面接を終了して評価へ</button>
+        </div>
+      </div>
+    </div>
+    <div id="mockRate" style="display:none">
+      <div class="card">
+        <h3>評価シート（面接官役の方が記入）</h3>
+        <div id="rateRows"></div>
+        <div class="grid cols2" style="margin-top:14px">
+          <div><label class="f">よかった点</label><textarea id="rateGood" rows="3"></textarea></div>
+          <div><label class="f">改善点・宿題</label><textarea id="rateImprove" rows="3"></textarea></div>
+        </div>
+        <div style="margin-top:10px"><label class="f">総評</label><textarea id="rateComment" rows="2"></textarea></div>
+        <div class="flex" style="margin-top:14px"><button class="btn mock" onclick="mockSave()">保存して終了</button><button class="btn ghost" onclick="mockDiscard()">保存せず破棄</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ データ管理 ============ -->
+  <section class="page" id="page-data">
+    <h2 class="pagetitle">データ管理</h2>
+    <p class="pagesub">データはこのMacのブラウザ内（localStorage）に自動保存されます。週1回のバックアップ書き出しをおすすめします。</p>
+    <div class="card" style="margin-bottom:16px">
+      <h3>☁️ GitHub同期（端末間で記録を共有）</h3>
+      <p class="muted" style="margin:4px 0 10px">状態：<span id="ghState"><b style="color:var(--sub)">未接続</b></span><span id="ghLastSync" class="muted"></span></p>
+      <div class="frow">
+        <div style="flex:1"><input id="ghTokenInput" type="password" placeholder="ghp_ で始まるトークン" style="width:100%"></div>
+        <button class="btn" onclick="ghConnect()">トークンを設定／変更</button>
+      </div>
+      <div class="flex" style="margin-top:10px;gap:8px">
+        <button class="btn ghost sm" onclick="syncPull(false)">⬇️ 今すぐ取得</button>
+        <button class="btn ghost sm" onclick="syncPush()">⬆️ 今すぐ送信</button>
+        <button class="btn ghost sm" onclick="ghDisconnect()" style="color:var(--danger)">同期解除</button>
+      </div>
+      <p id="ghMsg" class="muted" style="margin-top:8px"></p>
+      <p class="muted" style="margin-top:6px;font-size:12.5px">トークン発行：GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic) → Generate new token (classic) → <b>「gist」だけ</b>にチェック。<b>同じトークンを各端末（Mac・iPhone）に貼れば同じ記録</b>になります。データは秘密Gistに保存され、公開サイトのコードには出ません。</p>
+    </div>
+    <div class="grid cols2">
+      <div class="card">
+        <h3>バックアップ</h3>
+        <p class="muted" style="margin-bottom:10px">すべての記録をJSONファイルとして書き出します。ブラウザを変える時や万一に備えて定期的に保存してください。</p>
+        <button class="btn" onclick="exportData()">バックアップを書き出す</button>
+      </div>
+      <div class="card">
+        <h3>復元</h3>
+        <p class="muted" style="margin-bottom:10px">書き出したJSONファイルを読み込んで復元します（現在のデータは上書きされます）。</p>
+        <input type="file" id="importFile" accept=".json">
+        <button class="btn ghost" onclick="importData()" style="margin-top:8px">読み込む</button>
+      </div>
+    </div>
+    <div class="card" style="border-color:#f3c6c6">
+      <h3 style="color:var(--danger)">危険な操作</h3>
+      <button class="btn danger sm" onclick="resetData()">全データを初期化</button>
+      <p class="muted" style="margin-top:8px">※「サイトデータを消去」などブラウザの履歴削除を行うとデータが消えます。必ず同じブラウザ（SafariかChromeに固定）で開いてください。</p>
+    </div>
+  </section>
+
+  </main>
+</div>
+<script>
+/* ================= 固定データ ================= */
+const UNIVS = ["横浜国立大学(経営)","横浜市立大学(国際教養)","上智大学(総合グローバル)","上智大学(英語)","明治学院大学(国際)","明治大学(法)","明治大学(政経)","立教大学(経営)","共通"];
+
+const BASE_EVENTS = [
+ {d:"2026-06-12", l:"TOEFL 6/6受験分 スコア発表（目安）", t:"TOEFL"},
+ {d:"2026-07-07", l:"上智 出願開始", t:"出願"},
+ {d:"2026-07-23", l:"上智 出願締切（郵送7/24必着）", t:"締切"},
+ {d:"2026-08-18", l:"明治法 出願（目安・要項で確定）", t:"出願"},
+ {d:"2026-09-04", l:"横浜市立 出願開始", t:"出願"},
+ {d:"2026-09-08", l:"横浜市立 出願締切（必着）", t:"締切"},
+ {d:"2026-09-15", l:"明治学院 一次出願開始", t:"出願"},
+ {d:"2026-09-20", l:"上智 学科試問・面接（本番）", t:"試験"},
+ {d:"2026-09-24", l:"明治学院 一次出願締切", t:"締切"},
+ {d:"2026-09-27", l:"明治法 二次選考（目安）", t:"試験"},
+ {d:"2026-10-01", l:"上智 合格発表", t:"発表"},
+ {d:"2026-10-03", l:"横浜市立 小論文・面接（本番）", t:"試験"},
+ {d:"2026-10-04", l:"明治政経 試験（目安）", t:"試験"},
+ {d:"2026-10-15", l:"上智 入学手続締切 ／ 横国 出願開始（目安）", t:"締切"},
+ {d:"2026-10-21", l:"横国 出願締切（目安・必着） ／ 明学 二次出願開始", t:"締切"},
+ {d:"2026-11-02", l:"横浜市立 合格発表", t:"発表"},
+ {d:"2026-11-15", l:"明治学院 二次選考（小論文・面接）", t:"試験"},
+ {d:"2026-12-01", l:"横浜国立 小論文・面接（本番・目安）", t:"試験"},
+ {d:"2026-12-04", l:"明治学院 合格発表", t:"発表"},
+ {d:"2026-12-11", l:"明治学院 入学手続締切", t:"締切"},
+ {d:"2026-12-18", l:"横浜市立 入学手続締切", t:"締切"}
+];
+
+const MONTH_TASKS = {
+ "2026-06":["上智 入学センターに電話で出願資格を事前相談（03-3238-3167）","横国 経営学務係へ事前照会（045-339-3663）","明治法向け ETS直送（コード0413）の手配確認","7月TOEFLを申込（無料送付先に横市0416を前日22時までに指定）","LCSに成績証明書・卒業証明書を請求","立教の特別入試要項（6月中旬公開）を確認","6/6 TOEFLの結果を確認し、弱点セクションをアプリに記録","小論文：入門レッスン1〜4を読む","小論文：社説要約を週3本","面接：留学エピソードを10個書き出す"],
+ "2026-07":["上智 出願（7/7〜7/23・郵送7/24必着）","TOEFL再受験（90点超え目標）","横国・横市・明学の2027年度要項を確認しアプリの日程を更新","横市の出願書類準備を開始","小論文：週2本（社会科学テーマ）＋添削の利用開始","上智 学科試問の過去問を入手","面接：想定問答ノートの共通質問を「完成」にする"],
+ "2026-08":["明治法 出願（中旬・要項で確定）","横市 出願書類を完成させる","TOEFL：90未到達なら8月上旬に最終受験→以後終了","小論文：毎日1本ペース（上智学科試問対策中心）","明治法のプレゼン原稿を作成","模擬面接を開始（週1回・録画）","時事問題チェックを日課に"],
+ "2026-09":["横市 出願（9/4〜9/8必着）","明治政経 出願（上旬）","明学 一次出願（9/15〜9/24）※入学確約条件を最終判断","立教 出願（要項で確定）","9/20 上智本番（学科試問・面接）","9月下旬 明治法 二次（小論文＋プレゼン＋口頭試問）","横市 過去問演習を開始"],
+ "2026-10":["10/1 上智発表→10/15手続の判断（入学金）","10/3 横市本番（小論文・面接）","横国 出願（中旬・志望理由書を最高品質に）","明学 一次通過なら二次出願（10/21〜10/28）","小論文：横国（経営・経済テーマ）へ完全シフト","面接：横国対策を本格化"],
+ "2026-11":["11/2 横市発表（手続は12/18まで→横国の結果を見て判断可）","11/15 明学 二次選考","横国 小論文：週3本→直前は毎日1本","横国 模擬面接を週2回","明学 二次の直前リハーサル"],
+ "2026-12":["12月上旬 横国本番（小論文・面接）","12/4 明学発表 → 12/11 手続判断（横国発表前に注意）","12月中旬 横国発表","12/18 横市 入学手続締切","体調管理を最優先に"]
+};
+
+/* ---- TOEFL教材ライブラリ（画像が届き次第ここに登録されます） ---- */
+const MATERIALS = [
+ /* 例: {title:"参考書名", folder:"教材/book1", pages:120, section:"R", note:"弱点対策用"} */
+];
+
+/* ---- 小論文レッスン ---- */
+const ESSAY_LESSONS = [
+{t:"小論文とは何か ― 作文との決定的な違い", b:`
+<p>小論文とは、出されたテーマ（問い）に対して<b>自分の意見を述べ、その理由を筋道立てて説明する文章</b>です。アメリカの授業で書いた essay にとても近いものです。</p>
+<h4>作文・感想文との違い</h4>
+<ul><li><b>作文</b>＝体験や気持ちを書く（「楽しかった」でOK）</li><li><b>小論文</b>＝意見＋根拠を書く（「私は〜と考える。なぜなら〜」）</li></ul>
+<div class="ex"><b>例</b>　テーマ「コンビニの24時間営業について」<br>作文的な答え：「便利だと思います。夜中にお菓子が買えるからです。」<br>小論文的な答え：「24時間営業は見直すべきだと考える。第一に深夜帯の売上は人件費・光熱費に見合わないことが多く、第二に労働力不足の中で深夜労働は従業員の健康リスクを高めるからである。一方で病院近くの店舗など社会インフラとしての役割もあるため、立地に応じた柔軟な営業時間が望ましい。」</div>
+<p>採点者が見ているのは「正解」ではなく、<b>考える力と伝える力</b>。意見そのものに○×はありません。英語のessayで鍛えた論理の組み立てはそのまま武器になります。足りないのは日本語の型と表現だけです。</p>
+<div class="pt"><b>なぜ大学は小論文を課すのか</b>：講義を理解し、レポートや卒論を書ける「考える日本語力」があるかを見るためです。つまり小論文の練習＝大学の勉強の練習でもあります。</div>`},
+{t:"採点者は何を見ているか ― 評価の4つのものさし", b:`
+<ol><li><b>課題理解</b>：問われたことに正面から答えているか（最重要。ズレた答案は他が良くても落ちる）</li>
+<li><b>論理性</b>：意見→理由→具体例→結論が筋道立ってつながっているか</li>
+<li><b>具体性</b>：抽象論だけでなく、実例・体験・データで支えられているか</li>
+<li><b>表現</b>：誤字脱字がなく、正しい原稿用紙の使い方・「だ・である調」で書けているか</li></ol>
+<div class="pt">帰国生の答案で多い失点は「②③は良いのに④日本語表現で損をする」パターン。逆に言えば、表現は練習量で必ず伸びるので、伸びしろが一番大きいところです。</div>
+<div class="ex"><b>問いに答える、とは</b>　「〜について論じなさい」→ 自分の立場を決めて論じる／「〜の原因を述べ、解決策を提案しなさい」→ 原因と解決策の<b>両方</b>を必ず書く。設問を分解して「答えるべき要素リスト」を作ってから書き始めるとズレません。</div>`},
+{t:"基本の型 ― 序論・本論・結論", b:`
+<p>小論文は次の3部構成で書きます。英語の five-paragraph essay とほぼ同じです。</p>
+<h4>800字の場合の目安</h4>
+<ul><li><b>序論（約15%・120字）</b>：問題の背景＋自分の立場（結論）を先に示す</li><li><b>本論（約70%・560字）</b>：理由を2つ程度、それぞれ具体例つきで。「第一に〜。第二に〜。」</li><li><b>結論（約15%・120字）</b>：本論をまとめ、立場を再確認。新しい話は出さない</li></ul>
+<div class="ex"><b>骨組みテンプレート</b><br>序論：「近年、（背景）が問題となっている。私は（立場）と考える。」<br>本論：「第一に（理由1）。例えば（具体例）。第二に（理由2）。実際に（具体例）。確かに（反対意見）という見方もある。しかし（再反論）。」<br>結論：「以上より、（立場の再確認）。今後は（展望・提案）が求められる。」</div>
+<div class="pt"><b>反対意見への目配り（確かに〜しかし〜）</b>を入れると一段深い答案になります。TOEFLのWritingで使った concession と同じ技術です。</div>`},
+{t:"原稿用紙と表記のルール", b:`
+<p>形式面の減点は完全に防げます。最初に覚えてしまいましょう。</p>
+<ul><li>書き出しと段落の最初は<b>1マス空ける</b></li><li>文体は<b>「だ・である調」</b>で統一（「です・ます」と混ぜない）</li><li>句読点「、」「。」は1マス。行頭に来る場合は前の行の最後のマスに文字と一緒に入れる（禁則処理）</li><li>促音・拗音（っ・ゃ・ゅ・ょ）も1マス。行頭に来てよい</li><li>数字は縦書きなら漢数字、横書きなら算用数字（1マス2桁）</li><li>「！」「？」「…」「(笑)」など話し言葉の記号は使わない</li><li>略語は初出で正式名称（例：「国連（国際連合）」）</li><li>一人称は<b>「私」</b>。「僕」「自分」は使わない</li></ul>
+<div class="pt"><b>話し言葉→書き言葉 変換例</b>：「やっぱり→やはり」「ちゃんと→適切に」「すごく→非常に」「〜とか→〜など」「いろんな→様々な」「だけど→しかし」「〜じゃない→〜ではない」</div>
+<div class="ex"><b>字数のルール</b>：「800字以内」→8割（640字）以上は埋める。「800字程度」→±1割が目安。指定字数を1字でも超えると0点になり得るので絶対に超えない。</div>`},
+{t:"書くプロセスと時間配分 ― いきなり書き始めない", b:`
+<p>60分・800字の場合の黄金配分：</p>
+<ol><li><b>設問分析（5分）</b>：何を問われているか分解。答えるべき要素をリスト化</li><li><b>構成メモ（10分）</b>：立場を決め、理由2つと具体例を箇条書き。ここで勝負の8割が決まる</li><li><b>執筆（35分）</b>：メモに従って一気に書く。迷ったらメモに戻る</li><li><b>見直し（10分）</b>：誤字・「だである」統一・主語と述語のねじれを確認</li></ol>
+<div class="pt">いきなり書き始めると、途中で論がずれて書き直しになり、時間切れになります。<b>「メモなしで書き始めない」</b>を鉄則にしましょう。</div>
+<h4>課題文型・資料型の場合</h4>
+<ul><li>課題文がある場合：まず筆者の主張を1文で要約→それに対する自分の立場を決める</li><li>グラフ・資料がある場合：資料から「読み取れる事実」と「自分の解釈」を区別して書く</li></ul>`},
+{t:"帰国生小論文の特徴 ― 留学経験は最大の武器", b:`
+<p>帰国生入試の小論文では、<b>海外経験を持つ人にしか書けない視点</b>が高く評価されます。</p>
+<h4>使えるネタの例（ことみさんの場合）</h4>
+<ul><li>米国の高校での授業スタイル（議論中心・多様な意見の尊重）と日本の教育との違い</li><li>キリスト教系の学校（LCS）で感じた価値観・文化の違い</li><li>少数者・外国人として暮らした経験（多様性、移民、アイデンティティの話題に直結）</li><li>米国で見た社会問題（格差、医療、銃、分断など）と日本との比較</li></ul>
+<div class="ex"><b>使い方の型</b>：「私が3年間学んだ米国の高校では〜だった。一方日本では〜である。この違いから〜と考える。」→ 一般論しか書けない受験生と決定的な差がつく。</div>
+<div class="pt"><b>注意</b>：「アメリカはすごい、日本は遅れている」という単純な比較は浅い印象を与えます。<b>両方の良さと課題</b>を踏まえた上で自分の意見を述べると、成熟した答案になります。</div>`},
+{t:"大学別の傾向と対策", b:`
+<h4>横浜国立大学 経営学部（12月上旬・最重要）</h4>
+<ul><li>経営・経済を中心とする社会科学系テーマ。日本語で論述</li><li>対策：日経新聞・NHK経済ニュースを週次でストック。「企業の人手不足」「円安と物価」「AIと雇用」など頻出論点をテーマバンクで練習</li></ul>
+<h4>横浜市立大学 国際教養学部（10/3）</h4>
+<ul><li>人文科学・社会科学の幅広いテーマ。資料や課題文がつくことも</li><li>対策：多文化共生・国際協力・ジェンダー・環境などの定番論点を押さえる</li></ul>
+<h4>上智大学（9/20・学科試問）</h4>
+<ul><li>「学科試問」＝学科に関する基礎知識と考える力を見る筆記。総合グローバルなら国際関係・グローバル課題</li><li>対策：過去問の入手が最優先。出題形式に慣れる</li></ul>
+<h4>明治学院大学 国際学部（11/15・60分）</h4><ul><li>60分と短い。時間配分の練習を本番形式で</li></ul>
+<h4>明治大学 法学部（9月下旬・1200〜1600字）</h4><ul><li>字数が多い。構成メモの精度が命。プレゼンとの連動も意識</li></ul>`}
+];
+
+/* ---- 面接レッスン ---- */
+const INTV_LESSONS = [
+{t:"面接とは何か ― 面接官は何を見ているのか", b:`
+<p>面接は「口頭試問」ではなく<b>「この学生と一緒に学びたいか」を確かめる対話</b>です。面接官（大学の先生）が見ているのは主に4つ：</p>
+<ol><li><b>志望動機の本気度</b>：なぜこの大学・この学部なのかを自分の言葉で語れるか</li><li><b>経験の言語化</b>：留学で何を学び、どう成長したかを具体的に話せるか</li><li><b>学ぶ意欲と適性</b>：入学後に何を学びたいかのイメージがあるか</li><li><b>日本語のコミュニケーション力</b>：質問を正しく理解し、的確に答えられるか</li></ol>
+<div class="pt">完璧な「正解」を暗唱する場ではありません。多少言葉に詰まっても、<b>自分の頭で考えて誠実に答える姿勢</b>のほうが評価されます。3年間の米国生活で身につけた「自分の意見を言う力」はそのまま強みです。</div>
+<div class="ex"><b>面接の配点は重い</b>：横国・横市は「小論文＋面接」がほぼすべて。筆記が同点なら面接で決まります。"おまけ"ではなく主科目の一つと考えてください。</div>`},
+{t:"面接の流れとマナー ― 入室から退室まで", b:`
+<h4>当日の流れ（典型例）</h4>
+<ol><li>ノック3回 →「どうぞ」→「失礼します」と言って入室、ドアを静かに閉める</li><li>椅子の横に立ち「受験番号〇〇番、山中ことみです。よろしくお願いいたします」と一礼</li><li>「お掛けください」と言われてから座る</li><li>質疑応答（10〜20分程度、面接官2〜3名が多い）</li><li>終了→「本日はありがとうございました」と一礼→ドアの前で「失礼します」と一礼して退室</li></ol>
+<h4>基本マナー</h4>
+<ul><li>背筋を伸ばし、質問した面接官の目を見て話す（他の面接官にも時々視線を配る）</li><li>語尾まではっきり。「〜です」「〜と考えています」</li><li>敬語は「です・ます」が正しく使えれば十分。過剰な謙譲語は不要</li><li>服装は制服がなければ落ち着いた私服（ブレザー等）。清潔感が第一</li></ul>
+<div class="pt">米国式のカジュアルな振る舞い（足を組む、椅子に深くもたれる、相づちで「うん」）が無意識に出やすいので、模擬面接で先生にチェックしてもらいましょう。</div>`},
+{t:"答え方の型 ― 結論先行＋エピソード", b:`
+<p>すべての質問に使える万能の型：</p>
+<div class="ex"><b>①結論</b>「私が貴学を志望する理由は〜です」→ <b>②理由・背景</b>「きっかけは留学中に〜したことです」→ <b>③具体エピソード</b>「実際に〜という経験をし、〜と感じました」→ <b>④つなげる</b>「だから貴学の〜で学びたいと考えています」</div>
+<ul><li>1つの答えは<b>30秒〜1分</b>。長すぎる暗唱は逆効果。要点を話し、深掘りは追加質問に任せる</li><li>暗記した文章をそのまま話すと棒読みになる。<b>キーワードとエピソードだけ覚えて、その場で組み立てる</b></li><li>わからない質問には正直に：「勉強不足で存じませんが、私の考えでは〜」と考える姿勢を見せる</li><li>圧迫気味の質問（「それは甘い考えでは？」）は人柄テスト。むきにならず「ご指摘の通り〜という面もあります。ただ私は〜」と受け止めてから返す</li></ul>
+<div class="pt">想定問答ノートには文章ではなく「<b>骨子（キーワード3つ＋エピソード1つ）</b>」を書く。これが自然に話せる秘訣です。</div>`},
+{t:"帰国生面接の頻出質問と攻略", b:`
+<h4>必ず聞かれる5大質問</h4>
+<ol><li><b>なぜ本学・本学部か</b>（最重要。大学のWebサイトで教授名・カリキュラム・ゼミを調べ、固有名詞で語る）</li><li><b>留学で何を学んだか・苦労したか</b>（成長ストーリーを1つ用意。困難→工夫→成長の順で）</li><li><b>なぜ帰国して日本の大学か</b>（帰国生特有の質問。「米国の大学ではなく日本を選んだ積極的な理由」を必ず用意）</li><li><b>入学後に何を学びたいか・将来は</b>（学部の学びと将来をつなげる）</li><li><b>最近気になったニュース</b>（志望学部に関連する分野で2〜3本ストック。横国なら経済、横市・上智なら国際）</li></ol>
+<div class="pt"><b>「なぜ日本の大学？」の答え方</b>：消極的理由（英語に疲れた、学費）ではなく、「米国で外から日本を見て、日本の〜を学び直したいと思った」「日本を拠点に〜したい」など前向きな物語に。</div>
+<div class="ex"><b>兄弟ネタの注意</b>：「兄が横市だから」は志望理由としては弱い。きっかけとして触れるのは良いが、主たる理由は自分の学びにすること。</div>`},
+{t:"模擬面接の活用法 ― 練習で9割決まる", b:`
+<p>面接は「知識」より「場数」。元先生との実践練習を最大限活かしましょう。</p>
+<h4>効果的な進め方</h4>
+<ol><li><b>週1回</b>（10月以降は週2回）、本アプリの「模擬面接モード」で本番形式</li><li>入室の挨拶から退室まで通しで行う（マナーも毎回チェック）</li><li><b>Macのカメラで録画</b>（QuickTime Playerの「新規ムービー収録」）して見返す。姿勢・視線・話す速さは自分で見るのが一番効く</li><li>終了後に評価シートを記録→前回との比較で成長を確認</li><li>指摘された改善点は想定問答ノートに反映して次回までに練り直す</li></ol>
+<div class="pt"><b>振り返りの観点</b>：①結論から話せたか ②30秒〜1分に収まったか ③「えー」「なんか」が多くないか ④敬語の崩れ ⑤笑顔と姿勢。毎回1つだけ改善テーマを決めると伸びが速い。</div>`}
+];
+
+/* ---- 面接 質問バンク ---- */
+const QBANK = {
+"共通":["自己紹介を1分でお願いします","本学を志望した理由を教えてください","留学先ではどんなことを学びましたか","留学中に最も苦労したことと、それをどう乗り越えたかを教えてください","なぜ米国の大学ではなく日本の大学に進学しようと思ったのですか","高校時代に最も力を入れたことは何ですか","あなたの長所と短所を教えてください","入学後は何を学びたいですか","将来はどんな道に進みたいと考えていますか","最近気になったニュースを1つ挙げて、あなたの意見を聞かせてください","日本と米国の高校の違いは何だと思いますか","併願校と、本学が第一志望かどうかを教えてください"],
+"横浜国立大学(経営)":["なぜ経営学を学びたいのですか","経営学部で特に学びたい分野（マーケティング・会計・経営戦略など）はありますか","関心のある企業とその理由を教えてください","米国生活で感じた日米の企業・サービスの違いはありますか","最近の経済ニュースで関心を持ったものは","あなたにとって「良い経営」とは何だと思いますか"],
+"横浜市立大学(国際教養)":["国際教養とは何だと思いますか","関心のある社会問題と、その解決に必要なことを教えてください","小論文の出来はどうでしたか（自己評価とその理由）","横浜という都市で学ぶ意義は何だと思いますか","多文化共生についてあなたの経験から考えることは","データサイエンスにも関心はありますか"],
+"上智大学(総合グローバル)":["グローバルな課題で最も関心のあるものは何ですか","総合グローバル学部で何を研究したいですか","「グローバル」と「ローカル」の関係についてどう考えますか","英語以外に学んでみたい言語はありますか","留学経験はあなたの視野をどう変えましたか"],
+"上智大学(英語)":["英語学科で何を学びたいですか（英語「を」学ぶのではなく英語「で」何を学ぶか）","言語に興味を持ったきっかけは","日本人の英語教育についてどう思いますか"],
+"明治学院大学(国際)":["国際学部で学びたいテーマは何ですか","本学が第一志望である理由を教えてください（※入学確約の入試です）","ボランティアや課外活動の経験はありますか"],
+"明治大学(法)":["なぜ法学を学びたいのですか","プレゼンテーションの内容について詳しく聞かせてください","社会のルールについて、米国で感じたことはありますか"],
+"明治大学(政経)":["なぜ政治経済学部ですか","関心のある経済問題を教えてください"],
+"立教大学(経営)":["なぜ立教の経営学部ですか","リーダーシップについてあなたの考えを聞かせてください"]
+};
+
+
+/* ---- 大学別の頻出質問を追加（リサーチに基づく。質問バンクに表示され、ワンタップで想定問答に追加可） ---- */
+const QBANK_ADD = {
+"共通":["海外生活で価値観が変わった出来事を1つ挙げてください","帰国してから戸惑ったことはありますか、どう対処していますか","本学のアドミッションポリシーのどこに自分が合うと思いますか"],
+"横浜国立大学(経営)":["企業の社会的責任（CSR）と利益追求の両立についてどう考えますか","日本で起業（スタートアップ）が少ないのはなぜだと思いますか","経営学部で学んだことを将来どう生かしたいですか"],
+"横浜市立大学(国際教養)":["なぜ他大学ではなく本学の国際教養なのか、決め手を教えてください","リベラルアーツ（教養教育）で具体的に学びたいことは何ですか","英語以外に関心のある地域・言語はありますか"],
+"上智大学(総合グローバル)":["（深掘り）志望理由をもう少し具体的に説明してください","得意な科目・好きな科目とその理由を教えてください","滞在国と日本で報道（ニュースの伝え方）の違いを感じたことは","関心のある教員や科目があれば教えてください"],
+"上智大学(英語)":["滞在国と日本で報道の違いを感じたことは（英語で問われる場合あり）","印象に残っている英語の本・記事とその理由は","将来、英語をどう使って働きたいですか"],
+"明治学院大学(国際)":["国際協力・開発に関心はありますか、そのきっかけは","本学の精神『他者への貢献（Do for Others）』をどう考えますか"],
+"明治大学(法)":["（プレゼン後）今日のプレゼンで最も伝えたかったことは何ですか","表現の自由とその限界についてどう考えますか","海外で「ルール（法）」について考えさせられた経験は"],
+"明治大学(政経)":["関心のある政治・社会の出来事と、あなたの意見を聞かせてください","円安・物価高など最近の経済について感じることは"],
+"立教大学(経営)":["チームで成果を出した経験と、その中で果たした役割は","国際経営（グローバルビジネス）に関心はありますか"]
+};
+Object.keys(QBANK_ADD).forEach(u=>{ QBANK[u] = (QBANK[u]||[]).concat(QBANK_ADD[u]); });
+
+/* ---- 小論文テーマバンク ---- */
+const THEMES = {
+"横浜国立大学(経営)":["少子高齢化と人手不足が日本企業の経営に与える影響と対応策について論じなさい（800字）","AI（人工知能）の普及は雇用にどのような影響を与えるか、あなたの考えを述べなさい（800字）","円安は日本経済にとってプラスかマイナスか、立場を明確にして論じなさい（800字）","企業が利益の追求と社会的責任（CSR）を両立するにはどうすべきか（800字）","キャッシュレス化の進展がもたらす利点と課題について論じなさい（800字）","「働き方改革」について、日本と海外の働き方の違いに触れながらあなたの考えを述べなさい（1000字）"],
+"横浜市立大学(国際教養)":["多文化共生社会を実現するために必要なことは何か、あなたの経験を踏まえて論じなさい（800字）","SNSが民主主義に与える影響について論じなさい（800字）","グローバル化は格差を縮小するか拡大するか、あなたの考えを述べなさい（800字）","気候変動問題において先進国が果たすべき役割について論じなさい（800字）","「教養」を学ぶ意義とは何か、あなたの考えを述べなさい（800字）"],
+"上智大学(総合グローバル)":["グローバル化とナショナリズムの関係について論じなさい（800字）","国際協力において日本が果たすべき役割について述べなさい（800字）","移民・難民の受け入れについて、日本はどうあるべきか（800字）","「グローバル人材」とはどのような人材か、あなたの考えを述べなさい（800字）"],
+"明治学院大学(国際)":["世界の貧困問題の解決のために私たちにできることは何か（600字・60分想定）","異文化理解において最も大切なことは何か、体験を踏まえて述べなさい（600字・60分想定）"],
+"明治大学(法)":["ルールはなぜ必要なのか、あなたの経験を踏まえて論じなさい（1200字）","表現の自由とその限界について、あなたの考えを述べなさい（1600字）"],
+"共通":["留学経験はあなたをどのように変えたか（800字）","日本の教育とアメリカの教育の違いについて、体験を踏まえて論じなさい（800字）","「多様性」が社会にもたらすものについて論じなさい（800字）"]
+};
+
+
+/* ---- 参考サイト・リンク集（フェーズ＝いつ使うか、★＝中核、公式バッジ＝大学公式） ---- */
+const RESOURCES = [
+{cat:"① 小論文の型・基礎", color:"amber", when:"6月（基礎期）", items:[
+ {n:"河合塾 Kei-Net 小論文・総合問題対策", u:"https://www.keinet.ne.jp/learning/essay/", c:1, note:"無料で最も信頼できる基礎ガイド。大学別の出題概要一覧も見られる"},
+ {n:"坪田塾 小論文の書き方 完全版", u:"https://tsubotajuku.com/blog/write-essay/", c:1, note:"序論・本論・結論の型、課題文/テーマ/図表/英語の4出題タイプを網羅"},
+ {n:"明光プラス 小論文の書き方", u:"https://www.meikogijuku.jp/meiko-plus/study/essay.html", note:"例文付き。提出前チェックリストとしても使える"},
+ {n:"進路ナビ 小論文の書き方", u:"https://shinronavi.com/newcolumn/essay", note:"原稿用紙の作法・段落の分け方・採点ポイント"},
+ {n:"神戸国際大 小論文の書き方", u:"https://www.kobekyo.com/column/essay-howto/", note:"評価ポイントと出題形式の整理"}
+]},
+{cat:"② 帰国生入試の小論文 全般", color:"amber", when:"6〜7月", items:[
+ {n:"EDUBAL 帰国子女受験 小論文の書き方", u:"https://www.edubal.net/edublog/b20210926-1009546/", c:1, note:"合格者5人の体験に基づく勉強法"},
+ {n:"TCK Workshop 出題パターンを知ろう", u:"https://www.tckwshop.com/tckblog/japanese-essay-howtostart-vol2/", note:"テーマ型など出題パターンの分類"},
+ {n:"youmaga 帰国生小論文Q&A（テーマ型/課題文型）", u:"https://www.youmaga.com/seattleite/life-advice/life2010_11/", note:"2つの出題型と図表分析の必要性"},
+ {n:"EDUBAL 帰国大学受験の頻出テーマ5選", u:"https://www.edubal.net/edublog/b20210809-22770/", note:"異文化理解・情報社会など頻出テーマ集"}
+]},
+{cat:"③-A 横浜国立大学 経営（第1志望）", color:"green", when:"10〜12月（横国期）", items:[
+ {n:"横国 公式 帰国生徒選抜 募集要項(PDF)", u:"https://www.ynu.ac.jp/exam/faculty/essential/pdf/2026_ei_kikoku.pdf", c:1, o:1, note:"比較表の出典。最優先で精読（経営・経済の社会科学）"},
+ {n:"StudyChain 横国経営 帰国生 徹底解説", u:"https://studychain.jp/media/yokohama-u-business-prep/", note:"小論文は社会科学テーマ・約90分、面接の傾向"},
+ {n:"スカイ予備校 横国経営 過去問解説", u:"https://sky-yobiko.net/ynu231226/", note:"社会科学系の練習材料（学校推薦型の過去問）"},
+ {n:"潜龍舎 横国経営 模範解答(note)", u:"https://note.com/polly82jp/n/nb19f72adcb49", note:"論述の水準感をつかむ解答例"}
+]},
+{cat:"③-B 横浜市立大学 国際教養（第2志望）", color:"green", when:"8〜10月", items:[
+ {n:"横市 公式 過去の入試問題", u:"https://www.yokohama-cu.ac.jp/admissions/admissions/kakomon/index.html", c:1, o:1, note:"公式の過去問。兄の合格学部＝体験談も貴重"},
+ {n:"横市 公式 国際教養学部ページ", u:"https://www.yokohama-cu.ac.jp/admissions/admissions/general_selection/School_of_International_Liberal_Arts.html", o:1, note:"現代世界の社会・文化・人間への分析力を評価"},
+ {n:"EDUBAL 横市 帰国子女枠 対策", u:"https://www.edubal.net/eduexaminfo/uni_yokohamaichiritsu/", note:"100字要約＋200〜300字論述の反復を推奨"},
+ {n:"クベルナレッジ 横市国際教養 解説", u:"https://kuberu-ac.com/ycu-liberalarts/", note:"出題傾向と正答例の解説"},
+ {n:"友人会 横市 小論文 模範解答", u:"https://www.yu-hikai.com/senryuu/3375.html", note:"年度別の模範解答"}
+]},
+{cat:"③-C 上智 総合グローバル／英語（最優先・最速出願）", color:"purple", when:"7〜9月（最優先）", items:[
+ {n:"上智 公式 海外就学経験者(帰国生)入試", u:"https://adm.sophia.ac.jp/jpn/gakubu_tokubetsu_ad/kikoku/", c:1, o:1, note:"公式要項。学科試問・面接・書類審査"},
+ {n:"洋々 上智 帰国生入試の対策", u:"https://you2.jp/taisaku/jochi/jochi_kikoku.htm", note:"学科試問・面接は学科ごとに内容が異なる"},
+ {n:"毎日学習会 上智 海外就学経験者 過去問解答例", u:"https://everydayprep.jp/topics/ao/sophia/sophia_oversea/", c:1, note:"学科別の過去問解答例"},
+ {n:"推薦ナビ 上智 海外就学経験者 概要と対策", u:"https://suisen-navi.com/7044/", note:"出願資格・提出書類・学科試問の違い"},
+ {n:"洋々LABO 総合グローバル データ", u:"https://you2.jp/labo/3658/", note:"募集・英語資格・志望理由書の要点"}
+]},
+{cat:"③-D 明治 政経グローバル型／法（追加候補）", color:"green", when:"8〜10月", items:[
+ {n:"明治 政経 公式（総合問題の過去問掲載）", u:"https://www.meiji.ac.jp/seikei/exam/6t5h7p0000341fog.html", c:1, o:1, note:"2023〜2025年度の総合(日本語)問題が無料で入手可"},
+ {n:"モチベーションアカデミア 明治政経 対策", u:"https://m-academia-s.com/faq/private-university/meiji/meiji-000704.html", note:"政治・経済の知識と時事のインプットが鍵"},
+ {n:"早稲田塾 明治政経 グローバル型 解説", u:"https://www.wasedajuku.com/sns/aosuisen_uni/meiji/political_economics/", note:"入試の狙いと合格者例"}
+]},
+{cat:"③-E 立教 経営（追加候補）", color:"green", when:"9〜11月", items:[
+ {n:"洋々LABO 立教経営 帰国生入試", u:"https://you2.jp/labo/3421/", note:"2次は素材・枠が与えられ独創性/論理構成を評価(90分)"},
+ {n:"KIKOKU塾 立教経営 合格体験談", u:"https://www.ryugakukan.com/kikoku/voice/detail/?news_code=56", note:"小論文添削＋面接練習の合格プロセス"}
+]},
+{cat:"④ 時事・背景知識のインプット", color:"blue", when:"毎日（通年）", items:[
+ {n:"AOI 小論文 頻出テーマ5選", u:"https://aoaoi.jp/information/syorontheme/", c:1, note:"過去問分析に基づく頻出テーマ"},
+ {n:"TEKIBO 2026 時事用語一覧", u:"https://tekibo.net/jiji2018/", note:"ESG/SDGs等、小論文・面接に頻出の用語をポイント付き整理"},
+ {n:"受験ネット 学部別 予想テーマ・例題", u:"https://xn--uor874n.net/syouronbun-10-136", note:"総合・国際系の幅広い社会問題テーマ"},
+ {n:"Kip学伸 時事小論文 予想問題・解答", u:"https://www.kipgakushin.com/expected_questions07.html", note:"少子高齢化・環境など練習問題＋解答"}
+]}
+];
+
+
+/* ---- 面接 参考サイト・リンク集（無料の知識サイト中心。フェーズ＝いつ使うか） ---- */
+const INTV_RESOURCES = [
+{cat:"① 面接の基本・マナー", color:"green", when:"6〜7月（素材づくり）", items:[
+ {n:"スタディサプリ 大学受験の面接マナー（入退室・服装）", u:"https://shingakunet.com/journal/exam/20250515000007/", c:1, note:"本番の流れに沿った入退室マナー＋服装チェックリスト"},
+ {n:"進路ナビ 合格マナー実践対策（面接のコツ）", u:"https://shinronavi.com/newcolumn/manners/03", note:"控室・ノック・入室から着席・退出までの所作"},
+ {n:"AOI 面接マナー｜評価ポイント解説", u:"https://aoaoi.jp/information/post-5490/", note:"控室から退室までの具体的な動作と注意点"}
+]},
+{cat:"② 帰国生面接の頻出質問・答え方", color:"amber", when:"7〜9月（中核）", items:[
+ {n:"TCK 帰国生面接 質問例50本ノック＋5つの評価軸", u:"https://www.tckwshop.com/tckblog/45471-2/", c:1, note:"質問の意図を分析しながら「深み」のある回答を作る。最重要の質問集"},
+ {n:"TCK 帰国生面接のコツ3選（帰国子女との差別化）", u:"https://www.tckwshop.com/tckblog/interview-test-3points/", c:1, note:"「多様性」止まりにせず、滞在国・自分らしさで差をつける"},
+ {n:"代ゼミ国際 帰国生大学入試 Q&A", u:"https://www.yozemikikoku.com/returnee/qa.php", note:"書類・学科試験・面接の全体像と準備の考え方"},
+ {n:"AOI 面接でよく聞かれる質問例・回答例12選", u:"https://aoaoi.jp/information/post-5483/", note:"一般的な頻出12問と回答の組み立て例"},
+ {n:"EDUBAL 上智の圧迫面接 対策", u:"https://www.edubal.net/edublog/b20190312-23387/", note:"厳しい質問の意図を知り落ち着いて返す練習"}
+]},
+{cat:"③ 大学別の面接傾向・合格体験記", color:"purple", when:"各校の対策期（8〜12月）", items:[
+ {n:"上智 公式 海外就学経験者(帰国生)入試", u:"https://adm.sophia.ac.jp/jpn/gakubu_tokubetsu_ad/kikoku/", o:1, note:"公式。学科試問＋面接＋書類審査"},
+ {n:"洋々 上智 帰国生入試の対策（面接の形式）", u:"https://you2.jp/taisaku/jochi/jochi_kikoku.htm", c:1, note:"面接官2〜3名・10〜20分・志望理由書ベース・英語質問の可能性"},
+ {n:"代ゼミ 上智 合格体験記", u:"https://www.yozemikikoku.com/voice/taiken_jochi.php", note:"滞在国と日本の報道・法律の違いを問われた実例"},
+ {n:"代ゼミ 横浜国立 合格体験記", u:"https://www.yozemikikoku.com/voice/taiken_yokokoku.php", note:"横国志望の情報収集・面接練習の進め方"},
+ {n:"推薦ナビ 上智 学科試問・面接の概要", u:"https://suisen-navi.com/7044/", note:"アドミッションポリシーの確認が面接対策の起点"}
+]},
+{cat:"④ 明治法 プレゼン・口頭試問（独自対策）", color:"blue", when:"8〜9月（明治法）", items:[
+ {n:"早稲田塾 明治法 海外就学者特別入試の概要", u:"https://www.wasedajuku.com/sns/aosuisen_uni/meiji/law", note:"提出書類・筆記・口頭試問の構成と狙い"},
+ {n:"明治 法学部 Step into（学部の学び）", u:"https://www.meiji.ac.jp/stepinto/hogaku/", o:1, note:"討論・プレゼン重視の学部像→志望理由の裏づけに"},
+ {n:"ホワイトアカデミー 口頭試問とは（評価ポイント）", u:"https://whiteacademy-ao.com/blog/oral-examination/", note:"口頭試問の評価観点と答え方の知識記事"}
+]}
+];
+
+
+/* ---- 大学研究カード（公式アドミッションポリシー・理念に基づく） ---- */
+const UNIV_PROFILES = [
+{u:"横浜国立大学(経営)",
+ rinen:"国立大として実践性・国際性を重視。経営学部は「グローバルに活躍する実践的『知』を持つビジネス人材」「変革型リーダー」「専門性と幅広さを統合できるゼネラリスト」の養成を掲げる。",
+ motomeru:["消費者や企業等の経済活動に関心を持ち、社会の課題を自ら発見する意欲がある人","経営学・会計学・マーケティング・オペレーション・ファイナンス等で学んだ内容を、社会課題の分析と解決に生かしたい人","創造的・独創的な視点で解決の道筋を見出し、周囲と協調して目標を達成できる人"],
+ fuudo:"常盤台キャンパス。マネジメント／アカウンティング／マネジメント・サイエンスの3分野を基礎から分野横断的に学ぶ。英語で学ぶGBEEP、データのDSEPも。少人数・実践重視。",
+ keywords:["社会の発展に貢献したい","課題の発見と解決","協調性","グローバルビジネス"],
+ tsunagi:"米国で見た企業・サービスの具体例 → 解決したい社会課題 → 経営学のどの分野で、という順でつなぐと説得力が出ます。"},
+{u:"横浜市立大学(国際教養)",
+ rinen:"「国際都市・横浜にふさわしい国際性・創造性・倫理観を有し、高い志をもった人間」を育成。求める人物像は「枠にとらわれず自由で創造的に真理を探究」「課題意識と強い意志」「人類社会に貢献する意欲」。",
+ motomeru:["国語・社会・外国語の高い基礎学力を有する人","物事を批判的に考察する洞察力を持つ人","異なる教育制度で得た学びや、海外滞在で培った国際的感覚を生かせる人（海外帰国生）"],
+ fuudo:"「実践的な教養教育」。教養学系／都市学系に分かれ、国際社会・国際文化・人間科学・都市政策とまちづくりの4クラスター。2年後期から少人数ゼミ。多文化共生社会の実現に貢献。",
+ keywords:["実践的な教養(リベラルアーツ)","批判的思考","多文化共生","横浜という都市"],
+ tsunagi:"「どのクラスターで何を学び、横浜という都市の課題にどう関わりたいか」を具体化すると、志望理由が他大学と差別化できます。"},
+{u:"上智大学(総合グローバル)",
+ rinen:"イエズス会創立のカトリック大学。建学の精神は「他者のために、他者とともに（For Others, With Others）」。真理の探求とグローバル・コンピテンシー（グローバル課題への関心・複数言語・文化の違いを肯定的に受け止め橋渡しする力）を重視。",
+ motomeru:["世界の地域・人々の多様性がもたらす社会と文化の豊かさに強い関心を持つ人","地理・世界史に一定の知識があり、根拠に基づいて論理的に考え主体的に取り組める人","グローバル化を理解するのに必要な文献を読む英語力を持つ人"],
+ fuudo:"四谷のグローバルワンキャンパス。国際関係論と地域研究（アジア／中東・アフリカ等）を組み合わせて学ぶ。多様な他者と対話し協力して問題解決する力を養う。",
+ keywords:["他者のために、他者とともに","グローバル・コンピテンシー","地域研究＋国際関係","多様性の橋渡し"],
+ tsunagi:"「他者のために」の精神と、自分が留学中に誰かのために動いた経験を結びつけ、関心のある地域・国際課題を具体的に語ると上智らしさが出ます。"},
+{u:"上智大学(英語)",
+ rinen:"上智全体の建学の精神「他者のために、他者とともに」を共有。英語学科は英語『を』ではなく英語『で』学ぶのが特徴。",
+ motomeru:["英語圏の言語・歴史・政治・経済・社会・文化に関心を持ち、英語の高度な運用能力を身につけたい人","しっかりした英語学習経験があり、高度な内容を英語で学ぶ知識・技能と真摯な姿勢を持つ人","言語運用にとどまらず、世界の出来事を自分の問題として考え解決策を見出そうとする人"],
+ fuudo:"応用言語学・通訳・地域研究など、英語を使って専門を深める。秋から9つの研究コースを選択。※帰国生の英語学科は英語母語話者は受験不可（ことみさんは対象）。",
+ keywords:["英語『で』学ぶ","応用言語学・地域研究","9つの研究コース"],
+ tsunagi:"「英語が得意」だけでは弱いです。英語を使って何を探究したいか（言語学／特定地域／通訳翻訳など）を一つ決めて語りましょう。"},
+{u:"明治学院大学(国際)",
+ rinen:"建学の精神は「キリスト教による人格教育」。創設者ヘボンの精神に由来する教育理念「Do for Others（他者への貢献）」を掲げる。",
+ motomeru:["人間や社会に対する関心と探求心に富む人","自分の考えや意見を明確に表現できる人","社会に貢献する意欲のある人／グローバルな社会で将来を考えたい人","他の国の人々と共に考え、共に働くことに喜びを見出せる人"],
+ fuudo:"横浜（戸塚）／白金キャンパス。国際交流・ボランティア・キャリア教育に注力。※国際B（語学力枠）は第一志望・入学確約が条件。",
+ keywords:["Do for Others（他者への貢献）","社会貢献","共に考え共に働く"],
+ tsunagi:"「Do for Others」と、留学中に他者へ貢献・協働した体験を直結させると好印象。第一志望である理由も明確に（入学確約の入試のため）。"},
+{u:"明治大学(法)",
+ rinen:"明治大学の建学の精神は「権利自由」「独立自治」、理念は「個を強くする大学」。法学部の教育理念は「人間性・国際性に裏打ちされたリーガル・マインドの育成」で、個人の尊厳・他者への寛容・他者との共生を核とする。",
+ motomeru:["自律心を持ち、自ら学ぶ意欲のある人","社会への関心を持ち、広い視野から事象を探求する人","他者への寛容な精神を持ち、共生を目指せる人／論理的に考えられる人","異文化交流について理解のある人"],
+ fuudo:"少人数の討論・プレゼンを繰り返す学生主体の学び。駿河台／和泉。※海外就学者入試は小論文(1200〜1600字)＋プレゼンテーション＋口頭試問。",
+ keywords:["権利自由・独立自治","リーガル・マインド","他者への寛容と共生","個を強くする"],
+ tsunagi:"米国でルール・権利・多様性について考えた経験を、法学で深めたい問いにつなげましょう。プレゼンは法学部の学びそのものなので堂々と。"},
+{u:"明治大学(政経)",
+ rinen:"明治大学の建学の精神「権利自由」「独立自治」「個を強くする」を共有。政治経済学部のグローバル型入試は「高度な語学力と高い意識、柔軟な思考力を持つ学生」を求め、国際社会のリーダー育成を掲げる。",
+ motomeru:["世界の課題に関心を持ち、自立した『個』として専門能力を発揮したい人","柔軟な思考力で、変革を推進できる人","政治と経済を横断的に学び国際社会で活躍したい人"],
+ fuudo:"ダブルディグリーなど留学促進プログラムが充実。総合問題（日本語・記述式）＋口頭試問で選考。",
+ keywords:["国際社会のリーダー","柔軟な思考","政治と経済の融合"],
+ tsunagi:"関心のある政治・経済の問題＋留学で得た国際的視点を、将来像までつなげて語ると一貫します。"},
+{u:"立教大学(経営)",
+ rinen:"立教の使命は「キリスト教に基づいて人格を陶冶し、文化の進展に寄与する」。自由を重んじる学風。",
+ motomeru:["異なる文化・性別・障がい等への偏見が少なく、多様な背景の人と協働できる素地のある人","経営学・リーダーシップ教育に興味関心があり、学問的に探求する志を持つ人"],
+ fuudo:"看板はBLP（ビジネス・リーダーシップ・プログラム）。1年からグループで企画提案・相互フィードバック。4領域(マーケ／マネジメント／会計＆ファイナンス／コミュニケーション)。国際経営学科は英語のBBL。AACSB国際認証。",
+ keywords:["リーダーシップ（権限によらない）","協働","多様性","BLP"],
+ tsunagi:"立教の言う『リーダーシップ』は立場や権限によらず周囲を動かす力。留学で周囲を巻き込んだ経験があれば、それが直結します。"}
+];
+
+/* ---- 回答フレームのレッスンを追加（模範解答に頼らない） ---- */
+INTV_LESSONS.push({t:"主要質問の回答フレーム ― 模範解答に頼らず自分の言葉で", b:`
+<p>個人的な質問は<b>「丸暗記の模範解答」を作らない</b>のが鉄則です。面接官は暗記した答えを見抜きますし、帰国生で評価されるのは<b>あなた自身の経験と視点</b>だからです。下の「型」と「要素チェック」で骨組みだけ用意し、中身は自分の言葉で話せるようにします。</p>
+<h4>すべての質問に共通する型</h4>
+<ol><li><b>結論</b>を先に（聞かれたことに一文で答える）</li><li><b>理由・背景</b>（なぜそう考えるか）</li><li><b>具体的エピソード</b>（留学・経験から1つ）</li><li><b>大学との接続</b>（だから本学の◯◯で学びたい）</li></ol>
+<div class="pt"><b>「大学研究」タブと必ずセットで</b>：④の接続は、各大学の理念・求める学生像（→「大学研究」タブ）と自分の経験を結ぶと一気に説得力が出ます。例：上智なら「他者のために、他者とともに」と、自分が誰かのために動いた経験。</div>
+<h4>主要質問の要素チェック＆「型を示す例」</h4>
+<p><b>① 志望理由（なぜ本学・本学部か）</b><br>要素：きっかけ／関心テーマ／その大学だけの理由（科目・ゼミ・理念）／将来像</p>
+<div class="ex"><b>型を示す例（必ず自分の内容に置き換える）</b>：「貴学の総合グローバル学部を志望します。米国留学中に◯◯という課題に触れ、国際関係と地域研究の両面から学べる点に惹かれました。『他者のために』の精神のもと、将来は△△として貢献したいからです。」</div>
+<p><b>② 長所・自己PR</b><br>要素：長所を一語 → それを示す具体的な行動・成果 → 大学でどう生かすか。短所は「自覚＋改善の努力」をセットで。</p>
+<p><b>③ 留学で学んだこと</b><br>要素：「多様性」などの抽象論で止めない → 自分だからこその出来事と、そこで考えたこと。</p>
+<p><b>④ 将来像</b><br>要素：方向性（断定しすぎない）→ その第一歩としてこの学部で学びたいこと、で締める。</p>
+<div class="pt">注意：例文は<b>「形」を見るためのもの</b>です。そのまま覚えると深掘り質問（「具体的には？」）で崩れます。キーワードとエピソードだけメモして、本番は自分の言葉で話しましょう。</div>`});
+
+/* ---- 模擬面接 評価基準 ---- */
+const RATE_CRITERIA = [
+ {k:"manner", nm:"第一印象・態度・マナー", ds:"挨拶、姿勢、視線、表情、入退室"},
+ {k:"lang", nm:"日本語表現力", ds:"敬語、語彙、話し言葉が出ていないか"},
+ {k:"motive", nm:"志望動機の説得力", ds:"自分の言葉か、大学研究の深さ"},
+ {k:"qa", nm:"質問理解と応答の的確さ", ds:"結論先行、質問とのかみ合い、長さ"},
+ {k:"depth", nm:"内容の具体性・深さ", ds:"エピソード、考える姿勢、独自の視点"}
+];
+/* ================= 状態管理 ================= */
+const KEY = "kotomiNavi_v1";
+let S = load();
+function load(){
+  try{ const d = JSON.parse(localStorage.getItem(KEY)); if(d) return d; }catch(e){}
+  return {studyLog:[], toefl:[], essays:[], qa:[], mocks:[], lessons:{}, tasks:{}, events:[], plan:{}};
+}
+function save(){ localStorage.setItem(KEY, JSON.stringify(S)); if(typeof scheduleSyncPush==="function") scheduleSyncPush(); }
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+function esc(s){ return (s||"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function today(){ const d=new Date(); return d.toISOString().slice(0,10); }
+function fmtD(s){ const d=new Date(s+"T00:00"); return `${d.getMonth()+1}/${d.getDate()}(${"日月火水木金土"[d.getDay()]})`; }
+function daysTo(s){ return Math.ceil((new Date(s+"T00:00") - new Date(today()+"T00:00"))/86400000); }
+function addStudy(d,subj,min,memo){ S.studyLog.push({d,subj,min:+min,memo}); }
+
+/* ================= ナビゲーション ================= */
+document.querySelectorAll(".navbtn").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll(".navbtn").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active");
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("show"));
+  document.getElementById("page-"+b.dataset.page).classList.add("show");
+  renderAll();
+}));
+document.querySelectorAll(".subtabs").forEach(g=>g.querySelectorAll(".subtab").forEach(t=>t.addEventListener("click",()=>{
+  g.querySelectorAll(".subtab").forEach(x=>x.classList.remove("active"));
+  t.classList.add("active");
+  g.parentElement.querySelectorAll(".subpage").forEach(p=>p.classList.remove("show"));
+  document.getElementById("sub-"+t.dataset.sub).classList.add("show");
+})));
+
+/* ================= ダッシュボード ================= */
+function allEvents(){ return [...BASE_EVENTS, ...S.events].sort((a,b)=>a.d.localeCompare(b.d)); }
+function renderDash(){
+  const d = new Date();
+  document.getElementById("todayLabel").textContent = `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（${"日月火水木金土"[d.getDay()]}）`;
+  const up = allEvents().filter(e=>daysTo(e.d)>=0).slice(0,4);
+  document.getElementById("cdGrid").innerHTML = up.map(e=>{
+    const n = daysTo(e.d);
+    const cls = n<=7?"urgent":n<=21?"soon":"";
+    return `<div class="card cdcard ${cls}"><div class="muted">${fmtD(e.d)}・${e.t||"予定"}</div><div style="font-weight:600;font-size:13.5px;min-height:40px">${esc(e.l)}</div><div class="days">${n===0?"今日":"あと"+n+"日"}</div></div>`;
+  }).join("") || '<div class="empty">予定がありません</div>';
+  document.getElementById("dashGreeting").textContent = "今日もこつこつ。合格は毎日の積み重ねから。";
+
+  // TOEFL card
+  const tf = [...S.toefl].sort((a,b)=>a.d.localeCompare(b.d));
+  const last = tf[tf.length-1];
+  let h = "";
+  if(last){
+    const tot = last.r+last.l+last.s+last.w;
+    const pct = Math.min(100, tot/90*100);
+    h = `<div class="kpi">${tot}<small> /120（${fmtD(last.d)}・${last.type}）</small></div>
+    <div class="bar"><i style="width:${pct}%;background:var(--toefl)"></i></div>
+    <div class="muted">目標90まで ${tot>=90?"達成！🎉":"あと"+(90-tot)+"点"}　${weakText(last)}</div>`;
+  } else h = `<div class="empty">スコア未記録。6/6の結果が出たらTOEFLタブで記録してください。</div>`;
+  document.getElementById("dashToefl").innerHTML = h;
+
+  // Essay card
+  const m = today().slice(0,7);
+  const em = S.essays.filter(e=>e.d.slice(0,7)===m).length;
+  const lessonsDone = ESSAY_LESSONS.filter((_,i)=>S.lessons["e"+i]).length;
+  document.getElementById("dashEssay").innerHTML =
+    `<div class="kpi">${S.essays.length}<small> 本（今月 ${em} 本）</small></div>
+     <div class="muted" style="margin-top:6px">入門レッスン ${lessonsDone}/${ESSAY_LESSONS.length} 完了</div>
+     <div class="bar"><i style="width:${lessonsDone/ESSAY_LESSONS.length*100}%;background:var(--essay)"></i></div>`;
+
+  // Interview card
+  const qaDone = S.qa.filter(q=>q.status==="完成").length;
+  const il = INTV_LESSONS.filter((_,i)=>S.lessons["i"+i]).length;
+  const avg = S.mocks.length? (S.mocks.reduce((s,x)=>s+x.avg,0)/S.mocks.length).toFixed(1) : "—";
+  document.getElementById("dashIntv").innerHTML =
+    `<div class="kpi">${qaDone}<small> 問答 完成（全${S.qa.length}件）</small></div>
+     <div class="muted" style="margin-top:6px">レッスン ${il}/${INTV_LESSONS.length}　模擬面接 ${S.mocks.length}回（平均 ${avg}/5）</div>
+     <div class="bar"><i style="width:${il/INTV_LESSONS.length*100}%;background:var(--intv)"></i></div>`;
+
+  // Week summary
+  const monday = new Date(); monday.setDate(monday.getDate() - (monday.getDay()+6)%7);
+  const mstr = monday.toISOString().slice(0,10);
+  const wk = {TOEFL:0,小論文:0,面接:0};
+  S.studyLog.filter(l=>l.d>=mstr).forEach(l=>{ if(wk[l.subj]!=null) wk[l.subj]+=l.min; });
+  const mx = Math.max(60, wk.TOEFL, wk.小論文, wk.面接);
+  const col = {TOEFL:"var(--toefl)",小論文:"var(--essay)",面接:"var(--intv)"};
+  document.getElementById("dashWeek").innerHTML =
+    Object.keys(wk).map(k=>`<div class="hbar"><span class="lbl">${k}</span><div class="bar"><i style="width:${wk[k]/mx*100}%;background:${col[k]}"></i></div><span class="val">${Math.floor(wk[k]/60)}h${wk[k]%60}m</span></div>`).join("")
+    + `<p class="muted" style="margin-top:8px">月曜起算。学習ログ（TOEFLタブ）・エディタ練習・模擬面接が自動集計されます。</p>`;
+
+  // Month tasks
+  const tk = MONTH_TASKS[m]||[];
+  const pend = tk.map((t,i)=>({t,k:m+"_"+i})).filter(x=>!S.tasks[x.k]);
+  document.getElementById("dashTasks").innerHTML = pend.length?
+    pend.slice(0,8).map(x=>`<label class="chk"><input type="checkbox" onchange="toggleTask('${x.k}')"><span>${esc(x.t)}</span></label>`).join("")
+    : '<div class="empty">今月のタスクはすべて完了です 🎉</div>';
+}
+function weakText(t){
+  const arr=[["R",t.r],["L",t.l],["S",t.s],["W",t.w]].sort((a,b)=>a[1]-b[1]);
+  return `弱点：${arr[0][0]}(${arr[0][1]}) → 教材ライブラリで重点対策`;
+}
+
+/* ================= スケジュール ================= */
+function renderSched(){
+  const evs = allEvents();
+  const nextIdx = evs.findIndex(e=>daysTo(e.d)>=0);
+  document.getElementById("evtable").innerHTML =
+   "<tr><th>日付</th><th>残り</th><th>予定</th><th>種類</th><th></th></tr>" +
+   evs.map((e,i)=>{
+    const n = daysTo(e.d);
+    const cls = n<0?"past":(i===nextIdx?"next":"");
+    const tagc = {締切:"red",試験:"amber",出願:"blue",発表:"green",TOEFL:"blue"}[e.t]||"purple";
+    const del = e.custom?`<button class="del" onclick="delEvent('${e.id}')">削除</button>`:"";
+    return `<tr class="${cls}"><td style="white-space:nowrap">${fmtD(e.d)}</td><td>${n<0?"終了":n===0?"今日":"あと"+n+"日"}</td><td>${esc(e.l)}</td><td><span class="tag ${tagc}">${e.t||"予定"}</span></td><td>${del}</td></tr>`;
+   }).join("");
+  // month tasks
+  const cm = today().slice(0,7);
+  document.getElementById("taskList").innerHTML = Object.keys(MONTH_TASKS).map(m=>{
+    const items = MONTH_TASKS[m];
+    const done = items.filter((_,i)=>S.tasks[m+"_"+i]).length;
+    const open = m===cm ? "open":"";
+    const cur = m===cm ? "current":"";
+    return `<div class="monthblock ${open} ${cur}"><button onclick="this.parentElement.classList.toggle('open')">${m.replace("-","年")}月　<span class="muted">${done}/${items.length} 完了</span></button><div class="items">${
+      items.map((t,i)=>{const k=m+"_"+i;const c=S.tasks[k]?"checked":"";return `<label class="chk ${S.tasks[k]?'done':''}"><input type="checkbox" ${c} onchange="toggleTask('${k}')"><span>${esc(t)}</span></label>`;}).join("")
+    }</div></div>`;
+  }).join("");
+}
+function toggleTask(k){ S.tasks[k]=!S.tasks[k]; save(); renderAll(); }
+function addEvent(){
+  const d=document.getElementById("evDate").value, l=document.getElementById("evLabel").value.trim();
+  if(!d||!l) return alert("日付と内容を入力してください");
+  S.events.push({d,l,t:"予定",custom:true,id:uid()}); save();
+  document.getElementById("evLabel").value=""; renderAll();
+}
+function delEvent(id){ S.events=S.events.filter(e=>e.id!==id); save(); renderAll(); }
+
+/* ================= TOEFL ================= */
+function renderToefl(){
+  const tf=[...S.toefl].sort((a,b)=>a.d.localeCompare(b.d));
+  const last=tf[tf.length-1];
+  document.getElementById("toeflLatest").innerHTML = last?
+    `<div class="kpi">${last.r+last.l+last.s+last.w}<small> /120</small></div><div class="muted">${fmtD(last.d)}・${last.type}　目標90${last.r+last.l+last.s+last.w>=90?"　達成！🎉":""}</div>`
+    :'<div class="empty">まだ記録がありません</div>';
+  document.getElementById("toeflSections").innerHTML = last?
+    [["Reading",last.r],["Listening",last.l],["Speaking",last.s],["Writing",last.w]].map(([k,v])=>
+      `<div class="hbar"><span class="lbl">${k}</span><div class="bar"><i style="width:${v/30*100}%;background:${v<=Math.min(last.r,last.l,last.s,last.w)?"var(--danger)":"var(--toefl)"}"></i></div><span class="val">${v}/30</span></div>`).join("")
+      +`<p class="muted" style="margin-top:6px">赤＝最も低いセクション。ここに学習時間を集中。</p>`
+    :'<div class="empty">—</div>';
+  document.getElementById("toeflChart").innerHTML = tf.length?
+    tf.slice(-8).map(t=>{const tot=t.r+t.l+t.s+t.w;return `<div class="hbar"><span class="lbl">${fmtD(t.d)}</span><div class="bar"><i style="width:${tot/120*100}%;background:${t.type==="本番"?"var(--toefl)":"#93b4f5"}"></i></div><span class="val">${tot}</span></div>`;}).join("")
+      +`<p class="muted" style="margin-top:6px">濃い色＝本番／薄い色＝模試。90のライン突破が目標。</p>`
+    :'<div class="empty">—</div>';
+  document.getElementById("tfTable").innerHTML = tf.length?
+    "<tr><th>日付</th><th>種類</th><th>R</th><th>L</th><th>S</th><th>W</th><th>合計</th><th></th></tr>"+
+    [...tf].reverse().map((t,i)=>`<tr><td>${fmtD(t.d)}</td><td>${t.type}</td><td>${t.r}</td><td>${t.l}</td><td>${t.s}</td><td>${t.w}</td><td><b>${t.r+t.l+t.s+t.w}</b></td><td><button class="del" onclick="delToefl('${t.id}')">削除</button></td></tr>`).join("") : "";
+  const lg=[...S.studyLog].sort((a,b)=>b.d.localeCompare(a.d)).slice(0,15);
+  document.getElementById("lgTable").innerHTML = lg.length?
+    "<tr><th>日付</th><th>科目</th><th>分</th><th>内容</th></tr>"+
+    lg.map(l=>`<tr><td>${fmtD(l.d)}</td><td>${l.subj}</td><td>${l.min}</td><td>${esc(l.memo||"")}</td></tr>`).join("") : '<div class="empty"></div>';
+}
+function addToefl(){
+  const g=id=>document.getElementById(id);
+  const d=g("tfDate").value, r=+g("tfR").value, l=+g("tfL").value, s=+g("tfS").value, w=+g("tfW").value;
+  if(!d||[r,l,s,w].some(x=>isNaN(x)||x<0||x>30)) return alert("日付と各セクション(0〜30)を入力してください");
+  S.toefl.push({id:uid(),d,type:g("tfType").value,r,l,s,w}); save(); renderAll();
+}
+function delToefl(id){ S.toefl=S.toefl.filter(t=>t.id!==id); save(); renderAll(); }
+function addLog(){
+  const g=id=>document.getElementById(id);
+  if(!g("lgDate").value||!g("lgMin").value) return alert("日付と分を入力してください");
+  addStudy(g("lgDate").value,g("lgSubj").value,g("lgMin").value,g("lgMemo").value); save();
+  g("lgMemo").value=""; renderAll();
+}
+
+/* ================= レッスン共通 ================= */
+function renderLessons(elId, lessons, prefix){
+  document.getElementById(elId).innerHTML = lessons.map((L,i)=>{
+    const done=S.lessons[prefix+i];
+    return `<div class="lesson ${done?'done':''}" id="ls-${prefix}${i}">
+      <button class="head" onclick="this.parentElement.classList.toggle('open')"><span class="num">${done?"✓":i+1}</span>${esc(L.t)}<span class="caret">▶</span></button>
+      <div class="body">${L.b}<button class="btn sm ${done?'ghost':''} donebtn" onclick="toggleLesson('${prefix}${i}')">${done?"完了を取り消す":"このレッスンを完了にする ✓"}</button></div>
+    </div>`;
+  }).join("");
+}
+function toggleLesson(k){ S.lessons[k]=!S.lessons[k]; save(); renderAll(); }
+
+/* ================= 小論文 ================= */
+let esTimer=null, esLeft=0, esPaused=false, esStartedAt=null, esTotalSec=0;
+function renderEssay(){
+  renderLessons("essayLessons", ESSAY_LESSONS, "e");
+  // univ selects
+  ["esUniv","hwUniv"].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el.options.length===0) el.innerHTML = UNIVS.map(u=>`<option>${u}</option>`).join("");
+  });
+  // theme bank
+  document.getElementById("themeBank").innerHTML = Object.keys(THEMES).map(u=>
+    `<div class="card" style="margin-bottom:12px"><h3>${u}</h3>${THEMES[u].map(t=>
+      `<div class="qbankq"><span>${esc(t)}</span><button class="btn essay sm" onclick="pickTheme(this)" data-t="${esc(t)}" data-u="${u}">この題で書く</button></div>`).join("")}</div>`).join("");
+  // 参考サイト（リンク集）
+  document.getElementById("essayRefs").innerHTML =
+    `<div class="notice">リンクはブラウザで開きます。各カテゴリの色付きタグは<b>「いつ使うか（フェーズ）」</b>＝月別スケジュールと対応します。<span class="tag amber">★中核</span>は最優先の必読、<span class="tag green">公式</span>は大学公式（過去問・要項）です。まず<b>①②</b>を6月中に通読し、③は各校の対策期に開きます。</div>`
+    + RESOURCES.map(g=>`<div class="card" style="margin-bottom:14px">
+        <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">${esc(g.cat)} <span class="tag ${g.color}">${esc(g.when)}</span></h3>
+        ${g.items.map(it=>`<div class="qbankq" style="align-items:flex-start">
+          <span><a href="${it.u}" target="_blank" rel="noopener" style="font-weight:600;color:var(--toefl);text-decoration:none">${esc(it.n)}</a>
+          ${it.c?'<span class="tag amber" style="margin-left:6px">★中核</span>':''}${it.o?'<span class="tag green" style="margin-left:4px">公式</span>':''}
+          <br><small class="muted">${esc(it.note)}</small></span>
+        </div>`).join("")}
+      </div>`).join("");
+
+  // history
+  const es=[...S.essays].sort((a,b)=>b.d.localeCompare(a.d));
+  document.getElementById("essayHist").innerHTML = es.length? es.map(e=>
+    `<div class="hist" id="h-${e.id}">
+      <div class="head" onclick="document.getElementById('h-${e.id}').classList.toggle('open')">
+        <b>${fmtD(e.d)}</b><span class="tag ${e.mode==='手書き'?'amber':'blue'}">${e.mode}</span><span class="tag">${esc(e.univ)}</span>
+        <span style="flex:1">${esc(e.theme)}</span><span class="muted">${e.chars}字・${e.min}分</span>
+      </div>
+      <div class="body">
+        ${e.text?`<div class="essayview">${esc(e.text)}</div>`:'<p class="muted">（手書き練習・本文なし）</p>'}
+        <div class="grid cols2" style="margin-top:10px">
+          <div><label class="f">自己評価メモ（書けたこと・詰まったこと）</label><textarea rows="2" onchange="essayNote('${e.id}','review',this.value)">${esc(e.review||"")}</textarea></div>
+          <div><label class="f">添削・講評（塾や先生から）</label><textarea rows="2" onchange="essayNote('${e.id}','feedback',this.value)">${esc(e.feedback||"")}</textarea></div>
+        </div>
+        <button class="del" style="margin-top:6px" onclick="delEssay('${e.id}')">この記録を削除</button>
+      </div>
+    </div>`).join("") : '<div class="empty">まだ練習記録がありません。「練習する」タブから始めましょう。</div>';
+}
+function pickTheme(btn){
+  document.getElementById("esTheme").value = btn.dataset.t;
+  document.getElementById("esUniv").value = btn.dataset.u==="共通"?"共通":btn.dataset.u;
+  document.querySelector('[data-group="essay"] [data-sub="ewrite"]').click();
+  window.scrollTo(0,0);
+}
+function essayStart(){
+  const th=document.getElementById("esTheme").value.trim();
+  if(!th) return alert("テーマを入力するか、テーマバンクから選んでください");
+  esTotalSec = +document.getElementById("esMin").value*60;
+  esLeft = esTotalSec; esPaused=false; esStartedAt=today();
+  document.getElementById("esTarget").textContent = document.getElementById("esChars").value;
+  const ta=document.getElementById("essayText"); ta.disabled=false; ta.value=""; ta.focus();
+  document.getElementById("esPauseBtn").disabled=false;
+  document.getElementById("esFinishBtn").disabled=false;
+  document.getElementById("esStartBtn").disabled=true;
+  clearInterval(esTimer);
+  esTimer=setInterval(()=>{
+    if(esPaused) return;
+    esLeft--;
+    const m=Math.floor(Math.abs(esLeft)/60), s=Math.abs(esLeft)%60;
+    const el=document.getElementById("essayTimer");
+    el.textContent=(esLeft<0?"-":"")+String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
+    el.classList.toggle("low", esLeft<=300);
+    if(esLeft===0) alert("時間です！見直しの時間も含めて仕上げましょう。");
+  },1000);
+  document.getElementById("essayTimer").textContent=String(esTotalSec/60).padStart(2,"0")+":00";
+}
+function essayPause(){ esPaused=!esPaused; document.getElementById("esPauseBtn").textContent=esPaused?"再開":"一時停止"; }
+function essayFinish(){
+  clearInterval(esTimer);
+  const text=document.getElementById("essayText").value;
+  const chars=text.replace(/\s/g,"").length;
+  const usedMin=Math.max(1, Math.round((esTotalSec-Math.max(esLeft,0))/60));
+  S.essays.push({id:uid(), d:esStartedAt||today(), theme:document.getElementById("esTheme").value.trim(),
+    univ:document.getElementById("esUniv").value, mode:"タイピング", min:usedMin, chars, text});
+  addStudy(esStartedAt||today(),"小論文",usedMin,"エディタ練習");
+  save();
+  document.getElementById("essayText").disabled=true;
+  document.getElementById("esStartBtn").disabled=false;
+  document.getElementById("esPauseBtn").disabled=true;
+  document.getElementById("esFinishBtn").disabled=true;
+  document.getElementById("essayTimer").textContent="--:--";
+  alert(`保存しました（${chars}字・${usedMin}分）。履歴タブで自己評価メモを書いておきましょう。`);
+  renderAll();
+  document.querySelector('[data-group="essay"] [data-sub="ehist"]').click();
+}
+document.addEventListener("input",e=>{
+  if(e.target.id==="essayText"){
+    document.getElementById("esCount").textContent = e.target.value.replace(/\s/g,"").length;
+  }
+});
+function addHandwritten(){
+  const g=id=>document.getElementById(id);
+  if(!g("hwDate").value||!g("hwTheme").value.trim()) return alert("日付とテーマを入力してください");
+  S.essays.push({id:uid(), d:g("hwDate").value, theme:g("hwTheme").value.trim(), univ:g("hwUniv").value,
+    mode:"手書き", min:+g("hwMin").value||60, chars:+g("hwChars").value||0, text:""});
+  addStudy(g("hwDate").value,"小論文",+g("hwMin").value||60,"手書き練習");
+  save(); g("hwTheme").value=""; renderAll(); alert("記録しました");
+}
+function essayNote(id,k,v){ const e=S.essays.find(x=>x.id===id); if(e){e[k]=v; save();} }
+function delEssay(id){ if(confirm("削除しますか？")){S.essays=S.essays.filter(e=>e.id!==id); save(); renderAll();} }
+
+/* ================= 面接 ================= */
+function renderIntv(){
+  renderLessons("intvLessons", INTV_LESSONS, "i");
+  const sel=document.getElementById("qaNewUniv");
+  if(sel.options.length===0) sel.innerHTML = UNIVS.map(u=>`<option>${u}</option>`).join("");
+  const fl=document.getElementById("qaFilter");
+  if(fl.options.length<=1) fl.innerHTML = '<option value="">すべて</option>'+UNIVS.map(u=>`<option>${u}</option>`).join("");
+  // bank
+  document.getElementById("qBank").innerHTML = Object.keys(QBANK).map(u=>
+    `<div class="card" style="margin-bottom:12px"><h3>${u}</h3>${QBANK[u].map(q=>{
+      const added=S.qa.some(x=>x.q===q);
+      return `<div class="qbankq"><span>${esc(q)}</span>${added?'<span class="tag green">追加済</span>':`<button class="btn intv sm" onclick="bankAdd(this)" data-q="${esc(q)}" data-u="${u}">ノートへ</button>`}</div>`;
+    }).join("")}</div>`).join("");
+  // 大学研究カード
+  document.getElementById("intvUniv").innerHTML =
+    `<div class="notice">各大学の公式アドミッションポリシー・理念に基づく「研究カード」です。面接の<b>「なぜ本学か」</b>と志望理由書の土台になります。<b>事実なので覚えてOK</b>。ただし語るときは自分の経験と必ず結びつけてください（→入門レッスンの「回答フレーム」を参照）。</div>`
+    + UNIV_PROFILES.map(p=>`<div class="card" style="margin-bottom:14px">
+        <h3>${esc(p.u)}</h3>
+        <p style="margin:6px 0"><b>理念・教育の柱</b><br><span class="muted">${esc(p.rinen)}</span></p>
+        <p style="margin:6px 0"><b>求める学生像</b></p>
+        <ul style="margin:4px 0 8px 20px">${p.motomeru.map(m=>`<li style="margin-bottom:3px">${esc(m)}</li>`).join("")}</ul>
+        <p style="margin:6px 0"><b>校風・学びの特色</b><br><span class="muted">${esc(p.fuudo)}</span></p>
+        <p style="margin:6px 0"><b>志望理由に使えるキーワード</b><br>${p.keywords.map(k=>`<span class="tag purple" style="margin:2px 4px 2px 0">${esc(k)}</span>`).join("")}</p>
+        <div style="background:#fdf6e7;border-left:4px solid var(--essay);border-radius:0 8px 8px 0;padding:9px 13px;margin-top:8px;font-size:13.5px">${esc(p.tsunagi)}</div>
+      </div>`).join("");
+  // 参考サイト（面接）
+  document.getElementById("intvRefs").innerHTML =
+    `<div class="notice">リンクはブラウザで開きます。色付きタグは<b>「いつ使うか（フェーズ）」</b>＝月別スケジュールに対応します。<span class="tag amber">★中核</span>は最優先、<span class="tag green">公式</span>は大学公式です。模擬面接は元先生に実践でお願いし、ここでは<b>質問の引き出しと所作の知識</b>を仕込みます。質問バンクには大学別の頻出質問を追加済みです。</div>`
+    + INTV_RESOURCES.map(g=>`<div class="card" style="margin-bottom:14px">
+        <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">${esc(g.cat)} <span class="tag ${g.color}">${esc(g.when)}</span></h3>
+        ${g.items.map(it=>`<div class="qbankq" style="align-items:flex-start">
+          <span><a href="${it.u}" target="_blank" rel="noopener" style="font-weight:600;color:var(--toefl);text-decoration:none">${esc(it.n)}</a>
+          ${it.c?'<span class="tag amber" style="margin-left:6px">★中核</span>':''}${it.o?'<span class="tag green" style="margin-left:4px">公式</span>':''}
+          <br><small class="muted">${esc(it.note)}</small></span>
+        </div>`).join("")}
+      </div>`).join("");
+  renderQA();
+}
+function renderQA(){
+  const f=document.getElementById("qaFilter").value;
+  const list=S.qa.filter(q=>!f||q.univ===f);
+  const stc={"未着手":"red","作成中":"amber","完成":"green"};
+  document.getElementById("qaList").innerHTML = list.length? list.map(q=>
+    `<div class="qaitem">
+      <div class="q"><span class="tag">${esc(q.univ)}</span>${esc(q.q)}
+        <select class="right" onchange="qaStatus('${q.id}',this.value)" style="font-size:12px;padding:3px 6px">
+          ${["未着手","作成中","完成"].map(s=>`<option ${q.status===s?"selected":""}>${s}</option>`).join("")}
+        </select><span class="tag ${stc[q.status]}">${q.status}</span>
+        <button class="del" onclick="delQA('${q.id}')">削除</button></div>
+      <textarea rows="2" placeholder="骨子をメモ：キーワード3つ＋エピソード1つ（丸暗記の文章は書かない）" onchange="qaAnswer('${q.id}',this.value)">${esc(q.a||"")}</textarea>
+    </div>`).join("") : '<div class="empty">まだ問答がありません。質問バンクから追加しましょう。</div>';
+}
+function addQA(){
+  const q=document.getElementById("qaNewQ").value.trim();
+  if(!q) return alert("質問を入力してください");
+  S.qa.push({id:uid(), q, univ:document.getElementById("qaNewUniv").value, a:"", status:"未着手"});
+  save(); document.getElementById("qaNewQ").value=""; renderIntv();
+}
+function bankAdd(btn){
+  S.qa.push({id:uid(), q:btn.dataset.q, univ:btn.dataset.u, a:"", status:"未着手"});
+  save(); renderIntv();
+}
+function qaAnswer(id,v){ const q=S.qa.find(x=>x.id===id); if(q){q.a=v; if(q.status==="未着手"&&v.trim())q.status="作成中"; save();} }
+function qaStatus(id,v){ const q=S.qa.find(x=>x.id===id); if(q){q.status=v; save(); renderQA();} }
+function delQA(id){ S.qa=S.qa.filter(q=>q.id!==id); save(); renderIntv(); }
+
+/* ================= 模擬面接 ================= */
+let mock={qs:[],i:0,t0:null,timer:null,univ:""};
+function renderMock(){
+  const sel=document.getElementById("mockUniv");
+  if(sel.options.length===0) sel.innerHTML = UNIVS.filter(u=>u!=="共通").map(u=>`<option>${u}</option>`).join("");
+  const hist=[...S.mocks].sort((a,b)=>b.d.localeCompare(a.d));
+  document.getElementById("mockHist").innerHTML = hist.length? hist.map(s=>
+    `<div class="hist" onclick="this.classList.toggle('open')">
+      <div class="head"><b>${fmtD(s.d)}</b><span class="tag">${esc(s.univ)}</span><span class="muted">${s.n}問・${s.min}分</span>
+      <span class="right" style="font-weight:700;color:var(--mock)">平均 ${s.avg}/5</span></div>
+      <div class="body">
+        ${RATE_CRITERIA.map(c=>`<div class="hbar"><span class="lbl" style="width:170px">${c.nm}</span><div class="bar"><i style="width:${(s.ratings[c.k]||0)/5*100}%;background:var(--mock)"></i></div><span class="val">${s.ratings[c.k]||"-"}/5</span></div>`).join("")}
+        ${s.good?`<p style="margin-top:8px"><b>よかった点：</b>${esc(s.good)}</p>`:""}
+        ${s.improve?`<p><b>改善点：</b>${esc(s.improve)}</p>`:""}
+        ${s.comment?`<p><b>総評：</b>${esc(s.comment)}</p>`:""}
+      </div></div>`).join("") : '<div class="empty">まだ記録がありません。</div>';
+}
+function mockStart(){
+  const univ=document.getElementById("mockUniv").value;
+  const n=+document.getElementById("mockN").value;
+  const useCommon=document.getElementById("mockCommon").value==="1";
+  let pool=[...(QBANK[univ]||[])];
+  if(useCommon) pool=pool.concat(QBANK["共通"]);
+  pool=pool.concat(S.qa.filter(q=>q.status==="完成"&&(q.univ===univ||q.univ==="共通")).map(q=>q.q));
+  pool=[...new Set(pool)];
+  for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
+  mock={qs:pool.slice(0,n), i:0, t0:Date.now(), univ, timer:null};
+  if(!mock.qs.length) return alert("出題できる質問がありません");
+  document.getElementById("mockSetup").style.display="none";
+  document.getElementById("mockStage").style.display="block";
+  document.getElementById("mockUnivLabel").textContent=univ;
+  mock.timer=setInterval(()=>{
+    const s=Math.floor((Date.now()-mock.t0)/1000);
+    document.getElementById("mockTimer").textContent=String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
+  },1000);
+  mockShow();
+}
+function mockShow(){
+  document.getElementById("mockProg").textContent=`質問 ${mock.i+1} / ${mock.qs.length}`;
+  document.getElementById("mockQ").textContent=mock.qs[mock.i];
+}
+function mockNext(){ if(mock.i<mock.qs.length-1){mock.i++; mockShow();} else mockEnd(); }
+function mockPrev(){ if(mock.i>0){mock.i--; mockShow();} }
+function mockEnd(){
+  clearInterval(mock.timer);
+  mock.min=Math.max(1,Math.round((Date.now()-mock.t0)/60000));
+  document.getElementById("mockStage").style.display="none";
+  document.getElementById("mockRate").style.display="block";
+  document.getElementById("rateRows").innerHTML = RATE_CRITERIA.map(c=>
+    `<div class="raterow"><div><div class="nm">${c.nm}</div><div class="ds">${c.ds}</div></div>
+     <div class="rate" data-k="${c.k}">${[1,2,3,4,5].map(v=>`<button onclick="ratePick(this,'${c.k}',${v})">${v}</button>`).join("")}</div></div>`).join("");
+  mock.ratings={};
+}
+function ratePick(btn,k,v){
+  mock.ratings[k]=v;
+  btn.parentElement.querySelectorAll("button").forEach(b=>b.classList.remove("sel"));
+  btn.classList.add("sel");
+}
+function mockSave(){
+  const keys=RATE_CRITERIA.map(c=>c.k);
+  if(keys.some(k=>!mock.ratings[k])) return alert("5つの評価をすべて選んでください");
+  const avg=(keys.reduce((s,k)=>s+mock.ratings[k],0)/keys.length).toFixed(1);
+  S.mocks.push({d:today(), univ:mock.univ, n:mock.qs.length, min:mock.min, ratings:mock.ratings, avg:+avg,
+    good:document.getElementById("rateGood").value, improve:document.getElementById("rateImprove").value, comment:document.getElementById("rateComment").value});
+  addStudy(today(),"面接",mock.min,"模擬面接("+mock.univ+")");
+  save(); mockReset(); renderAll();
+  alert("お疲れさまでした！記録を保存しました。");
+}
+function mockDiscard(){ if(confirm("保存せず破棄しますか？")) mockReset(); }
+function mockReset(){
+  document.getElementById("mockRate").style.display="none";
+  document.getElementById("mockStage").style.display="none";
+  document.getElementById("mockSetup").style.display="block";
+  ["rateGood","rateImprove","rateComment"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("mockTimer").textContent="00:00";
+}
+
+/* ================= 日課プラン ================= */
+const PLAN_COLORS = {TOEFL:"var(--toefl)",小論文:"var(--essay)",面接:"var(--intv)",復習:"#8895a8",休息:"#8895a8",本番:"var(--mock)"};
+const PLAN_WEEK1 = {
+"2026-06-08":[
+ {s:"TOEFL",t:"セットアップ＆現状分析",i:["ETSアカウントで6/6結果を確認（未発表なら4月スコアで仮分析）","TOEFLタブにスコアを記録→「セクション別」で弱点を確認","7月の受験日を予約→「スケジュール」に予定として追加","単語帳（TOEFL3800等）Rank1を50語"]},
+ {s:"小論文",t:"入門レッスン①",i:["小論文レッスン1・2を読む（読んだら完了チェック）","レッスン3の骨組みテンプレートをノートに書き写す","新聞の社説1本を200字で要約（手書き）"]},
+ {s:"面接",t:"入門レッスン①＋素材づくり",i:["面接レッスン1・2を読む","留学エピソードを10個書き出し→想定問答ノートに自由質問として追加","共通質問#1「自己紹介を1分で」の骨子を作る"]}],
+"2026-06-09":[
+ {s:"TOEFL",t:"Reading強化",i:["単語Rank1の復習＋新規50語","リーディング模試1セット→学習ログに記録","間違い分析：根拠となる文に線を引き直す（30分）"]},
+ {s:"小論文",t:"入門レッスン②＋型の練習",i:["レッスン3・4を読む","テーマバンク『共通』の3テーマで構成メモだけ作る（1本10分）","社説1本要約"]},
+ {s:"面接",t:"骨子づくり",i:["レッスン3（答え方の型）を読む","共通質問#2「志望理由」#3「留学で学んだこと」の骨子","Macで録画：1分自己紹介を話してみる"]}],
+"2026-06-10":[
+ {s:"TOEFL",t:"教材取り込み＋Listening",i:["参考書4冊の画像をフォルダに入れてClaudeに連絡（教材ライブラリ化）","リスニング模試1セット→記録","間違えた音声でシャドーイング20分"]},
+ {s:"小論文",t:"初めてのエディタ練習",i:["レッスン5・6を読む","エディタ：テーマバンク『共通』#1「留学経験」を600字・40分で","保存後、自己評価メモを書く"]},
+ {s:"面接",t:"入門レッスン完了",i:["レッスン4・5を読む（これで全レッスン完了）","共通質問#4〜#6の骨子","ニュースチェック15分（経済1本・国際1本）"]}],
+"2026-06-11":[
+ {s:"TOEFL",t:"Speaking強化",i:["単語Rank1完了→Rank2へ","SpeakingタスクのテンプレをノートにまとめS課題を録音3本","録音を聞き直して言い直し練習"]},
+ {s:"小論文",t:"大学別傾向＋800字",i:["レッスン7（大学別傾向）を読む","エディタ：『共通』#2「日米教育の違い」800字・60分","社説1本要約"]},
+ {s:"面接",t:"最重要質問に着手",i:["共通質問#7〜#9の骨子","「なぜ帰国して日本の大学か」を文章でA4半分に書き出す（最重要・志望理由書にも使う）","録画：志望理由を1分で"]}],
+"2026-06-12":[
+ {s:"TOEFL",t:"スコア確定＆弱点プラン",i:["6/6スコア発表（目安）→TOEFLタブに記録","弱点セクションを確定し、明日から毎日45分の集中枠に","Writing：Integratedのテンプレ確認＋1本書く"]},
+ {s:"小論文",t:"社会科学テーマ",i:["エディタ：『横浜市立』#1「多文化共生」800字・60分","昨日の答案を音読→誤字・話し言葉をチェックして修正"]},
+ {s:"面接",t:"大学別質問へ",i:["共通質問#10〜#12の骨子（共通12問完成！）","横国質問#1「なぜ経営学を学びたいか」に着手","ニュース15分"]}],
+"2026-06-13":[
+ {s:"TOEFL",t:"模試デー",i:["模試 半回分（R＋L通し）→記録","間違い直しノートを作る（なぜ間違えたか1行ずつ）"]},
+ {s:"小論文",t:"週の振り返り",i:["今週の答案を読み返し、一番弱い1本を書き直す","家族に読んでもらい感想をもらう"]},
+ {s:"面接",t:"通し練習",i:["今週作った骨子を口に出して通し練習（録画）","元先生に模擬面接の定例日程を打診（週1回・日曜推奨）"]}],
+"2026-06-14":[
+ {s:"復習",t:"週次レビュー",i:["単語の総復習（今週の100語）","小論文レッスン1〜7の要点をノート1枚にまとめる"]},
+ {s:"面接",t:"模擬面接 第1回",i:["元先生と模擬面接モードで実施（来られない場合は家族相手にリハーサル）","評価シートの改善点を想定問答ノートに反映"]},
+ {s:"休息",t:"日本語のシャワー",i:["軽めに：日本の本・ドキュメンタリー・ニュース番組を楽しむ","来週のプランをこの画面で確認"]}]
+};
+function dIdx(ds){ return Math.round((new Date(ds+"T00:00")-new Date("2026-06-08T00:00"))/86400000); }
+function pick(arr,n){ return arr[((n%arr.length)+arr.length)%arr.length]; }
+function planFor(ds){
+  const dow = new Date(ds+"T00:00").getDay(); // 0=日
+  const n = dIdx(ds);
+  const evToday = allEvents().filter(e=>e.d===ds);
+  const exam = evToday.find(e=>e.t==="試験");
+  const tomorrow = new Date(ds+"T00:00"); tomorrow.setDate(tomorrow.getDate()+1);
+  const tds = tomorrow.toISOString().slice(0,10);
+  const examTmr = allEvents().find(e=>e.d===tds && e.t==="試験");
+  let note = evToday.length? "この日の予定：" + evToday.map(e=>e.l).join("／") : "";
+  if(examTmr) note += (note?"　":"") + "★明日は本番（" + examTmr.l + "）。夜は詰め込まず早く寝る。";
+
+  if(exam) return {phase:"本番日", note, blocks:[
+    {s:"本番",t:"試験当日：" + exam.l, i:["持ち物：受験票・筆記用具・時計・上着（会場は寒いことも）","会場には60分前到着。直前は新しい問題を解かない","小論文：構成メモ10分の鉄則だけ思い出す／面接：結論先行・30秒〜1分"]},
+    {s:"休息",t:"終了後",i:["お疲れさま！結果を気にせず、今日は休む","面接・小論文の出題内容を覚えているうちにメモ（次の大学の対策に使う）"]},
+    {s:"休息",t:"夜",i:["早めに就寝。明日からのプランはこの画面で確認"]}]};
+
+  if(PLAN_WEEK1[ds]) return {phase:"第1週：基礎固め（6/8〜6/14）", note, blocks:PLAN_WEEK1[ds]};
+
+  const essayT = u => { const p = THEMES[u]||THEMES["共通"]; return "テーマバンク『" + u.split("(")[0] + "』：「" + pick(p, Math.floor(n/2)).slice(0,30) + "…」"; };
+  const intvQ = u => { const p = QBANK[u]||QBANK["共通"]; return "『" + u.split("(")[0] + "』質問 #" + ((Math.floor(n/2)%p.length)+1) + "「" + pick(p, Math.floor(n/2)).slice(0,24) + "…」"; };
+
+  /* 日曜は共通パターン */
+  if(dow===0) return {phase: phaseName(ds), note, blocks:[
+    {s:"復習",t:"週次レビュー",i:["今週の学習ログと答案を見直す（ダッシュボードの週サマリー確認）","単語・間違い直しノートの総復習","今月のチェックリスト（スケジュール画面）の進み具合を確認"]},
+    {s:"面接",t:"模擬面接（定例）",i:["元先生と模擬面接モードで1セッション（録画する）","評価シートの改善点を想定問答ノートに反映"]},
+    {s:"休息",t:"回復",i:["夜は勉強しない。睡眠と気分転換を最優先","来週のプランをこの画面でざっと確認"]}]};
+
+  let blocks;
+  if(ds<="2026-07-19"){ /* P1 TOEFL集中期 */
+    const sec = pick(["Reading模試1セット","Listening模試1セット","Speaking 全タスク1周（録音）","Writing 2題（Integrated＋Academic Discussion）","Reading模試1セット","R＋L半回通し"], n);
+    blocks = [
+      {s:"TOEFL",t:"スコアメイク（7月本番へ）",i:["単語50語＋前日分の復習","本日のメイン："+sec+"→学習ログに記録","間違い分析30分（教材ライブラリの該当章※取込後に章指定）"]},
+      (dow===2||dow===4)?
+        {s:"小論文",t:"日本語の足腰",i:["社説1本を200字要約","前回答案の書き直し（講評・自己評価を反映）","書き言葉変換リスト（レッスン4）を音読"]}:
+        {s:"小論文",t:"エディタ実戦",i:[essayT(pick(["上智大学(総合グローバル)","共通","横浜市立大学(国際教養)"],Math.floor(n/2)))+" を800字・60分","保存→自己評価メモ","構成メモ10分を必ず先に"]},
+      (dow===2||dow===5)?
+        {s:"TOEFL",t:"夜の弱点集中",i:["弱点セクション45分（教材の該当章）","シャドーイング/音読20分","ニュース15分（日本語）"]}:
+        {s:"面接",t:"骨子づくり＋録画",i:[intvQ(pick(["横浜国立大学(経営)","上智大学(総合グローバル)","横浜市立大学(国際教養)"],Math.floor(n/3)))+" の骨子を作る","完成した骨子は録画で話す練習→ステータスを「完成」に","ニュース15分"]}
+    ];
+  } else if(ds<="2026-09-19"){ /* P2 上智集中・実戦期 */
+    blocks = [
+      (dow===6)?
+        {s:"小論文",t:"週の書き直し",i:["今週のいちばん弱い答案を書き直す","誤字・話し言葉チェックを音読で"]}:
+        {s:"小論文",t:"上智 学科試問対策",i:[(dow===2||dow===4)?"上智 学科試問の過去問1回分（時間厳守）":essayT(pick(["上智大学(総合グローバル)","横浜市立大学(国際教養)","共通"],Math.floor(n/2)))+" 800字・60分","構成メモ10分→執筆→見直しの手順で","保存→自己評価メモ／添削に出す"]},
+      (dow===1||dow===3)?
+        {s:"小論文",t:"講評反映＋ストック",i:["添削・講評を履歴に記入し書き直し","社説要約1本","頻出論点ノート（国際・経済）に1項目追加"]}:
+        {s:"面接",t:"想定問答の完成度UP",i:[intvQ(pick(["上智大学(総合グローバル)","上智大学(英語)","横浜国立大学(経営)"],Math.floor(n/3))),"録画して30秒〜1分に収める練習","「未着手」の質問を1つ減らす"]},
+      (ds<="2026-08-09" && (dow===2||dow===5))?
+        {s:"TOEFL",t:"再受験ラストスパート（〜8月上旬）",i:["90未到達の場合のみ：弱点セクション模試＋復習90分","到達済みなら→小論文の過去問演習に振替","8月上旬の受験予約を確認"]}:
+        {s:"面接",t:"夜の仕上げ",i:["今日の骨子を録画→見返して1つだけ直す","ニュースストック15分（国際・経済）","8月：明治法プレゼン原稿／9月：出願書類の進行も確認"]}
+    ];
+  } else if(ds<="2026-10-02"){ /* P3 横市直前 */
+    blocks = [
+      {s:"小論文",t:"横市 直前演習（10/3本番）",i:["横市の過去問または "+essayT("横浜市立大学(国際教養)")+" を本番形式・手書きで","構成メモ10分の徹底","答案を音読チェック"]},
+      {s:"面接",t:"横市 面接仕上げ",i:[intvQ("横浜市立大学(国際教養)"),"小論文の出来を聞かれた時の答え方を準備","録画→姿勢・語尾チェック"]},
+      {s:"復習",t:"夜は軽く",i:["時事の最終確認（多文化共生・国際協力・横浜）","明日のプラン確認・早めに就寝"]}
+    ];
+  } else if(ds<="2026-11-14"){ /* P4 横国シフト＋明学 */
+    blocks = [
+      {s:"小論文",t:"横国 経営・経済テーマ（12月本番）",i:[essayT("横浜国立大学(経営)")+" を手書き・800字・60分","週1回は明学想定の60分・600字も（11/15まで）","添削に出す→講評を履歴に記録"]},
+      {s:"面接",t:"横国 面接本格化",i:[intvQ("横浜国立大学(経営)"),"経営学部の教授・ゼミを1つ調べてノートに","録画練習：志望理由を毎回ブラッシュアップ"]},
+      {s:"復習",t:"経済ニュースの夜",i:["日経・NHK経済ニュース30分→頻出論点ノートに追記","今週の答案見直し","10月中旬：横国出願／10月下旬：明学二次出願を忘れずに（スケジュール参照）"]}
+    ];
+  } else if(ds<="2026-11-30"){ /* P5 横国集中 */
+    blocks = [
+      {s:"小論文",t:"横国 過去問・毎日1本",i:["横国の過去問または経営・経済テーマを本番形式・手書きで1本","書いたら必ず音読チェック","頻出論点ノートの総復習"]},
+      {s:"面接",t:"横国 模擬面接 週2回",i:["元先生と横国想定の模擬面接（できない日は録画練習）",intvQ("横浜国立大学(経営)"),"評価シートの改善点を翌日までに反映"]},
+      {s:"復習",t:"体調管理優先",i:["経済ニュース15分のみ","23時までに就寝。睡眠が最大の試験対策"]}
+    ];
+  } else { /* 12月〜 */
+    blocks = [
+      {s:"小論文",t:"最終調整",i:["横国本番（12月上旬）まで：過去問1本＋見直しのみ","新しい問題集には手を出さない"]},
+      {s:"面接",t:"最終リハーサル",i:["志望理由・5大質問の最終確認","入退室の所作を1回通す"]},
+      {s:"休息",t:"コンディション最優先",i:["夜は休む。受験票・持ち物の確認","本番後は：明学手続(12/11)・横市手続(12/18)の判断日程を確認"]}
+    ];
+  }
+  return {phase: phaseName(ds), note, blocks};
+}
+function phaseName(ds){
+  if(ds<="2026-06-14") return "第1週：基礎固め";
+  if(ds<="2026-07-19") return "TOEFL集中期（7月本番まで）";
+  if(ds<="2026-09-19") return "実戦期：上智 9/20へ";
+  if(ds<="2026-10-02") return "横市直前期（10/3へ）";
+  if(ds<="2026-11-14") return "横国シフト期＋明学 11/15";
+  if(ds<="2026-11-30") return "横国集中期（12月本番へ）";
+  return "最終調整期";
+}
+const SLOT_LABELS = ["午前（9:00–11:00）","午後（14:00–16:00）","夜（20:00–22:00）"];
+function renderPlan(){
+  const el = document.getElementById("planDate");
+  if(!el.value) el.value = today();
+  const ds = el.value;
+  const p = planFor(ds);
+  document.getElementById("planPhase").textContent = p.phase;
+  document.getElementById("planNote").textContent = p.note || "";
+  document.getElementById("planBlocks").innerHTML = p.blocks.map((b,i)=>{
+    const k = ds+"_"+i, done = S.plan[k];
+    return `<div class="card" style="border-top:4px solid ${PLAN_COLORS[b.s]||"#8895a8"};${done?"opacity:.55":""}">
+      <div class="muted" style="font-weight:700">${SLOT_LABELS[i]}</div>
+      <h3 style="margin:4px 0 8px"><span class="chip" style="background:${PLAN_COLORS[b.s]||"#8895a8"}">${b.s}</span>${esc(b.t)}</h3>
+      ${b.i.map(x=>`<div class="chk" style="cursor:default"><span style="color:${PLAN_COLORS[b.s]||"#8895a8"}">▸</span><span>${esc(x)}</span></div>`).join("")}
+      <button class="btn sm ${done?"ghost":""}" style="margin-top:12px;${done?"":"background:"+(PLAN_COLORS[b.s]||"#8895a8").replace("var(--toefl)","#2563eb").replace("var(--essay)","#d97706").replace("var(--intv)","#059669").replace("var(--mock)","#dc2626")}" onclick="planDone('${k}','${b.s}','${ds}')">${done?"完了済み（取り消す）":"このコマを完了にする（2hを記録）"}</button>
+    </div>`;
+  }).join("");
+  // dashboard mini
+  const tp = planFor(today());
+  document.getElementById("dashPlanPhase").textContent = "　" + tp.phase;
+  document.getElementById("dashPlan").innerHTML = tp.blocks.map((b,i)=>{
+    const k = today()+"_"+i, done = S.plan[k];
+    return `<div class="hbar"><span class="lbl" style="width:130px;font-weight:700;color:${done?"#9aa6b8":"inherit"}">${SLOT_LABELS[i].split("（")[0]}</span>
+      <span class="tag" style="background:${PLAN_COLORS[b.s]||"#8895a8"};color:#fff">${b.s}</span>
+      <span style="flex:1;font-size:13px;${done?"text-decoration:line-through;color:#9aa6b8":""}">${esc(b.t)}</span>
+      <input type="checkbox" ${done?"checked":""} onchange="planDone('${k}','${b.s}','${today()}')" style="accent-color:var(--ok);width:17px;height:17px"></div>`;
+  }).join("") + `<p class="muted" style="margin-top:6px">詳しい内容は左メニュー「日課プラン」へ。</p>`;
+}
+function planDone(k, subj, ds){
+  if(S.plan[k]){ delete S.plan[k]; }
+  else {
+    S.plan[k] = true;
+    const logSubj = (subj==="TOEFL"||subj==="小論文"||subj==="面接") ? subj : null;
+    if(logSubj) addStudy(ds, logSubj, 120, "日課プラン");
+  }
+  save(); renderAll();
+}
+function planMove(d){
+  const el = document.getElementById("planDate");
+  const dt = new Date((el.value||today())+"T00:00"); dt.setDate(dt.getDate()+d);
+  el.value = dt.toISOString().slice(0,10); renderPlan();
+}
+function planToday(){ document.getElementById("planDate").value = today(); renderPlan(); }
+
+/* ================= データ管理 ================= */
+function exportData(){
+  const blob=new Blob([JSON.stringify(S,null,1)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=`ことみ受験ナビ_バックアップ_${today()}.json`;
+  a.click();
+}
+function importData(){
+  const f=document.getElementById("importFile").files[0];
+  if(!f) return alert("ファイルを選択してください");
+  const r=new FileReader();
+  r.onload=()=>{ try{ const d=JSON.parse(r.result); if(!d.studyLog) throw 0; S=d; save(); renderAll(); alert("復元しました"); }catch(e){ alert("ファイルを読み込めませんでした"); } };
+  r.readAsText(f);
+}
+function resetData(){
+  if(prompt('すべてのデータが消えます。「初期化」と入力してください')==="初期化"){ localStorage.removeItem(KEY); S=load(); renderAll(); }
+}
+
+/* ================= 起動 ================= */
+function renderAll(){ if(!S.plan) S.plan={}; renderDash(); renderSched(); renderToefl(); renderEssay(); renderIntv(); renderMock(); renderPlan(); }
+["tfDate","lgDate","hwDate","evDate"].forEach(id=>document.getElementById(id).value=today());
+renderAll();
+
+/* ================= GitHub同期（Gist方式） ================= */
+var GH_TOKEN_KEY="kotomiNavi_ghToken", GH_GIST_KEY="kotomiNavi_gistId", GIST_FILE="kotomi-juken-navi-data.json";
+var ghToken = localStorage.getItem(GH_TOKEN_KEY) || "";
+var ghGistId = localStorage.getItem(GH_GIST_KEY) || "";
+var ghLast = null, ghBusy = false, ghPushTimer = null, ghPullTimer = null;
+
+function persistLocal(){ localStorage.setItem(KEY, JSON.stringify(S)); }
+function ghKeyOf(it){ return (it && it.id!=null) ? ("id:"+it.id) : ("j:"+JSON.stringify(it)); }
+function mergeState(local, remote){
+  local = local||{}; remote = remote||{};
+  var out = {};
+  ["studyLog","toefl","essays","qa","mocks","events"].forEach(function(k){
+    var m = {};
+    (remote[k]||[]).forEach(function(it){ m[ghKeyOf(it)] = it; });
+    (local[k]||[]).forEach(function(it){ m[ghKeyOf(it)] = it; }); // 同一はローカル優先
+    out[k] = Object.keys(m).map(function(id){ return m[id]; });
+  });
+  ["lessons","tasks","plan"].forEach(function(k){
+    out[k] = Object.assign({}, remote[k]||{}, local[k]||{}); // キーはローカル優先
+  });
+  return out;
+}
+function ghTime(){ return new Date().toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit",second:"2-digit"}); }
+function ghMsgSet(t){ var el=document.getElementById("ghMsg"); if(el) el.textContent=t; }
+function renderSyncStatus(){
+  var st=document.getElementById("ghState"), lt=document.getElementById("ghLastSync");
+  if(st) st.innerHTML = (ghToken && ghGistId) ? '<b style="color:var(--ok)">接続済み</b>' : '<b style="color:var(--sub)">未接続</b>';
+  if(lt) lt.textContent = ghLast ? ("　最終同期："+ new Date(ghLast).toLocaleString("ja-JP")) : "";
+}
+function ghApi(path, method, body){
+  return fetch("https://api.github.com"+path, {
+    method: method||"GET",
+    headers: {"Authorization":"token "+ghToken, "Accept":"application/vnd.github+json"},
+    body: body ? JSON.stringify(body) : undefined
+  });
+}
+async function ghReadRemote(){
+  var res = await ghApi("/gists/"+ghGistId);
+  if(res.status===401) throw new Error("トークンが無効です（gist権限を確認）");
+  if(!res.ok) throw new Error("GitHubエラー "+res.status);
+  var g = await res.json();
+  var f = g.files && g.files[GIST_FILE];
+  if(!f) return null;
+  var content = f.content;
+  if(f.truncated && f.raw_url){ content = await (await fetch(f.raw_url)).text(); }
+  if(!content) return null;
+  return JSON.parse(content);
+}
+async function syncPull(silent){
+  if(!ghToken || !ghGistId || ghBusy) return;
+  if(silent){ var ae=document.activeElement; if(ae && /^(TEXTAREA|INPUT|SELECT)$/.test(ae.tagName)) return; } // 入力中は中断しない
+  ghBusy = true;
+  try{
+    var remote = await ghReadRemote();
+    if(remote){ S = mergeState(S, remote); persistLocal(); renderAll(); ghLast = new Date(); }
+    if(!silent) ghMsgSet("✅ 最新の記録を取得しました（"+ghTime()+"）");
+    renderSyncStatus();
+  }catch(e){ if(!silent) ghMsgSet("⚠️ 取得に失敗："+(e.message||e)); }
+  finally{ ghBusy = false; }
+}
+async function syncPush(){
+  if(!ghToken || !ghGistId || ghBusy) return;
+  ghBusy = true;
+  try{
+    var remote = await ghReadRemote();              // 相手の新着を消さないよう先に統合
+    if(remote){ S = mergeState(S, remote); persistLocal(); }
+    var body = {files:{}}; body.files[GIST_FILE] = {content: JSON.stringify(S)};
+    var res = await ghApi("/gists/"+ghGistId, "PATCH", body);
+    if(res.status===401) throw new Error("トークンが無効です");
+    if(!res.ok) throw new Error("GitHubエラー "+res.status);
+    ghLast = new Date(); ghMsgSet("⬆️ 送信しました（"+ghTime()+"）"); renderAll(); renderSyncStatus();
+  }catch(e){ ghMsgSet("⚠️ 送信に失敗："+(e.message||e)); }
+  finally{ ghBusy = false; }
+}
+function scheduleSyncPush(){
+  if(!ghToken || !ghGistId) return;
+  clearTimeout(ghPushTimer);
+  ghPushTimer = setTimeout(function(){ syncPush(); }, 1500);
+}
+function startAutoSync(){
+  clearInterval(ghPullTimer);
+  ghPullTimer = setInterval(function(){ syncPull(true); }, 45000); // 約45秒ごとに取得＝ほぼライブ
+}
+async function ghConnect(){
+  var v = (document.getElementById("ghTokenInput").value||"").trim();
+  if(!v){ alert("トークンを入力してください"); return; }
+  var prev = ghToken; ghToken = v; ghMsgSet("🔄 接続中…");
+  try{
+    var res = await ghApi("/gists?per_page=100");
+    if(res.status===401) throw new Error("トークンが無効です（gist権限を確認）");
+    if(!res.ok) throw new Error("GitHubエラー "+res.status);
+    var list = await res.json();
+    var found = (list||[]).find(function(g){ return g.files && g.files[GIST_FILE]; });
+    if(found){ ghGistId = found.id; }
+    else{
+      var body = {description:"ことみの受験ナビ 同期データ", public:false, files:{}};
+      body.files[GIST_FILE] = {content: JSON.stringify(S)};
+      var cr = await ghApi("/gists","POST",body);
+      if(!cr.ok) throw new Error("Gist作成に失敗 "+cr.status);
+      var created = await cr.json(); ghGistId = created.id;
+    }
+    localStorage.setItem(GH_TOKEN_KEY, ghToken);
+    localStorage.setItem(GH_GIST_KEY, ghGistId);
+    await syncPull(false);   // 既存Gistがあれば統合
+    await syncPush();        // 統合結果を送信して両端末をそろえる
+    startAutoSync();
+    document.getElementById("ghTokenInput").value = "";
+    ghMsgSet("✅ 接続しました。各端末で同じトークンを設定すれば記録が共有されます。");
+    renderSyncStatus();
+  }catch(e){
+    ghToken = prev; localStorage.setItem(GH_TOKEN_KEY, ghToken||"");
+    ghMsgSet("⚠️ 接続に失敗："+(e.message||e)); renderSyncStatus();
+  }
+}
+function ghDisconnect(){
+  if(!confirm("同期を解除します。この端末の記録は残ります。よろしいですか？")) return;
+  ghToken=""; ghGistId="";
+  localStorage.removeItem(GH_TOKEN_KEY); localStorage.removeItem(GH_GIST_KEY);
+  clearInterval(ghPullTimer); clearTimeout(ghPushTimer);
+  ghMsgSet("同期を解除しました。"); renderSyncStatus();
+}
+/* 同期の初期化 */
+renderSyncStatus();
+if(ghToken && ghGistId){ startAutoSync(); syncPull(true); }
+
+</script>
+</body>
+</html>
