@@ -212,6 +212,7 @@ label.f{display:block;font-size:12px;color:var(--sub);font-weight:600;margin-bot
     <p class="pagesub">目標：7月受験で90点超え（横浜市立 +10点加点／上智で競争力）。横市へはETS直送（DIコード0416）が必須。</p>
     <div class="subtabs" data-group="toefl">
       <button class="subtab active" data-sub="tfrec">記録</button>
+      <button class="subtab" data-sub="tfread">Reading加点プログラム</button>
       <button class="subtab" data-sub="tfbook">公式問題集ガイド</button>
     </div>
     <div class="subpage show" id="sub-tfrec">
@@ -246,6 +247,47 @@ label.f{display:block;font-size:12px;color:var(--sub);font-weight:600;margin-bot
         <table id="lgTable"></table>
       </div>
     </div>
+    </div>
+    <div class="subpage" id="sub-tfread">
+      <div id="rdgBanner"></div>
+      <div class="card" style="border-top:4px solid var(--toefl);margin-bottom:16px">
+        <h3><span class="chip" style="background:var(--toefl)">今日のフォーカス</span><span id="rdgFocusDate" class="muted" style="font-weight:400"></span></h3>
+        <div id="rdgFocus"></div>
+      </div>
+      <div class="subtabs" data-group="rdg" style="margin-bottom:14px">
+        <button class="subtab active" data-sub="rdgplan">本番までの日割り</button>
+        <button class="subtab" data-sub="rdgskill">タイプ別 攻略法</button>
+        <button class="subtab" data-sub="rdgtrack">演習トラッカー</button>
+      </div>
+      <div class="subpage show" id="sub-rdgplan">
+        <div class="notice">7/7のReading加点に向けた日割りです。各日の「完了」で進捗が記録され、学習ログにも反映されます。今日の予定は色付きで表示されます。</div>
+        <div id="rdgPlan"></div>
+      </div>
+      <div class="subpage" id="sub-rdgskill">
+        <div class="notice">新形式Readingの3タイプ別に、80→加点のための具体策をまとめました。読んだら<b>「完了にする ✓」</b>で進捗を記録できます。</div>
+        <div id="rdgSkills"></div>
+      </div>
+      <div class="subpage" id="sub-rdgtrack">
+        <div class="notice">演習の正答率を記録して伸びを見える化します。タイプ別に「一番できなかったもの」も残すと、翌日の重点が決まります。</div>
+        <div class="grid cols3">
+          <div class="card"><h3>直近の正答率</h3><div id="rdgLatest"></div></div>
+          <div class="card"><h3>推移</h3><div id="rdgTrend"></div></div>
+          <div class="card"><h3>弱点タイプ</h3><div id="rdgWeak"></div></div>
+        </div>
+        <div class="card">
+          <h3>演習を記録する</h3>
+          <div class="frow">
+            <div><label class="f">日付</label><input type="date" id="rdDate"></div>
+            <div style="flex:1"><label class="f">教材・セット名</label><input id="rdName" style="width:100%" placeholder="例：公式問題集 Practice Test 1 / TPO Reading"></div>
+            <div><label class="f">正答</label><input type="number" id="rdCorr" min="0" style="width:74px"></div>
+            <div><label class="f">問題数</label><input type="number" id="rdTot" min="1" value="10" style="width:74px"></div>
+            <div><label class="f">所要分</label><input type="number" id="rdMin" min="1" value="30" style="width:74px"></div>
+            <div><label class="f">弱かったタイプ</label><select id="rdType"><option>Complete the Words</option><option>Read in Daily Life</option><option>Academic Passage</option><option>時間配分</option><option>特になし</option></select></div>
+            <button class="btn toefl sm" onclick="addRdg()">記録</button>
+          </div>
+          <table id="rdTable"></table>
+        </div>
+      </div>
     </div>
     <div class="subpage" id="sub-tfbook">
       <div class="notice">『TOEFL iBT公式総合対策』（2026新形式対応・ETS公式）の使い方ガイドです。各レッスンを読み、終わったら<b>「完了にする ✓」</b>で進捗を記録できます（端末間で同期されます）。ページ数は本書のもの。音声は旺文社「英語の友」アプリで再生できます。</div>
@@ -736,7 +778,7 @@ const KEY = "kotomiNavi_v1";
 let S = load();
 function load(){
   try{ const d = JSON.parse(localStorage.getItem(KEY)); if(d) return d; }catch(e){}
-  return {studyLog:[], toefl:[], essays:[], qa:[], mocks:[], lessons:{}, tasks:{}, events:[], plan:{}};
+  return {studyLog:[], toefl:[], essays:[], qa:[], mocks:[], lessons:{}, tasks:{}, events:[], plan:{}, rdgLog:[], rdgPlan:{}, rdgSteps:{}};
 }
 function save(){ localStorage.setItem(KEY, JSON.stringify(S)); if(typeof scheduleSyncPush==="function") scheduleSyncPush(); }
 const APP_VERSION = "2026.06.08b";
@@ -759,7 +801,7 @@ document.querySelectorAll(".navbtn").forEach(b=>b.addEventListener("click",()=>{
 document.querySelectorAll(".subtabs").forEach(g=>g.querySelectorAll(".subtab").forEach(t=>t.addEventListener("click",()=>{
   g.querySelectorAll(".subtab").forEach(x=>x.classList.remove("active"));
   t.classList.add("active");
-  g.parentElement.querySelectorAll(".subpage").forEach(p=>p.classList.remove("show"));
+  g.parentElement.querySelectorAll(":scope > .subpage").forEach(p=>p.classList.remove("show"));
   document.getElementById("sub-"+t.dataset.sub).classList.add("show");
 })));
 
@@ -1408,6 +1450,173 @@ function planMove(d){
 }
 function planToday(){ document.getElementById("planDate").value = today(); renderPlan(); }
 
+/* ================= Reading加点プログラム ================= */
+const RDG_EXAM = "2026-07-07";
+
+const RDG_SKILLS = [
+{t:"加点の全体戦略 ― 「前半で落とさない」が最優先", b:`
+<p>新形式Readingは50問・約30分の<b>2段階アダプティブ</b>。Module1の正答率でModule2が <b>Upper（難・高得点域）</b> か <b>Lower（易）</b> に分かれます。つまり前半の取りこぼしがそのまま上限を下げます。</p>
+<h4>ことみさんの加点プラン（80点台→Reading底上げ）</h4>
+<ul>
+<li><b>①前半集中</b>：序盤の易しめ問題を絶対に落とさない。見直し時間を最初の方に厚く。</li>
+<li><b>②語彙の穴埋め</b>：Reading低下の主因は語彙不足のことが多い。Complete the Words は語彙力が直結（次のレッスン）。</li>
+<li><b>③時間配分</b>：30分を3タイプに割り振り、1問に沈まない（捨てる勇気）。</li>
+</ul>
+<div class="ex"><b>まず今日</b>：演習トラッカーで現状の正答率を1セット測る → 3タイプのどれが弱いかを特定 → 弱いタイプに翌日の重点を寄せる。</div>`},
+{t:"タイプ1：Complete the Words（語彙で稼ぐ）", b:`
+<p>70〜100語の短文中の空所に語を入れる。1パッセージ10語。<b>語彙・活用・前置詞・コロケーション</b>が勝負で、ここはやればやるだけ伸びる「得点源」。</p>
+<h4>具体策</h4>
+<ul>
+<li><b>『英単語3800』RANK2→3</b>を1日50語＋前日分の復習。意味だけでなく<b>使われ方（コロケーション）</b>も見る。</li>
+<li>品詞を意識：空所の前後から「ここは名詞／動詞／形容詞」を先に判断してから語を選ぶ。</li>
+<li>活用ミスに注意：三単現の s、過去形、複数形、比較級など「形」で落とさない。</li>
+</ul>
+<div class="pt">毎朝の単語15分はReadingに最も費用対効果が高い。サボらないこと。</div>`},
+{t:"タイプ2：Read in Daily Life（先読みで速く正確に）", b:`
+<p>メール・チャット・広告など実用文（15〜150語）。1つにつき2〜3問。スピードと情報の<b>拾い読み（スキャン）</b>が鍵。</p>
+<h4>具体策</h4>
+<ul>
+<li><b>設問を先に読む</b>：何を聞かれるか把握してから本文へ。全文精読しない。</li>
+<li><b>固有名詞・数字・日付</b>を目印にスキャン。該当箇所を見つけて照合。</li>
+<li>言い換え（paraphrase）に注意：本文の語が選択肢で別表現になっている。</li>
+</ul>
+<div class="ex"><b>練習法</b>：1問あたり目標時間を決めて解く（例：実用文は1問40秒）。時間を計らない練習は本番で効かない。</div>`},
+{t:"タイプ3：Read an Academic Passage（構造で読む）", b:`
+<p>約200語の学術文、1つにつき5問。配点比重が高く、ここで差がつく。設問タイプを知ると速くなります。</p>
+<h4>読み方</h4>
+<ul>
+<li>段落は<b>「主張（topic sentence）→具体例・根拠」</b>の構造。最初と最後の文を意識。</li>
+<li>つなぎ語（however / for example / therefore / in contrast）で論理の流れをつかむ。</li>
+</ul>
+<h4>設問タイプ別のコツ</h4>
+<ul>
+<li><b>事実情報</b>：該当段落を特定して照合。本文にない選択肢は切る。</li>
+<li><b>語彙問題</b>：前後の文脈から推測（知らない語でも文脈で解ける）。</li>
+<li><b>推論</b>：本文から論理的に導けるか。書いていない飛躍はNG。</li>
+<li><b>文挿入／要約</b>：代名詞・接続語の指す内容で位置を判断。</li>
+</ul>
+<div class="pt">「なぜその選択肢が正解か」を本文の1文で言えるようにする＝精度が上がる。</div>`},
+{t:"時間配分と見直し（30分の使い方）", b:`
+<p>30分・50問は1問あたり平均30〜35秒。沈まないことが全て。</p>
+<ul>
+<li>分からない問題は<b>仮マーク→次へ</b>。1問に1分以上かけない。</li>
+<li>Module1（前半）は<b>やや慎重に</b>、見直し時間を確保（上位モジュール入りの分岐点）。</li>
+<li>残り時間で仮マークを再検討。空欄は作らない（推測でも埋める）。</li>
+</ul>
+<div class="ex"><b>本番リハ</b>：必ず30分タイマーで通し演習。時計を見る癖を本番前に作る。</div>`},
+{t:"間違い分析ノート（最重要・これで伸びる）", b:`
+<p>解きっぱなしは伸びません。間違えた問題を「<b>なぜ間違えたか</b>」で分類するノートを作ります。</p>
+<h4>1問1行で分類</h4>
+<ul>
+<li><b>語彙不足</b>：知らない語が原因 → 単語帳へ追加</li>
+<li><b>読み違い</b>：構造・主語を取り違えた → 該当文を音読</li>
+<li><b>設問理解</b>：聞かれ方を誤解 → 設問タイプを再確認</li>
+<li><b>時間切れ</b>：配分ミス → ペース練習</li>
+</ul>
+<div class="pt">毎晩「今日の間違いトップ3」を演習トラッカーの弱点タイプに記録 → 翌日の重点が自動で決まる仕組みにしています。</div>`}
+];
+
+const RDG_PLAN = [
+{d:"2026-06-22", f:"診断", t:"現状把握（公式Practiceで弱点特定）", i:["公式『総合対策』Practice Test の Reading（問題 p.71〜83）を30分タイマーで通し→演習トラッカーに正答率を記録","採点は解説 p.114〜132。3タイプ（Complete the Words／Daily Life／Academic）のどこで落としたか特定","攻略法レッスン①（全体戦略）を読む","『英単語3800』RANK2 を50語"]},
+{d:"2026-06-23", f:"語彙", t:"Complete the Words（公式 攻略法p.20〜）", i:["公式『総合対策』Reading攻略法 p.20〜23（Complete the Words の解説）を読む","昨日のPractice の Complete the Words を解き直し、間違えた語を単語ノートへ","攻略法レッスン②を読む","『英単語3800』RANK2 を50語＋前日分の復習"]},
+{d:"2026-06-24", f:"速読", t:"Read in Daily Life（公式 攻略法p.24〜）", i:["公式『総合対策』Reading攻略法 p.24〜26（Daily Life）を読む","Practice の実用文問題を「設問先読み→スキャン」で解き直し（1問40秒目標）→記録","攻略法レッスン③を読む","『英単語3800』RANK2 を50語＋復習"]},
+{d:"2026-06-25", f:"学術文", t:"Academic Passage（公式 攻略法p.27〜）", i:["公式『総合対策』Reading攻略法 p.27〜30（Academic Passage）を読む","Practice の学術文（5問）を構造読みで解き直し、各正解を解説 p.114〜132 で根拠確認","攻略法レッスン④を読む","『英単語3800』RANK2 を50語＋復習"]},
+{d:"2026-06-26", f:"分析", t:"間違い分析の習慣化", i:["攻略法レッスン⑥（間違い分析）を読む","今週のPractice間違いを4分類（語彙不足／読み違い／設問理解／時間切れ）でノート化","弱点タイプを30分集中：公式 Reading の該当問題を再演習→記録","『英単語3800』RANK2 を50語＋復習"]},
+{d:"2026-06-27", f:"通し", t:"週末リハ①（新規問題で通し）", i:["ETS公式オンラインの無料サンプル（Reading）を30分通しで解く→記録 ※新規問題で実力チェック","間違いを解説で確認し、間違い分析ノートを更新","『英単語3800』RANK2 の総仕上げ（不安な語を再確認）"]},
+{d:"2026-06-28", f:"復習", t:"週次レビュー＋休養", i:["演習トラッカーで今週の正答率の伸びを確認","公式 攻略法 p.20〜30 をざっと読み返し（要点だけ）","『英単語3800』RANK3 へ移行・50語","夜は休む"]},
+{d:"2026-06-29", f:"語彙", t:"弱点タイプ集中①", i:["前週いちばん弱かったタイプを45分演習（公式の該当問題／不足ならETSオンラインサンプル）→記録","公式 攻略法の該当ページを再読","間違い語を単語ノートへ追加","『英単語3800』RANK3 を50語＋復習"]},
+{d:"2026-06-30", f:"速読", t:"スピード強化（時間厳守）", i:["公式 Reading の Daily Life＋Complete the Words を時間を計って解き直し→記録","1問あたりの目標時間（実用文40秒・語彙20秒）を守れたか確認","『英単語3800』RANK3 を50語＋復習"]},
+{d:"2026-07-01", f:"学術文", t:"Academic Passage 精度上げ", i:["ETS公式オンラインサンプルの学術文を演習→記録（新規問題）","設問タイプ別（事実情報／語彙／推論／文挿入）に正誤を分類","推論問題は必ず本文の1文で根拠付け","『英単語3800』RANK3 を50語＋復習"]},
+{d:"2026-07-02", f:"通し", t:"本番形式リハ②", i:["Reading を30分通し（公式Practice を再挑戦＝1回目との伸びを比較）→記録","前半（Module1）の正答率を特に確認","解説 p.114〜132 で間違いノート更新","『英単語3800』RANK2-3 の不安な語を復習"]},
+{d:"2026-07-03", f:"弱点", t:"弱点総ざらい", i:["演習トラッカーで最多の弱点タイプを集中演習（公式／ETSサンプル）→記録","間違い分析ノートの語を全部見直す","『英単語3800』RANK2-3 で覚え切れていない語を再確認"]},
+{d:"2026-07-04", f:"通し", t:"週末リハ③（仕上げ）", i:["ETS公式オンラインサンプル（または公式Practice）で30分通し→記録（目標正答率を設定）","時間配分が安定したか確認","他セクション（L/S/W）も公式 攻略法を各1タスク軽く確認"]},
+{d:"2026-07-05", f:"調整", t:"最終調整＋事務確認", i:["弱点タイプを軽く30分（公式の該当問題）","★ETS直送設定を確認（横市 DIコード0416）","受験票・本人確認書類・会場と所要時間を確認","単語ノート（間違い語）の総復習"]},
+{d:"2026-07-06", f:"前日", t:"前日：軽く整える", i:["新しい問題は解かない。間違いノートと『英単語3800』の苦手語を眺めるだけ","攻略法レッスン①（全体戦略）と⑤（時間配分）を読み返す","持ち物を準備して早めに就寝"]},
+{d:"2026-07-07", f:"本番", t:"本番日 ★Reading加点を取りに行く", i:["会場に早め到着。直前は『英単語3800』の苦手語ノートだけ","前半で落とさない・1問に沈まない・空欄を作らない","終了後、出来を演習トラッカーにメモ→お疲れさま！"]}
+];
+
+function renderReading(){
+  renderLessons("rdgSkills", RDG_SKILLS, "r_");
+  // banner countdown
+  const dleft = daysTo(RDG_EXAM);
+  const bn = document.getElementById("rdgBanner");
+  if(bn){
+    if(dleft>=0){
+      const cls = dleft<=3?"urgent":dleft<=7?"soon":"";
+      bn.innerHTML = `<div class="card cdcard ${cls}" style="margin-bottom:16px"><div class="flex"><div><div class="muted">TOEFL本番（7/7）まで</div><div class="days">${dleft===0?"今日が本番！":"あと "+dleft+" 日"}</div></div><div class="right" style="text-align:right"><div class="muted">弱点</div><div style="font-size:20px;font-weight:700;color:var(--toefl)">Reading を加点</div></div></div></div>`;
+    } else {
+      bn.innerHTML = `<div class="card" style="margin-bottom:16px;border-left:5px solid var(--ok)"><b>7/7の受験お疲れさまでした。</b> スコアが出たら「記録」タブに入力し、必要なら次回（横市は8月上旬受験分まで有効）の弱点対策に進みましょう。</div>`;
+    }
+  }
+  // today focus
+  let cur = RDG_PLAN.find(p=>p.d===today());
+  if(!cur) cur = RDG_PLAN.find(p=>p.d>today());
+  const fEl = document.getElementById("rdgFocus");
+  if(fEl){
+    if(cur){
+      document.getElementById("rdgFocusDate").textContent = "　"+fmtD(cur.d)+"・"+cur.f;
+      const k = "p_"+cur.d, done=S.rdgPlan[k];
+      fEl.innerHTML = `<div style="font-size:17px;font-weight:700;margin:4px 0 8px">${esc(cur.t)}</div>`+
+        cur.i.map(x=>`<div class="chk" style="cursor:default"><span style="color:var(--toefl)">▸</span><span>${esc(x)}</span></div>`).join("")+
+        `<button class="btn toefl sm ${done?'ghost':''}" style="margin-top:12px" onclick="rdgDone('${cur.d}')">${done?"完了済み（取り消す）":"今日のReadingを完了にする（記録）"}</button>`;
+    } else {
+      document.getElementById("rdgFocusDate").textContent="";
+      fEl.innerHTML = '<div class="empty">プログラムは7/7で終了です。お疲れさまでした。</div>';
+    }
+  }
+  // day plan list
+  const pl=document.getElementById("rdgPlan");
+  if(pl){
+    pl.innerHTML = RDG_PLAN.map(p=>{
+      const k="p_"+p.d, done=S.rdgPlan[k], isToday=p.d===today(), past=daysTo(p.d)<0;
+      const tagc = p.f==="本番"?"red":(p.f==="通し"||p.f==="前日"?"amber":"blue");
+      return `<div class="card" style="margin-bottom:8px;${isToday?'border:2px solid var(--toefl);':''}${done||past?'opacity:.62;':''}">
+        <div class="flex" style="cursor:pointer" onclick="this.parentElement.querySelector('.rdgitems').style.display=this.parentElement.querySelector('.rdgitems').style.display==='block'?'none':'block'">
+          <input type="checkbox" ${done?'checked':''} onclick="event.stopPropagation();rdgDone('${p.d}')" style="accent-color:var(--ok);width:17px;height:17px">
+          <b>${fmtD(p.d)}</b><span class="tag ${tagc}">${p.f}</span>
+          <span style="flex:1">${esc(p.t)}</span>${isToday?'<span class="tag blue">今日</span>':''}
+        </div>
+        <div class="rdgitems" style="display:${isToday?'block':'none'};margin-top:8px">
+          ${p.i.map(x=>`<div class="chk" style="cursor:default"><span style="color:var(--toefl)">▸</span><span>${esc(x)}</span></div>`).join("")}
+        </div>
+      </div>`;
+    }).join("");
+  }
+  // tracker
+  const lg=[...S.rdgLog].sort((a,b)=>a.d.localeCompare(b.d));
+  const last=lg[lg.length-1];
+  const pctOf=x=>Math.round(x.corr/x.tot*100);
+  const L=document.getElementById("rdgLatest");
+  if(L) L.innerHTML = last?`<div class="kpi">${pctOf(last)}<small>%（${last.corr}/${last.tot}）</small></div><div class="muted">${fmtD(last.d)}・${esc(last.name||"")}</div>`:'<div class="empty">まだ記録がありません</div>';
+  const T=document.getElementById("rdgTrend");
+  if(T) T.innerHTML = lg.length?lg.slice(-8).map(x=>`<div class="hbar"><span class="lbl">${fmtD(x.d)}</span><div class="bar"><i style="width:${pctOf(x)}%;background:var(--toefl)"></i></div><span class="val">${pctOf(x)}%</span></div>`).join(""):'<div class="empty">—</div>';
+  const W=document.getElementById("rdgWeak");
+  if(W){
+    const cnt={};
+    lg.forEach(x=>{ if(x.type&&x.type!=="特になし"){cnt[x.type]=(cnt[x.type]||0)+1;} });
+    const arr=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a]);
+    W.innerHTML = arr.length?arr.map(t=>`<div class="hbar"><span class="lbl" style="width:150px">${t}</span><div class="bar"><i style="width:${cnt[t]/lg.length*100}%;background:var(--mock)"></i></div><span class="val">${cnt[t]}回</span></div>`).join("")+'<p class="muted" style="margin-top:6px">回数が多いタイプを翌日の重点に。</p>':'<div class="empty">記録が増えると弱点タイプが見えます</div>';
+  }
+  const tb=document.getElementById("rdTable");
+  if(tb) tb.innerHTML = lg.length?"<tr><th>日付</th><th>セット</th><th>正答率</th><th>分</th><th>弱点</th><th></th></tr>"+[...lg].reverse().map(x=>`<tr><td>${fmtD(x.d)}</td><td>${esc(x.name||"")}</td><td><b>${pctOf(x)}%</b> (${x.corr}/${x.tot})</td><td>${x.min||""}</td><td>${esc(x.type||"")}</td><td><button class="del" onclick="delRdg('${x.id}')">削除</button></td></tr>`).join(""):"";
+}
+function rdgDone(d){
+  const k="p_"+d;
+  if(S.rdgPlan[k]){ delete S.rdgPlan[k]; }
+  else { S.rdgPlan[k]=true; addStudy(d,"TOEFL",120,"Reading加点プログラム"); }
+  save(); renderAll();
+}
+function addRdg(){
+  const g=id=>document.getElementById(id);
+  const d=g("rdDate").value, corr=+g("rdCorr").value, tot=+g("rdTot").value;
+  if(!d||isNaN(corr)||!tot||corr<0||corr>tot) return alert("日付・正答・問題数を正しく入力してください（正答≦問題数）");
+  S.rdgLog.push({id:uid(), d, name:g("rdName").value.trim(), corr, tot, min:+g("rdMin").value||null, type:g("rdType").value});
+  addStudy(d,"TOEFL",+g("rdMin").value||0,"Reading演習");
+  save(); g("rdName").value=""; g("rdCorr").value=""; renderAll();
+}
+function delRdg(id){ S.rdgLog=S.rdgLog.filter(x=>x.id!==id); save(); renderAll(); }
+
+
 /* ================= データ管理 ================= */
 function exportData(){
   const blob=new Blob([JSON.stringify(S,null,1)],{type:"application/json"});
@@ -1428,8 +1637,8 @@ function resetData(){
 }
 
 /* ================= 起動 ================= */
-function renderAll(){ if(!S.plan) S.plan={}; renderDash(); renderSched(); renderToefl(); renderEssay(); renderIntv(); renderMock(); renderPlan(); }
-["tfDate","lgDate","hwDate","evDate"].forEach(id=>document.getElementById(id).value=today());
+function renderAll(){ if(!S.plan) S.plan={}; if(!S.rdgLog) S.rdgLog=[]; if(!S.rdgPlan) S.rdgPlan={}; if(!S.rdgSteps) S.rdgSteps={}; renderDash(); renderSched(); renderToefl(); renderReading(); renderEssay(); renderIntv(); renderMock(); renderPlan(); }
+["tfDate","lgDate","hwDate","evDate","rdDate"].forEach(id=>{var el=document.getElementById(id); if(el) el.value=today();});
 renderAll();
 
 /* ================= GitHub同期（Gist方式） ================= */
@@ -1443,13 +1652,13 @@ function ghKeyOf(it){ return (it && it.id!=null) ? ("id:"+it.id) : ("j:"+JSON.st
 function mergeState(local, remote){
   local = local||{}; remote = remote||{};
   var out = {};
-  ["studyLog","toefl","essays","qa","mocks","events"].forEach(function(k){
+  ["studyLog","toefl","essays","qa","mocks","events","rdgLog"].forEach(function(k){
     var m = {};
     (remote[k]||[]).forEach(function(it){ m[ghKeyOf(it)] = it; });
     (local[k]||[]).forEach(function(it){ m[ghKeyOf(it)] = it; }); // 同一はローカル優先
     out[k] = Object.keys(m).map(function(id){ return m[id]; });
   });
-  ["lessons","tasks","plan"].forEach(function(k){
+  ["lessons","tasks","plan","rdgPlan","rdgSteps"].forEach(function(k){
     out[k] = Object.assign({}, remote[k]||{}, local[k]||{}); // キーはローカル優先
   });
   return out;
