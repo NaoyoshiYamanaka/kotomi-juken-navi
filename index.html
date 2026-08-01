@@ -537,6 +537,17 @@ label.f{display:block;font-size:12px;color:var(--sub);font-weight:600;margin-bot
           <div id="e50prompt" style="background:#f6f8fb;border-left:4px solid #b9c6da;border-radius:0 8px 8px 0;padding:10px 14px;font-size:14px;line-height:1.8"></div>
         </div>
         <div class="card">
+          <h3>✏️ 書き直しモード（PCで改稿 → Claudeが採点）</h3>
+          <p class="muted" style="margin:2px 0 8px">初稿（手書きのテキスト化）に画面上で手を入れて、第2版・第3版…と改稿します。<b>採点と講評はアプリではなくClaude（チャット）が行います。</b>流れ：①ここで直して「新しい版として保存」→②「採点用にコピー」→③チャットに貼って送る→④返ってきた[採点]ブロックを下の「一括貼り付け」へ（自動でこの版に紐づきます）。</p>
+          <div id="e50revList" style="margin-bottom:8px"></div>
+          <textarea id="e50revText" style="font-size:15px;line-height:2;min-height:340px;overflow-y:hidden" oninput="e50RevCount()" placeholder="最新版の本文がここに表示されます。直接書き換えて「新しい版として保存」。"></textarea>
+          <p class="muted" style="margin:4px 0 8px"><span id="e50revCount">0</span> 字（目標800字・最低640字）</p>
+          <div class="flex">
+            <button class="btn essay sm" onclick="e50NewRev()">① 新しい版として保存</button>
+            <button class="btn sm" onclick="e50CopyRev()">② 最新版を採点用にコピー</button>
+          </div>
+        </div>
+        <div class="card">
           <h3>一括貼り付け（本文＋採点＋寸評）</h3>
           <p class="muted" style="margin-bottom:6px">私が返す「【本文】…[採点]…講評…」ブロックをそのまま貼り付けて「解析して保存」。選択中の番号に登録されます。</p>
           <textarea id="e50paste" rows="7" placeholder="【本文】&#10;（テキスト化した本文）&#10;&#10;[採点]&#10;日付: 2026-07-16&#10;課題文理解: 3/5&#10;設問対応: 3/5&#10;主張の明確さ: 3/5&#10;論理と根拠: 2/5&#10;具体性・視野: 3/5&#10;日本語表現: 3/5&#10;合計: 17/30&#10;所要時間: 55分&#10;自己採点: 20/30&#10;誤字: 責務→債務、消減→削減&#10;講評:&#10;（寸評本文）"></textarea>
@@ -546,7 +557,7 @@ label.f{display:block;font-size:12px;color:var(--sub);font-weight:600;margin-bot
           <h3>手動で編集</h3>
           <div class="frow"><div><label class="f">日付</label><input type="date" id="e50date"></div></div>
           <div class="frow" id="e50scoreInputs"></div>
-          <div><label class="f">本文（テキスト化）</label><textarea id="e50text" rows="6"></textarea></div>
+          <div><label class="f">本文（テキスト化）</label><textarea id="e50text" rows="12"></textarea></div>
           <div style="margin-top:8px"><label class="f">寸評（講評）</label><textarea id="e50fb" rows="5"></textarea></div>
           <button class="btn essay sm" style="margin-top:8px" onclick="e50Save()">保存</button>
         </div>
@@ -1137,7 +1148,7 @@ function load(){
   return {studyLog:[], toefl:[], essays:[], qa:[], mocks:[], lessons:{}, tasks:{}, events:[], plan:{}, rdgLog:[], rdgPlan:{}, rdgSteps:{}, fgsScores:[], essay50:{}};
 }
 function save(){ localStorage.setItem(KEY, JSON.stringify(S)); if(typeof scheduleSyncPush==="function") scheduleSyncPush(); }
-const APP_VERSION = "2026.08.15";
+const APP_VERSION = "2026.08.18";
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
 function esc(s){ return (s||"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function ymd(dt){ return dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0")+"-"+String(dt.getDate()).padStart(2,"0"); }
@@ -1159,6 +1170,7 @@ document.querySelectorAll(".subtabs").forEach(g=>g.querySelectorAll(".subtab").f
   t.classList.add("active");
   g.parentElement.querySelectorAll(":scope > .subpage").forEach(p=>p.classList.remove("show"));
   document.getElementById("sub-"+t.dataset.sub).classList.add("show");
+  if(t.dataset.sub==="e50"||t.dataset.sub==="efgs"){ try{ e50RevCount(); }catch(e){} }
 })));
 
 /* ================= ダッシュボード ================= */
@@ -2625,23 +2637,24 @@ function addGoji(){
 }
 function delGoji(i){ S.goji.splice(i,1); save(); renderEssay50(); }
 function syncE50ToFgs(n){
-  const r=(S.essay50||{})[n]; if(!r||r.total==null) return;
+  const r=(S.essay50||{})[n]; if(!r) return;
   const pl=ESSAY50_PLAN.find(x=>x.n==n);
-  const entry={id:"e50-"+n, d:r.d||today(), theme:"第"+n+"回 "+(pl?pl.th:""), scores:r.scores||{}, total:r.total, feedback:r.feedback||""};
   if(!S.fgsScores) S.fgsScores=[];
-  const i=S.fgsScores.findIndex(x=>x.id===entry.id);
-  if(i>=0) S.fgsScores[i]=entry; else S.fgsScores.push(entry);
+  S.fgsScores=S.fgsScores.filter(x=>x.id!=="e50-"+n); // 旧形式(1問1件)を除去
+  const revs=(r.revs&&r.revs.length)?r.revs:((r.total!=null||r.text)?[{v:1,d:r.d,text:r.text,scores:r.scores,total:r.total,feedback:r.feedback}]:[]);
+  revs.forEach(rv=>{
+    if(rv.total==null) return;
+    const id="e50-"+n+"-v"+rv.v;
+    const entry={id, d:rv.d||r.d||today(), theme:"第"+n+"回 "+(pl?pl.th:"")+"（第"+rv.v+"版）", scores:rv.scores||{}, total:rv.total, feedback:rv.feedback||""};
+    const i=S.fgsScores.findIndex(x=>x.id===id);
+    if(i>=0) S.fgsScores[i]=entry; else S.fgsScores.push(entry);
+  });
 }
 function reconcileEssay50Scores(){
   if(!S.essay50) return;
-  let changed=false;
-  Object.keys(S.essay50).forEach(k=>{
-    const r=S.essay50[k]; if(!r||r.total==null) return;
-    const id="e50-"+k;
-    const ex=(S.fgsScores||[]).find(x=>x.id===id);
-    if(!ex||ex.total!==r.total||ex.d!==(r.d||ex.d)){ syncE50ToFgs(+k); changed=true; }
-  });
-  if(changed) save();
+  const before=JSON.stringify(S.fgsScores||[]);
+  Object.keys(S.essay50).forEach(k=>syncE50ToFgs(+k));
+  if(JSON.stringify(S.fgsScores||[])!==before) save();
 }
 function e50Rec(n){ return (S.essay50&&S.essay50[n])||null; }
 function renderEssay50(){
@@ -2697,6 +2710,51 @@ function e50Fill(){
   if(g("e50text")) g("e50text").value=(r&&r.text)||"";
   if(g("e50fb")) g("e50fb").value=(r&&r.feedback)||"";
   FGS_RUBRIC.forEach(c=>{const el=g("e50_"+c.k); if(el) el.value=(r&&r.scores&&r.scores[c.k]!=null)?r.scores[c.k]:0;});
+  const revs=e50RevsOf(e50cur);
+  const rl=g("e50revList");
+  if(rl) rl.innerHTML= revs.length? revs.map(rv=>`<details style="margin:4px 0"><summary style="cursor:pointer;font-weight:600">第${rv.v}版（${rv.d||""}）${rv.total!=null?` <span class="tag" style="background:${fgsBand(rv.total)[1]};color:#fff">${rv.total}/30</span>`:' <span class="tag amber">未採点</span>'}</summary><div style="white-space:pre-wrap;background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:13.5px;line-height:1.8;margin-top:4px">${esc(rv.text||"")}</div>${rv.feedback?`<details style="margin-top:4px"><summary class="muted" style="cursor:pointer;font-size:12.5px">この版への講評</summary><div style="white-space:pre-wrap;font-size:13px;background:#f2f7f2;border-radius:6px;padding:8px 12px;margin-top:4px">${esc(rv.feedback)}</div></details>`:""}</details>`).join("") : '<p class="muted" style="margin:0">まだ版がありません。手書き初稿は、私のテキスト化を「一括貼り付け」すると第1版として入ります。ここに直接書き始めてもOKです。</p>';
+  const rt=g("e50revText");
+  if(rt&&document.activeElement!==rt){ rt.value=revs.length?revs[revs.length-1].text:((r&&r.text)||""); e50RevCount(); }
+}
+function e50RevsOf(n){
+  const r=(S.essay50||{})[n];
+  if(!r) return [];
+  if(!r.revs){
+    if(r.text||r.total!=null) r.revs=[{v:1, d:r.d||today(), text:r.text||"", scores:r.scores||null, total:(r.total!=null?r.total:null), feedback:r.feedback||""}];
+    else r.revs=[];
+  }
+  return r.revs;
+}
+function e50RevCount(){
+  const el=document.getElementById("e50revText"), c=document.getElementById("e50revCount");
+  if(!el) return;
+  if(c) c.textContent=el.value.replace(/\s/g,"").length;
+  el.style.height="auto";
+  el.style.height=Math.max(340, el.scrollHeight+6)+"px";
+}
+function e50NewRev(){
+  const txt=(document.getElementById("e50revText").value||"").trim();
+  if(!txt) return alert("本文を入力してください");
+  if(!S.essay50) S.essay50={};
+  if(!S.essay50[e50cur]) S.essay50[e50cur]={d:today(), text:"", feedback:"", scores:null, total:null};
+  const revs=e50RevsOf(e50cur);
+  const last=revs[revs.length-1];
+  if(last&&last.text===txt) return alert("直前の版と同じ内容です。どこかを直してから保存してください。");
+  const v=last?last.v+1:1;
+  revs.push({v, d:today(), text:txt, scores:null, total:null, feedback:""});
+  S.essay50[e50cur].text=txt; S.essay50[e50cur].d=today();
+  save(); renderEssay50();
+  alert("第"+v+"版として保存しました。「② 採点用にコピー」→ Claudeのチャットに貼って送ってください。");
+}
+function e50CopyRev(){
+  const revs=e50RevsOf(e50cur);
+  if(!revs.length) return alert("保存された版がありません。まず「① 新しい版として保存」を。");
+  const last=revs[revs.length-1];
+  const pl=ESSAY50_PLAN.find(x=>x.n==e50cur);
+  const out="【採点依頼】50本ノート 第"+e50cur+"回「"+(pl?pl.th:"")+"」 第"+last.v+"版\n（6基準での採点と講評をお願いします。前回からの改稿版です）\n\n【本文】\n"+last.text;
+  const done=()=>alert("コピーしました。Claudeのチャットに貼り付けて送ってください。");
+  if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(out).then(done).catch(()=>prompt("下を全選択してコピーしてください", out));
+  else prompt("下を全選択してコピーしてください", out);
 }
 function e50ToggleModel(){
   const box=document.getElementById("e50modelBox"), btn=document.getElementById("e50modelBtn");
@@ -2730,9 +2788,10 @@ function e50Save(){
   const g=id=>document.getElementById(id);
   const scores={}; let total=0, any=false;
   FGS_RUBRIC.forEach(c=>{const v=+g("e50_"+c.k).value; scores[c.k]=v; total+=v; if(v>0) any=true;});
+  const prevM=e50Rec(e50cur);
   const text=g("e50text").value.trim(), fb=g("e50fb").value.trim();
   if(!S.essay50) S.essay50={};
-  S.essay50[e50cur]={d:g("e50date").value||today(), text, feedback:fb, scores:any?scores:null, total:any?total:null};
+  S.essay50[e50cur]={d:g("e50date").value||today(), text, feedback:fb, scores:any?scores:null, total:any?total:null, min:(prevM&&prevM.min)||null, self:(prevM&&prevM.self)||null, revs:(prevM&&prevM.revs)||undefined};
   syncE50ToFgs(e50cur);
   save(); renderAll(); alert("第"+e50cur+"回を保存しました"+(any?"（"+total+"/30）":""));
 }
@@ -2751,7 +2810,21 @@ function e50Parse(){
   labels.forEach(([k,re])=>{const m=t.match(re); if(m){scores[k]=+m[1]; total+=+m[1]; found++;} else scores[k]=0;});
   let fb=""; const fm=t.match(/講評[:：]?\s*([\s\S]*)$/); if(fm) fb=fm[1].trim();
   if(!S.essay50) S.essay50={};
-  S.essay50[e50cur]={d, text, feedback:fb, scores:found?scores:null, total:found?total:null, min:tmin?+tmin:((prev&&prev.min)||null), self:tself?+tself:((prev&&prev.self)||null)};
+  const tv=((t.match(/版[:：]\s*(\d+)/)||t.match(/第(\d+)版/))||[])[1];
+  if(!S.essay50[e50cur]) S.essay50[e50cur]={d, text:"", feedback:"", scores:null, total:null};
+  const revsA=e50RevsOf(e50cur);
+  let tgt=tv?revsA.find(x=>x.v===+tv):null;
+  if(!tgt){
+    const lastA=revsA[revsA.length-1];
+    if(!revsA.length || (tm&&lastA&&lastA.total!=null&&lastA.text!==text)){
+      revsA.push({v:(lastA?lastA.v+1:1), d, text:(tm?text:""), scores:null, total:null, feedback:""});
+    }
+    tgt=revsA[revsA.length-1];
+  }
+  if(tm&&text) tgt.text=text;
+  tgt.d=d; if(found){ tgt.scores=scores; tgt.total=total; } tgt.feedback=fb;
+  const lastR=revsA[revsA.length-1];
+  S.essay50[e50cur]=Object.assign(S.essay50[e50cur], {d, text:(lastR&&lastR.text)||text, feedback:fb, scores:found?scores:null, total:found?total:null, min:tmin?+tmin:((prev&&prev.min)||null), self:tself?+tself:((prev&&prev.self)||null), revs:revsA});
   syncE50ToFgs(e50cur);
   save(); document.getElementById("e50paste").value=""; renderAll();
   alert("第"+e50cur+"回に登録しました"+(found?"："+total+"/30（基準"+found+"個）":"（本文のみ）"));
