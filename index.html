@@ -504,7 +504,7 @@ label.f{display:block;font-size:12px;color:var(--sub);font-weight:600;margin-bot
       <div class="subpage" id="sub-fgsscore">
         <div class="card">
           <h3>講評を貼り付けて記録（おすすめ）</h3>
-          <p class="muted" style="margin-bottom:8px">私（Claude）がお返しする「<b>[採点]</b> …」のブロックを、下にそのまま貼り付けて「解析して記録」を押すと、日付・6基準の点数・講評がまとめて登録されます。</p>
+          <p class="muted" style="margin-bottom:8px"><b>50本ノートに貼り付けた採点は自動でここに反映されます（貼り直し不要）。</b>この欄は、50本ノート以外の練習（塾の課題・自由練習など）を記録したいときに使ってください。私（Claude）がお返しする「<b>[採点]</b> …」ブロックをそのまま貼って「解析して記録」を押します。</p>
           <textarea id="fgsPaste" rows="8" placeholder="[採点]&#10;日付: 2026-07-16&#10;テーマ: 課題文③ 人間の安全保障&#10;課題文理解: 3/5&#10;設問対応: 3/5&#10;主張の明確さ: 3/5&#10;論理と根拠: 2/5&#10;具体性・視野: 3/5&#10;日本語表現: 3/5&#10;合計: 17/30&#10;講評:&#10;（ここに講評本文が入ります）"></textarea>
           <button class="btn essay sm" style="margin-top:8px" onclick="parseFgsPaste()">解析して記録</button>
         </div>
@@ -588,13 +588,22 @@ label.f{display:block;font-size:12px;color:var(--sub);font-weight:600;margin-bot
       <div id="recNextSet"></div>
       <div id="recStage" style="display:none"></div>
       <div class="card" style="margin-bottom:14px"><h3>やり方（1回15〜20分）</h3>
-        <ol style="margin:8px 0 0 22px">
-          <li>質問を<b>5問</b>選ぶ（「★志願書対策」や「質問バンク」から）</li>
-          <li>各問について、<b>キーワード3つ＋エピソード1つ</b>だけメモする（文章は書かない）</li>
-          <li>スマホのボイスメモで録音しながら、1問<b>30秒〜1分</b>で答える</li>
-          <li>聞き返して、下のチェック表の項目を数える</li>
-          <li>気づきを下に記録し、<b>次回は1つだけ</b>直す</li>
+        <p style="margin:4px 0 6px"><b>石田先生の宿題があるとき（上にカードが出ているとき）</b></p>
+        <ol style="margin:0 0 10px 22px">
+          <li>先に<b>想定問答ノート</b>で各問の骨子を書いておく（文章にせず箇条書きで。書き方は下の「骨子の作り方」を参照）</li>
+          <li>スマホのボイスメモで<b>録音を回してから</b>、宿題カードの「<b>▶ この宿題で録音練習を開始</b>」を押す</li>
+          <li>質問が1問ずつ表示される。<b>結論→理由→エピソード</b>の順に、1問<b>30秒〜1分</b>で答える（骨子を忘れたら「骨子を見る／隠す」でチラ見してOK）</li>
+          <li>答えたら「<b>🎙 録音した→次へ</b>」で進む（質問ごとの録音回数は自動で記録され、石田先生にも見えます）</li>
+          <li>終わったら録音を聞き返し、下のチェック表の項目を数えて「録音練習の記録」に気づきを書く。<b>次回は1つだけ</b>直す</li>
         </ol>
+        <div style="background:#f6f8fb;border-left:4px solid var(--intv);border-radius:0 8px 8px 0;padding:10px 14px;margin:8px 0"><b>骨子の作り方（質問の型に合わせる）</b>
+        <ul style="margin:6px 0 0 20px">
+          <li><b>体験・動機を聞く質問</b>（留学で変わったことは？）→ 結論＋<b>エピソード1つ</b></li>
+          <li><b>考え・意見を聞く質問</b>（債務は免除すべき？）→ <b>立場＋理由2つ</b></li>
+          <li><b>知識・理解を確かめる質問</b>（マヤ諸語とは？）→ <b>要点2〜3語</b>を正確に</li>
+          <li>どの型でも共通：<b>最初の一文（結論）だけは決めておく</b></li>
+        </ul></div>
+        <p class="muted" style="margin:0">宿題がない期間は、「★志願書対策」から気になる5問を選び、同じ要領で録音→聞き返し→記録します。</p>
       </div>
       <div class="card" style="margin-bottom:14px"><h3>聞き返しチェック表</h3>
         <ul style="margin:8px 0 0 22px">
@@ -607,6 +616,7 @@ label.f{display:block;font-size:12px;color:var(--sub);font-weight:600;margin-bot
         </ul>
       </div>
       <div class="card"><h3>録音練習の記録</h3>
+        <p class="muted" style="margin:2px 0 8px">「どの質問を何回録音したか」は上の宿題カードに自動で付きます。ここには<b>聞き返して気づいたこと</b>を残します（宿題モードを終了すると質問数は自動で入ります）。</p>
         <div class="frow">
           <div><label class="f">日付</label><input type="date" id="recDate"></div>
           <div><label class="f">練習した質問数</label><input type="number" id="recN" min="1" value="5" style="width:80px"></div>
@@ -848,7 +858,7 @@ const INTV_LESSONS = [
 <p>すべての質問に使える万能の型：</p>
 <div class="ex"><b>①結論</b>「私が貴学を志望する理由は〜です」→ <b>②理由・背景</b>「きっかけは留学中に〜したことです」→ <b>③具体エピソード</b>「実際に〜という経験をし、〜と感じました」→ <b>④つなげる</b>「だから貴学の〜で学びたいと考えています」</div>
 <ul><li>1つの答えは<b>30秒〜1分</b>。長すぎる暗唱は逆効果。要点を話し、深掘りは追加質問に任せる</li><li>暗記した文章をそのまま話すと棒読みになる。<b>キーワードとエピソードだけ覚えて、その場で組み立てる</b></li><li>わからない質問には正直に：「勉強不足で存じませんが、私の考えでは〜」と考える姿勢を見せる</li><li>圧迫気味の質問（「それは甘い考えでは？」）は人柄テスト。むきにならず「ご指摘の通り〜という面もあります。ただ私は〜」と受け止めてから返す</li></ul>
-<div class="pt">想定問答ノートには文章ではなく「<b>骨子（キーワード3つ＋エピソード1つ）</b>」を書く。これが自然に話せる秘訣です。</div>`},
+<div class="pt">想定問答ノートには文章ではなく<b>骨子だけ</b>を書く。書き方は質問の型に合わせる——体験系は「結論＋エピソード1つ」、意見系は「立場＋理由2つ」、知識系は「要点2〜3語」。これが自然に話せる秘訣です。</div>`},
 {t:"帰国生面接の頻出質問と攻略", b:`
 <h4>必ず聞かれる5大質問</h4>
 <ol><li><b>なぜ本学・本学部か</b>（最重要。大学のWebサイトで教授名・カリキュラム・ゼミを調べ、固有名詞で語る）</li><li><b>留学で何を学んだか・苦労したか</b>（成長ストーリーを1つ用意。困難→工夫→成長の順で）</li><li><b>なぜ帰国して日本の大学か</b>（帰国生特有の質問。「米国の大学ではなく日本を選んだ積極的な理由」を必ず用意）</li><li><b>入学後に何を学びたいか・将来は</b>（学部の学びと将来をつなげる）</li><li><b>最近気になったニュース</b>（志望学部に関連する分野で2〜3本ストック。横国なら経済、横市・上智なら国際）</li></ol>
@@ -1127,7 +1137,7 @@ function load(){
   return {studyLog:[], toefl:[], essays:[], qa:[], mocks:[], lessons:{}, tasks:{}, events:[], plan:{}, rdgLog:[], rdgPlan:{}, rdgSteps:{}, fgsScores:[], essay50:{}};
 }
 function save(){ localStorage.setItem(KEY, JSON.stringify(S)); if(typeof scheduleSyncPush==="function") scheduleSyncPush(); }
-const APP_VERSION = "2026.08.10";
+const APP_VERSION = "2026.08.13";
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
 function esc(s){ return (s||"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function ymd(dt){ return dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0")+"-"+String(dt.getDate()).padStart(2,"0"); }
@@ -1570,7 +1580,7 @@ function renderQA(){
           ${["未着手","作成中","完成"].map(s=>`<option ${q.status===s?"selected":""}>${s}</option>`).join("")}
         </select><span class="tag ${stc[q.status]}">${q.status}</span>
         <button class="del" onclick="delQA('${q.id}')">削除</button></div>
-      <textarea rows="2" placeholder="骨子をメモ：キーワード3つ＋エピソード1つ（丸暗記の文章は書かない）" onchange="qaAnswer('${q.id}',this.value)">${esc(q.a||"")}</textarea>
+      <textarea rows="2" placeholder="骨子をメモ（文章は書かない）：体験系＝結論＋エピソード1つ／意見系＝立場＋理由2つ／知識系＝要点2〜3語" onchange="qaAnswer('${q.id}',this.value)">${esc(q.a||"")}</textarea>
     </div>`;
   const hwList=list.filter(q=>hw.has(q.q));
   const rest=list.filter(q=>!hw.has(q.q));
@@ -2386,7 +2396,7 @@ function renderFGS(){
   if(rb) rb.innerHTML = `<div class="card"><h3>小論文 採点表（30点満点）</h3>
     <table><tr><th>基準</th><th>見るところ</th><th>配点</th></tr>${FGS_RUBRIC.map(c=>`<tr><td><b>${c.nm}</b></td><td class="muted">${c.d}</td><td>5点</td></tr>`).join("")}
     <tr><td colspan="2" style="text-align:right"><b>合計</b></td><td><b>30点</b></td></tr></table>
-    <p class="muted" style="margin-top:8px">目安：24点以上＝合格圏／18〜23点＝あと一歩／17点以下＝要強化。私が写真を採点するときはこの6基準で点数と講評を返します。返ってきた点数は「採点記録」タブに入力すると、推移と弱点が見えます。</p></div>`;
+    <p class="muted" style="margin-top:8px">目安：24点以上＝合格圏／18〜23点＝あと一歩／17点以下＝要強化。私が写真を採点するときはこの6基準で点数と講評を返します。50本ノートに貼り付けた採点は、自動でこの「採点記録」にも反映されます（推移グラフ・弱点分析に含まれます）。</p></div>`;
   renderLessons("fgsKata", FGS_KATA, "f_");
   // passages
   const bk=document.getElementById("fgsBank");
@@ -2478,7 +2488,7 @@ function parseFgsPaste(){
   save(); document.getElementById("fgsPaste").value=""; renderAll();
   const bd=fgsBand(total); alert("記録しました："+total+"/30（"+bd[0]+"）／基準"+found+"個を反映");
 }
-function delFgsScore(id){ S.fgsScores=S.fgsScores.filter(x=>x.id!==id); save(); renderAll(); }
+function delFgsScore(id){ if(String(id).indexOf("e50-")===0) return alert("この記録は50本ノートと連動しています（50本ノート側が原本のため、ここからは削除できません）"); S.fgsScores=S.fgsScores.filter(x=>x.id!==id); save(); renderAll(); }
 
 /* ================= 小論文50本ノート ================= */
 const ESSAY50_PLAN = [
@@ -2594,6 +2604,25 @@ const ESSAY50_POINT = {
 5:`<b>📐 設計図（概念適用型）</b><ol style="margin:6px 0 10px 20px"><li><b>概念の要点</b>（約90字）：定義＋特徴（保護とエンパワメント）を自分の言葉で。</li><li><b>事例</b>（約180字）：ジュリアさん。「戦争はしていない。しかし脅かされている」という対比が、概念の必要性をそのまま示す。</li><li><b>分析</b>（約170字）：原因を一つにせず「貧困＋差別の歴史＋制度からの排除」と重ねる。最後に「だからこの概念に意義がある」と概念へ戻す。</li><li><b>対策</b>（約230字）：概念の二本柱（保護／エンパワメント）に対応させて短期・長期を書くと、概念を「使えている」ことが伝わる。</li><li><b>結論</b>（約80字）：概念の言葉で締める。</li></ol><b>🛠 使った技</b><ul style="margin:6px 0 10px 20px"><li>概念を「名前」でなく「分析の道具」として使う——分析と対策の骨組みに概念の柱を対応させる。</li><li>一人の人物から入ると、抽象概念が具体になる。</li></ul><b>👣 真似るコツ</b><ul style="margin:6px 0 0 20px"><li>人間の安全保障・多文化共生など概念系の題は、この「定義→顔の見える事例→複合原因→二本柱の対策」で。</li></ul>`
 };
 let e50cur=1;
+function syncE50ToFgs(n){
+  const r=(S.essay50||{})[n]; if(!r||r.total==null) return;
+  const pl=ESSAY50_PLAN.find(x=>x.n==n);
+  const entry={id:"e50-"+n, d:r.d||today(), theme:"第"+n+"回 "+(pl?pl.th:""), scores:r.scores||{}, total:r.total, feedback:r.feedback||""};
+  if(!S.fgsScores) S.fgsScores=[];
+  const i=S.fgsScores.findIndex(x=>x.id===entry.id);
+  if(i>=0) S.fgsScores[i]=entry; else S.fgsScores.push(entry);
+}
+function reconcileEssay50Scores(){
+  if(!S.essay50) return;
+  let changed=false;
+  Object.keys(S.essay50).forEach(k=>{
+    const r=S.essay50[k]; if(!r||r.total==null) return;
+    const id="e50-"+k;
+    const ex=(S.fgsScores||[]).find(x=>x.id===id);
+    if(!ex||ex.total!==r.total||ex.d!==(r.d||ex.d)){ syncE50ToFgs(+k); changed=true; }
+  });
+  if(changed) save();
+}
 function e50Rec(n){ return (S.essay50&&S.essay50[n])||null; }
 function renderEssay50(){
   if(!S.essay50) S.essay50={};
@@ -2676,6 +2705,7 @@ function e50Save(){
   const text=g("e50text").value.trim(), fb=g("e50fb").value.trim();
   if(!S.essay50) S.essay50={};
   S.essay50[e50cur]={d:g("e50date").value||today(), text, feedback:fb, scores:any?scores:null, total:any?total:null};
+  syncE50ToFgs(e50cur);
   save(); renderAll(); alert("第"+e50cur+"回を保存しました"+(any?"（"+total+"/30）":""));
 }
 function e50Parse(){
@@ -2690,6 +2720,7 @@ function e50Parse(){
   let fb=""; const fm=t.match(/講評[:：]?\s*([\s\S]*)$/); if(fm) fb=fm[1].trim();
   if(!S.essay50) S.essay50={};
   S.essay50[e50cur]={d, text, feedback:fb, scores:found?scores:null, total:found?total:null};
+  syncE50ToFgs(e50cur);
   save(); document.getElementById("e50paste").value=""; renderAll();
   alert("第"+e50cur+"回に登録しました"+(found?"："+total+"/30（基準"+found+"個）":"（本文のみ）"));
 }
@@ -2753,7 +2784,7 @@ function addCase(){
   save(); renderCases(); alert("事例を追加しました");
 }
 function delCase(id){ if(!confirm("この事例を削除しますか？")) return; S.cases=(S.cases||[]).filter(c=>c.id!==id); save(); renderCases(); }
-function renderAll(){ if(!S.plan) S.plan={}; if(!S.rdgLog) S.rdgLog=[]; if(!S.rdgPlan) S.rdgPlan={}; if(!S.rdgSteps) S.rdgSteps={}; if(!S.fgsScores) S.fgsScores=[]; if(!S.essay50) S.essay50={}; if(!S.cases) S.cases=[]; if(!S.recs) S.recs=[]; if(!S.mockSets) S.mockSets=[]; if(!S.customQs) S.customQs=[];  if(S.nextSet&&S.nextSet.items&&S.nextSet.items.length){ var migId="mig"+(S.nextSet.upd||0); if(!S.mockSets.some(x=>x.id===migId)){ S.mockSets.push({id:migId, name:"引き継ぎセット", d:S.nextSet.d||"", items:S.nextSet.items, upd:S.nextSet.upd||Date.now()}); seedQAFromQuestions(S.nextSet.items.map(x=>x.q)); } S.nextSet=null; } reconcileHomeworkQA(); renderDash(); renderSched(); renderToefl(); renderReading(); renderEssay(); renderFGS(); renderCases(); renderEssay50(); renderIntv(); renderShigan(); renderRecs(); renderNextSet(); renderMock(); renderPlan(); }
+function renderAll(){ if(!S.plan) S.plan={}; if(!S.rdgLog) S.rdgLog=[]; if(!S.rdgPlan) S.rdgPlan={}; if(!S.rdgSteps) S.rdgSteps={}; if(!S.fgsScores) S.fgsScores=[]; if(!S.essay50) S.essay50={}; if(!S.cases) S.cases=[]; if(!S.recs) S.recs=[]; if(!S.mockSets) S.mockSets=[]; if(!S.customQs) S.customQs=[];  if(S.nextSet&&S.nextSet.items&&S.nextSet.items.length){ var migId="mig"+(S.nextSet.upd||0); if(!S.mockSets.some(x=>x.id===migId)){ S.mockSets.push({id:migId, name:"引き継ぎセット", d:S.nextSet.d||"", items:S.nextSet.items, upd:S.nextSet.upd||Date.now()}); seedQAFromQuestions(S.nextSet.items.map(x=>x.q)); } S.nextSet=null; } reconcileHomeworkQA(); reconcileEssay50Scores(); renderDash(); renderSched(); renderToefl(); renderReading(); renderEssay(); renderFGS(); renderCases(); renderEssay50(); renderIntv(); renderShigan(); renderRecs(); renderNextSet(); renderMock(); renderPlan(); }
 ["tfDate","lgDate","hwDate","evDate","rdDate","fgsDate","e50date","recDate"].forEach(id=>{var el=document.getElementById(id); if(el) el.value=today();});
 renderAll();
 
