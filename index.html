@@ -1148,7 +1148,7 @@ function load(){
   return {studyLog:[], toefl:[], essays:[], qa:[], mocks:[], lessons:{}, tasks:{}, events:[], plan:{}, rdgLog:[], rdgPlan:{}, rdgSteps:{}, fgsScores:[], essay50:{}};
 }
 function save(){ localStorage.setItem(KEY, JSON.stringify(S)); if(typeof scheduleSyncPush==="function") scheduleSyncPush(); }
-const APP_VERSION = "2026.08.18";
+const APP_VERSION = "2026.08.19";
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
 function esc(s){ return (s||"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function ymd(dt){ return dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0")+"-"+String(dt.getDate()).padStart(2,"0"); }
@@ -2889,7 +2889,38 @@ function addCase(){
   save(); renderCases(); alert("事例を追加しました");
 }
 function delCase(id){ if(!confirm("この事例を削除しますか？")) return; S.cases=(S.cases||[]).filter(c=>c.id!==id); save(); renderCases(); }
-function renderAll(){ if(!S.plan) S.plan={}; if(!S.rdgLog) S.rdgLog=[]; if(!S.rdgPlan) S.rdgPlan={}; if(!S.rdgSteps) S.rdgSteps={}; if(!S.fgsScores) S.fgsScores=[]; if(!S.essay50) S.essay50={}; if(!S.cases) S.cases=[]; if(!S.recs) S.recs=[]; if(!S.mockSets) S.mockSets=[]; if(!S.customQs) S.customQs=[]; if(!S.goji) S.goji=[];  if(S.nextSet&&S.nextSet.items&&S.nextSet.items.length){ var migId="mig"+(S.nextSet.upd||0); if(!S.mockSets.some(x=>x.id===migId)){ S.mockSets.push({id:migId, name:"引き継ぎセット", d:S.nextSet.d||"", items:S.nextSet.items, upd:S.nextSet.upd||Date.now()}); seedQAFromQuestions(S.nextSet.items.map(x=>x.q)); } S.nextSet=null; } reconcileHomeworkQA(); reconcileEssay50Scores(); renderDash(); renderSched(); renderToefl(); renderReading(); renderEssay(); renderFGS(); renderCases(); renderEssay50(); renderIntv(); renderShigan(); renderRecs(); renderNextSet(); renderMock(); renderPlan(); }
+function renderAllCore(){ if(!S.plan) S.plan={}; if(!S.rdgLog) S.rdgLog=[]; if(!S.rdgPlan) S.rdgPlan={}; if(!S.rdgSteps) S.rdgSteps={}; if(!S.fgsScores) S.fgsScores=[]; if(!S.essay50) S.essay50={}; if(!S.cases) S.cases=[]; if(!S.recs) S.recs=[]; if(!S.mockSets) S.mockSets=[]; if(!S.customQs) S.customQs=[]; if(!S.goji) S.goji=[];  if(S.nextSet&&S.nextSet.items&&S.nextSet.items.length){ var migId="mig"+(S.nextSet.upd||0); if(!S.mockSets.some(x=>x.id===migId)){ S.mockSets.push({id:migId, name:"引き継ぎセット", d:S.nextSet.d||"", items:S.nextSet.items, upd:S.nextSet.upd||Date.now()}); seedQAFromQuestions(S.nextSet.items.map(x=>x.q)); } S.nextSet=null; } reconcileHomeworkQA(); reconcileEssay50Scores(); renderDash(); renderSched(); renderToefl(); renderReading(); renderEssay(); renderFGS(); renderCases(); renderEssay50(); renderIntv(); renderShigan(); renderRecs(); renderNextSet(); renderMock(); renderPlan(); }
+function uiSnapshot(){
+  const dkey=d=>{
+    const anc=d.closest("[id]");
+    const sum=d.querySelector(":scope>summary");
+    const sibs=anc?[...anc.querySelectorAll("details")]:[d];
+    return ((anc&&anc.id)||"")+"#"+sibs.indexOf(d)+"::"+((sum&&sum.textContent.trim().slice(0,60))||"");
+  };
+  const openDetails=[...document.querySelectorAll("details[open]")].map(dkey);
+  const bkey=el=>{
+    const head=el.querySelector("button.head, > button, .head")||el.querySelector("button");
+    return el.classList[0]+"::"+((head&&head.textContent.trim().slice(0,60))||el.textContent.trim().slice(0,40));
+  };
+  const openBlocks=[...document.querySelectorAll(".lesson.open,.monthblock.open,.hist.open")].map(bkey);
+  const mb=document.getElementById("e50modelBox");
+  return {openDetails:new Set(openDetails), openBlocks:new Set(openBlocks), model:!!(mb&&mb.style.display!=="none"), dkey, bkey};
+}
+function uiRestore(snap){
+  if(!snap) return;
+  document.querySelectorAll("details").forEach(d=>{ try{ if(snap.openDetails.has(snap.dkey(d))) d.open=true; }catch(e){} });
+  document.querySelectorAll(".lesson,.monthblock,.hist").forEach(el=>{ try{ if(snap.openBlocks.has(snap.bkey(el))) el.classList.add("open"); }catch(e){} });
+  if(snap.model){
+    const b=document.getElementById("e50modelBox"), btn=document.getElementById("e50modelBtn");
+    if(b){ b.style.display="block"; if(btn) btn.textContent="📖 閉じる"; }
+  }
+}
+function renderAll(){
+  let snap=null;
+  try{ snap=uiSnapshot(); }catch(e){}
+  renderAllCore();
+  try{ uiRestore(snap); }catch(e){}
+}
 ["tfDate","lgDate","hwDate","evDate","rdDate","fgsDate","e50date","recDate"].forEach(id=>{var el=document.getElementById(id); if(el) el.value=today();});
 renderAll();
 
@@ -2948,7 +2979,12 @@ async function syncPull(silent){
   ghBusy = true;
   try{
     var remote = await ghReadRemote();
-    if(remote){ S = mergeState(S, remote); persistLocal(); renderAll(); ghLast = new Date(); }
+    if(remote){
+      var _before=JSON.stringify(S);
+      var _merged=mergeState(S, remote);
+      if(JSON.stringify(_merged)!==_before){ S=_merged; persistLocal(); renderAll(); }
+      ghLast = new Date();
+    }
     if(!silent) ghMsgSet("✅ 最新の記録を取得しました（"+ghTime()+"）");
     renderSyncStatus();
   }catch(e){ if(!silent) ghMsgSet("⚠️ 取得に失敗："+(e.message||e)); }
@@ -2959,12 +2995,16 @@ async function syncPush(){
   ghBusy = true;
   try{
     var remote = await ghReadRemote();              // 相手の新着を消さないよう先に統合
-    if(remote){ S = mergeState(S, remote); persistLocal(); }
+    if(remote){
+      var _b=JSON.stringify(S);
+      var _m=mergeState(S, remote);
+      if(JSON.stringify(_m)!==_b){ S=_m; persistLocal(); renderAll(); } else { persistLocal(); }
+    }
     var body = {files:{}}; body.files[GIST_FILE] = {content: JSON.stringify(S)};
     var res = await ghApi("/gists/"+ghGistId, "PATCH", body);
     if(res.status===401) throw new Error("トークンが無効です");
     if(!res.ok) throw new Error("GitHubエラー "+res.status);
-    ghLast = new Date(); ghMsgSet("⬆️ 送信しました（"+ghTime()+"）"); renderAll(); renderSyncStatus();
+    ghLast = new Date(); ghMsgSet("⬆️ 送信しました（"+ghTime()+"）"); renderSyncStatus();
   }catch(e){ ghMsgSet("⚠️ 送信に失敗："+(e.message||e)); }
   finally{ ghBusy = false; }
 }
