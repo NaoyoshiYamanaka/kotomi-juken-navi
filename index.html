@@ -525,7 +525,7 @@ label.f{display:block;font-size:12px;color:var(--sub);font-weight:600;margin-bot
         <div class="card"><h3>採点履歴</h3><div id="fgsHist"></div></div>
       </div>
       <div class="subpage" id="sub-e50">
-        <div class="notice">小論文50本を1本ずつ記録するノートです。<b>進め方：第2〜5回が4つの出題型の見本（実物級の課題文＋模範小論つき）。まずこの4回を順番に書いて、模範と見比べて型を覚える。</b>第6回以降は同じ型の反復練習です（第6〜20回=2026年型／第21〜29回=2024年型／第30〜38回=2025年型／第39〜47回=応用／第48〜50回=実物過去問）。<b>まず自分で書いてから模範を開く</b>のがコツ。<br><b>ペースは週2本</b>。書いたら撮影して私（Claude）に送ってください——採点と改善点をお返しします。1本は番号順の型練習、もう1本は実物過去問（課題文バンクの★実物）への挑戦に充てるのがおすすめです。私が返す「【本文】…[採点]…」ブロックを「一括貼り付け」に貼れば、まとめて登録できます。</div>
+        <div class="notice">小論文50本を1本ずつ記録するノートです。<b>進め方：第2〜5回が4つの出題型の見本（実物級の課題文＋模範小論つき）。まずこの4回を順番に書いて、模範と見比べて型を覚える。</b>第6回以降は同じ型の反復練習です（第6〜20回=2026年型／第21〜29回=2024年型／第30〜38回=2025年型／第39〜47回=応用／第48〜50回=実物過去問）。<b>まず自分で書いてから模範を開く</b>のがコツ。<br><b>当面のミッション：まず1本、24点（合格圏）を取る。</b>書き直しも1本に数えます。<br><b>ペースは週2本</b>。書いたら撮影して私（Claude）に送ってください——採点と改善点をお返しします。<b>構成メモの写真と所要時間もひと言添える</b>と、メモ段階の癖と時間配分まで指導できます。送る前に、自分でも6基準で自己採点してみると力がつきます（差は私が伝えます）。1本は番号順の型練習、もう1本は実物過去問（課題文バンクの★実物）への挑戦に充てるのがおすすめです。私が返す「【本文】…[採点]…」ブロックを「一括貼り付け」に貼れば、まとめて登録できます。</div>
         <div id="e50Head"></div>
         <div class="card">
           <div class="frow">
@@ -539,7 +539,7 @@ label.f{display:block;font-size:12px;color:var(--sub);font-weight:600;margin-bot
         <div class="card">
           <h3>一括貼り付け（本文＋採点＋寸評）</h3>
           <p class="muted" style="margin-bottom:6px">私が返す「【本文】…[採点]…講評…」ブロックをそのまま貼り付けて「解析して保存」。選択中の番号に登録されます。</p>
-          <textarea id="e50paste" rows="7" placeholder="【本文】&#10;（テキスト化した本文）&#10;&#10;[採点]&#10;日付: 2026-07-16&#10;課題文理解: 3/5&#10;設問対応: 3/5&#10;主張の明確さ: 3/5&#10;論理と根拠: 2/5&#10;具体性・視野: 3/5&#10;日本語表現: 3/5&#10;合計: 17/30&#10;講評:&#10;（寸評本文）"></textarea>
+          <textarea id="e50paste" rows="7" placeholder="【本文】&#10;（テキスト化した本文）&#10;&#10;[採点]&#10;日付: 2026-07-16&#10;課題文理解: 3/5&#10;設問対応: 3/5&#10;主張の明確さ: 3/5&#10;論理と根拠: 2/5&#10;具体性・視野: 3/5&#10;日本語表現: 3/5&#10;合計: 17/30&#10;所要時間: 55分&#10;自己採点: 20/30&#10;誤字: 責務→債務、消減→削減&#10;講評:&#10;（寸評本文）"></textarea>
           <button class="btn essay sm" style="margin-top:8px" onclick="e50Parse()">解析して保存</button>
         </div>
         <div class="card">
@@ -1137,7 +1137,7 @@ function load(){
   return {studyLog:[], toefl:[], essays:[], qa:[], mocks:[], lessons:{}, tasks:{}, events:[], plan:{}, rdgLog:[], rdgPlan:{}, rdgSteps:{}, fgsScores:[], essay50:{}};
 }
 function save(){ localStorage.setItem(KEY, JSON.stringify(S)); if(typeof scheduleSyncPush==="function") scheduleSyncPush(); }
-const APP_VERSION = "2026.08.14";
+const APP_VERSION = "2026.08.15";
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
 function esc(s){ return (s||"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function ymd(dt){ return dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0")+"-"+String(dt.getDate()).padStart(2,"0"); }
@@ -1706,7 +1706,7 @@ function addCustomQ(){
   const inp=document.getElementById("customQ");
   const q=(inp.value||"").trim();
   if(!q) return alert("質問を入力してください");
-  if(!S.customQs) S.customQs=[];
+  if(!S.customQs) S.customQs=[]; if(!S.goji) S.goji=[];
   if(S.customQs.some(x=>x.q===q)) return alert("同じ質問がすでにあります");
   S.customQs.push({id:uid(), q});
   inp.value="";
@@ -1741,7 +1741,7 @@ function seedQAFromQuestions(qs){
 function saveMockSet(){
   const qs=[...document.querySelectorAll("#setPicker input:checked")].map(x=>x.dataset.q);
   if(!qs.length) return alert("質問を1つ以上チェックしてください");
-  if(!S.mockSets) S.mockSets=[]; if(!S.customQs) S.customQs=[]; 
+  if(!S.mockSets) S.mockSets=[]; if(!S.customQs) S.customQs=[]; if(!S.goji) S.goji=[]; 
   const name=(document.getElementById("setName").value||"").trim()||("セット"+(S.mockSets.length+1));
   const d=document.getElementById("setDate").value||"";
   if(editingSetId){
@@ -2484,6 +2484,7 @@ function parseFgsPaste(){
   labels.forEach(([k,re])=>{const m=t.match(re); if(m){scores[k]=+m[1]; total+=+m[1]; found++;} else scores[k]=0;});
   if(found<6 && !confirm("6基準のうち"+found+"個の点数を読み取りました。このまま記録しますか？（不足分は0点扱い）")) return;
   let fb=t; const fm=t.match(/講評[:：]?\s*([\s\S]*)$/); if(fm && fm[1].trim()) fb=fm[1].trim();
+  absorbGoji(t);
   S.fgsScores.push({id:uid(), d, theme, scores, total, feedback:fb});
   save(); document.getElementById("fgsPaste").value=""; renderAll();
   const bd=fgsBand(total); alert("記録しました："+total+"/30（"+bd[0]+"）／基準"+found+"個を反映");
@@ -2604,6 +2605,25 @@ const ESSAY50_POINT = {
 5:`<b>📐 設計図（概念適用型）</b><ol style="margin:6px 0 10px 20px"><li><b>概念の要点</b>（約90字）：定義＋特徴（保護とエンパワメント）を自分の言葉で。</li><li><b>事例</b>（約180字）：ジュリアさん。「戦争はしていない。しかし脅かされている」という対比が、概念の必要性をそのまま示す。</li><li><b>分析</b>（約170字）：原因を一つにせず「貧困＋差別の歴史＋制度からの排除」と重ねる。最後に「だからこの概念に意義がある」と概念へ戻す。</li><li><b>対策</b>（約230字）：概念の二本柱（保護／エンパワメント）に対応させて短期・長期を書くと、概念を「使えている」ことが伝わる。</li><li><b>結論</b>（約80字）：概念の言葉で締める。</li></ol><b>🛠 使った技</b><ul style="margin:6px 0 10px 20px"><li>概念を「名前」でなく「分析の道具」として使う——分析と対策の骨組みに概念の柱を対応させる。</li><li>一人の人物から入ると、抽象概念が具体になる。</li></ul><b>👣 真似るコツ</b><ul style="margin:6px 0 0 20px"><li>人間の安全保障・多文化共生など概念系の題は、この「定義→顔の見える事例→複合原因→二本柱の対策」で。</li></ul>`
 };
 let e50cur=1;
+function absorbGoji(t){
+  const m=t.match(/誤字[:：]\s*(.+)/); if(!m) return 0;
+  if(!S.goji) S.goji=[];
+  let n=0;
+  m[1].split(/[、,，\/]/).forEach(p=>{
+    const mm=p.trim().match(/(.+?)→(.+)/);
+    if(mm){ const w=mm[1].trim(), r=mm[2].trim();
+      if(w&&r&&!S.goji.some(x=>x.w===w)){ S.goji.push({w,r}); n++; } }
+  });
+  return n;
+}
+function addGoji(){
+  const w=(document.getElementById("gojiW").value||"").trim(), r=(document.getElementById("gojiR").value||"").trim();
+  if(!w||!r) return alert("誤と正の両方を入力してください");
+  if(!S.goji) S.goji=[];
+  if(S.goji.some(x=>x.w===w)) return alert("すでに登録されています");
+  S.goji.push({w,r}); save(); renderEssay50();
+}
+function delGoji(i){ S.goji.splice(i,1); save(); renderEssay50(); }
 function syncE50ToFgs(n){
   const r=(S.essay50||{})[n]; if(!r||r.total==null) return;
   const pl=ESSAY50_PLAN.find(x=>x.n==n);
@@ -2630,10 +2650,15 @@ function renderEssay50(){
   const scored=done.map(k=>S.essay50[k]);
   const avg=scored.length?(scored.reduce((s,x)=>s+x.total,0)/scored.length).toFixed(1):"—";
   const hd=document.getElementById("e50Head");
-  if(hd) hd.innerHTML=`<div class="grid cols3" style="margin-bottom:4px">
+  const passN=scored.filter(x=>x.total>=24).length;
+  if(hd) hd.innerHTML=`<div class="grid cols4" style="margin-bottom:4px">
     <div class="card"><div class="muted">記録済み</div><div class="kpi">${done.length}<small>/50 本</small></div></div>
     <div class="card"><div class="muted">平均点</div><div class="kpi">${avg}<small>/30</small></div></div>
-    <div class="card"><div class="muted">直近の点</div><div class="kpi">${scored.length?scored[scored.length-1].total:"—"}<small>/30</small></div></div></div>`;
+    <div class="card"><div class="muted">直近の点</div><div class="kpi">${scored.length?scored[scored.length-1].total:"—"}<small>/30</small></div></div>
+    <div class="card" style="border-left:4px solid ${passN?"var(--ok)":"var(--essay)"}"><div class="muted">合格圏（24点以上）</div><div class="kpi">${passN}<small>回・まず1回→目標3回</small></div></div></div>
+  <div class="card" style="border-left:4px solid var(--danger);margin-bottom:4px"><h3>📕 マイ誤字帳 — 書く前に30秒読む</h3>
+    ${(S.goji&&S.goji.length)?`<div style="display:flex;flex-wrap:wrap;gap:6px">${S.goji.map((g,i)=>`<span class="tag red" style="font-size:13px;padding:4px 10px">${esc(g.w)} → ${esc(g.r)}<button class="del" style="font-size:11px;margin-left:4px" onclick="delGoji(${i})">✕</button></span>`).join("")}</div>`:'<p class="muted" style="margin:0">まだ登録がありません。私の講評の「誤字:」行から自動で貯まります（手動でも追加できます）。</p>'}
+    <div class="frow" style="margin-top:8px;margin-bottom:0"><div><label class="f">誤</label><input id="gojiW" style="width:110px" placeholder="責務"></div><div><label class="f">正</label><input id="gojiR" style="width:110px" placeholder="債務"></div><button class="btn essay sm" onclick="addGoji()">追加</button></div></div>`;
   const sel=document.getElementById("e50sel");
   if(sel){ const cur=sel.value||e50cur; sel.innerHTML=ESSAY50_PLAN.map(p=>{const r=e50Rec(p.n);const mk=r&&r.total!=null?`✓${r.total}`:(r&&r.text?"下書":"—");return `<option value="${p.n}">${p.n}. ${p.th}（${mk}）</option>`;}).join(""); sel.value=cur; }
   const si=document.getElementById("e50scoreInputs");
@@ -2666,7 +2691,7 @@ function e50Fill(){
     }
     pr.innerHTML=html;
   }
-  const st=document.getElementById("e50status"); if(st) st.innerHTML= r?(r.total!=null?`<b style="color:${fgsBand(r.total)[1]}">採点済み ${r.total}/30・${fgsBand(r.total)[0]}</b>（${r.d||""}）`:"下書き保存あり"):"未着手";
+  const st=document.getElementById("e50status"); if(st) st.innerHTML= r?(r.total!=null?`<b style="color:${fgsBand(r.total)[1]}">採点済み ${r.total}/30・${fgsBand(r.total)[0]}</b>（${r.d||""}${r.min?`・${r.min}分`:""}${r.self!=null?`・自己採点${r.self}→実際${r.total}（差${r.total-r.self>=0?"+":""}${r.total-r.self}）`:""}）`:"下書き保存あり"):"未着手";
   const g=id=>document.getElementById(id);
   if(g("e50date")) g("e50date").value=(r&&r.d)||today();
   if(g("e50text")) g("e50text").value=(r&&r.text)||"";
@@ -2715,14 +2740,18 @@ function e50Parse(){
   const t=document.getElementById("e50paste").value;
   if(!t.trim()) return alert("ブロックを貼り付けてください");
   const gm=re=>{const m=t.match(re); return m?m[1].trim():"";};
-  const tm=t.match(/【本文】\s*([\s\S]*?)(?=\[採点\]|$)/); const text=tm?tm[1].trim():"";
+  const prev=e50Rec(e50cur);
+  const tm=t.match(/【本文】\s*([\s\S]*?)(?=\[採点\]|$)/); const text=tm?tm[1].trim():((prev&&prev.text)||"");
+  const tmin=(t.match(/所要時間[:：]\s*(\d+)/)||[])[1];
+  const tself=(t.match(/自己採点[:：]\s*(\d+)/)||[])[1];
+  absorbGoji(t);
   const d=gm(/日付[:：]\s*(\d{4}-\d{2}-\d{2})/)||today();
   const labels=[["r1",/課題文[理解把握]*[:：]\s*(\d)/],["r2",/設問[^:：\n]*[:：]\s*(\d)/],["r3",/主張[^:：\n]*[:：]\s*(\d)/],["r4",/論理[^:：\n]*[:：]\s*(\d)/],["r5",/具体[^:：\n]*[:：]\s*(\d)/],["r6",/(?:日本語|表現)[^:：\n]*[:：]\s*(\d)/]];
   const scores={}; let total=0, found=0;
   labels.forEach(([k,re])=>{const m=t.match(re); if(m){scores[k]=+m[1]; total+=+m[1]; found++;} else scores[k]=0;});
   let fb=""; const fm=t.match(/講評[:：]?\s*([\s\S]*)$/); if(fm) fb=fm[1].trim();
   if(!S.essay50) S.essay50={};
-  S.essay50[e50cur]={d, text, feedback:fb, scores:found?scores:null, total:found?total:null};
+  S.essay50[e50cur]={d, text, feedback:fb, scores:found?scores:null, total:found?total:null, min:tmin?+tmin:((prev&&prev.min)||null), self:tself?+tself:((prev&&prev.self)||null)};
   syncE50ToFgs(e50cur);
   save(); document.getElementById("e50paste").value=""; renderAll();
   alert("第"+e50cur+"回に登録しました"+(found?"："+total+"/30（基準"+found+"個）":"（本文のみ）"));
@@ -2787,7 +2816,7 @@ function addCase(){
   save(); renderCases(); alert("事例を追加しました");
 }
 function delCase(id){ if(!confirm("この事例を削除しますか？")) return; S.cases=(S.cases||[]).filter(c=>c.id!==id); save(); renderCases(); }
-function renderAll(){ if(!S.plan) S.plan={}; if(!S.rdgLog) S.rdgLog=[]; if(!S.rdgPlan) S.rdgPlan={}; if(!S.rdgSteps) S.rdgSteps={}; if(!S.fgsScores) S.fgsScores=[]; if(!S.essay50) S.essay50={}; if(!S.cases) S.cases=[]; if(!S.recs) S.recs=[]; if(!S.mockSets) S.mockSets=[]; if(!S.customQs) S.customQs=[];  if(S.nextSet&&S.nextSet.items&&S.nextSet.items.length){ var migId="mig"+(S.nextSet.upd||0); if(!S.mockSets.some(x=>x.id===migId)){ S.mockSets.push({id:migId, name:"引き継ぎセット", d:S.nextSet.d||"", items:S.nextSet.items, upd:S.nextSet.upd||Date.now()}); seedQAFromQuestions(S.nextSet.items.map(x=>x.q)); } S.nextSet=null; } reconcileHomeworkQA(); reconcileEssay50Scores(); renderDash(); renderSched(); renderToefl(); renderReading(); renderEssay(); renderFGS(); renderCases(); renderEssay50(); renderIntv(); renderShigan(); renderRecs(); renderNextSet(); renderMock(); renderPlan(); }
+function renderAll(){ if(!S.plan) S.plan={}; if(!S.rdgLog) S.rdgLog=[]; if(!S.rdgPlan) S.rdgPlan={}; if(!S.rdgSteps) S.rdgSteps={}; if(!S.fgsScores) S.fgsScores=[]; if(!S.essay50) S.essay50={}; if(!S.cases) S.cases=[]; if(!S.recs) S.recs=[]; if(!S.mockSets) S.mockSets=[]; if(!S.customQs) S.customQs=[]; if(!S.goji) S.goji=[];  if(S.nextSet&&S.nextSet.items&&S.nextSet.items.length){ var migId="mig"+(S.nextSet.upd||0); if(!S.mockSets.some(x=>x.id===migId)){ S.mockSets.push({id:migId, name:"引き継ぎセット", d:S.nextSet.d||"", items:S.nextSet.items, upd:S.nextSet.upd||Date.now()}); seedQAFromQuestions(S.nextSet.items.map(x=>x.q)); } S.nextSet=null; } reconcileHomeworkQA(); reconcileEssay50Scores(); renderDash(); renderSched(); renderToefl(); renderReading(); renderEssay(); renderFGS(); renderCases(); renderEssay50(); renderIntv(); renderShigan(); renderRecs(); renderNextSet(); renderMock(); renderPlan(); }
 ["tfDate","lgDate","hwDate","evDate","rdDate","fgsDate","e50date","recDate"].forEach(id=>{var el=document.getElementById(id); if(el) el.value=today();});
 renderAll();
 
@@ -2802,7 +2831,7 @@ function ghKeyOf(it){ return (it && it.id!=null) ? ("id:"+it.id) : ("j:"+JSON.st
 function mergeState(local, remote){
   local = local||{}; remote = remote||{};
   var out = {};
-  ["studyLog","toefl","essays","qa","mocks","events","rdgLog","fgsScores","cases","recs","mockSets","customQs"].forEach(function(k){
+  ["studyLog","toefl","essays","qa","mocks","events","rdgLog","fgsScores","cases","recs","mockSets","customQs","goji"].forEach(function(k){
     var m = {};
     (remote[k]||[]).forEach(function(it){ m[ghKeyOf(it)] = it; });
     (local[k]||[]).forEach(function(it){ m[ghKeyOf(it)] = it; }); // 同一はローカル優先
