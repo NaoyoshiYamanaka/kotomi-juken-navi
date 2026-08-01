@@ -168,7 +168,7 @@ label.f{display:block;font-size:12px;color:var(--sub);font-weight:600;margin-bot
     <div class="card" style="margin-bottom:16px;border:2px solid var(--ink)">
       <h3 style="font-size:16px">📌 いま使うのはこの2つだけ</h3>
       <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:10px">
-        <button class="bigjump" style="background:var(--essay)" onclick="goE50()">✍️ 小論文：50本ノート<small>週2本書く → 撮影してClaudeへ → 返ってきた採点を貼り付け</small></button>
+        <button class="bigjump" style="background:var(--essay)" onclick="goE50()">✍️ 小論文：50本ノート<small>週5本書く → 撮影してClaudeへ → 返ってきた採点を貼り付け</small></button>
         <button class="bigjump" style="background:var(--intv)" onclick="goShigan()">🎤 面接：志願書対策<small>深掘り質問に骨子で答える → 録音して聞き返す</small></button>
       </div>
     </div>
@@ -228,7 +228,7 @@ label.f{display:block;font-size:12px;color:var(--sub);font-weight:600;margin-bot
   <!-- ============ TOEFL ============ -->
   <section class="page" id="page-toefl">
     <h2 class="pagetitle">TOEFL対策</h2>
-    <p class="pagesub">目標：7月受験で90点超え（横浜市立 +10点加点／上智で競争力）。横市へはETS直送（DIコード0416）が必須。</p>
+    <p class="pagesub">目標：90点超え（横浜市立 +10点加点／上智で競争力）。横市へはETS直送（DIコード0416）が必須。</p>
     <div class="subtabs" data-group="toefl">
       <button class="subtab active" data-sub="tfrec">記録</button>
       <button class="subtab" data-sub="tfread">Reading加点プログラム</button>
@@ -279,7 +279,7 @@ label.f{display:block;font-size:12px;color:var(--sub);font-weight:600;margin-bot
         <button class="subtab" data-sub="rdgtrack">演習トラッカー</button>
       </div>
       <div class="subpage show" id="sub-rdgplan">
-        <div class="notice">7/7のReading加点に向けた日割りです。各日の「完了」で進捗が記録され、学習ログにも反映されます。今日の予定は色付きで表示されます。</div>
+        <div class="notice">【7月受験向けのアーカイブ】7/7のReading加点に向けた日割りです。再受験の日程が決まったら新しい日割りを作り直します。各日の「完了」で進捗が記録され、学習ログにも反映されます。今日の予定は色付きで表示されます。</div>
         <div id="rdgPlan"></div>
       </div>
       <div class="subpage" id="sub-rdgskill">
@@ -329,7 +329,7 @@ label.f{display:block;font-size:12px;color:var(--sub);font-weight:600;margin-bot
     </div>
     <div class="subpage show" id="sub-elesson"><div id="essayLessons"></div></div>
     <div class="subpage" id="sub-eroad">
-      <div class="notice">「才能」ではなく<b>「型 × 量 × フィードバック」</b>で受かります。<b>本番（9/20）まで約7週間。今日からは「週2本」ペース——1本は型練習（第2回から番号順）、もう1本は実物過去問への挑戦。書いたら撮影して私（Claude）へ→採点→弱点を次の1本で直す、を繰り返します。</b>下の週割は目安として使ってください。今日から本番まで約2ヶ月。この画面が小論文の全行程の地図です。迷ったらここに戻ってください。</div>
+      <div class="notice">「才能」ではなく<b>「型 × 量 × フィードバック」</b>で受かります。<b>本番（9/20）まで<span id="eroadDays">—</span>。今日からは「週5本」ペース——型練習3本（第2回から番号順）＋実物過去問1本＋前回答案の書き直し1本。書いたら撮影して私（Claude）へ→採点→弱点を次の1本で直す、を繰り返します。</b>下の週割は目安として使ってください。今日から本番まで約2ヶ月。この画面が小論文の全行程の地図です。迷ったらここに戻ってください。</div>
       <div class="card" style="border-left:5px solid var(--essay);margin-bottom:16px">
         <h3>🎯 ゴールと現在地</h3>
         <p>目標は6基準で<b>合計24/30（合格圏）</b>。いま書き慣れていなくて当然です。小論文は短期間で最も伸びる科目——<b>正しい型で数をこなし、毎回フィードバックを受ければ2ヶ月で合格圏に届きます。</b></p>
@@ -372,7 +372,7 @@ label.f{display:block;font-size:12px;color:var(--sub);font-weight:600;margin-bot
         <h3>🗓 8週間カリキュラム（50本ノートと連動）</h3>
         <table style="margin-top:8px">
           <tr><th>週</th><th>期間</th><th>やること</th><th>本数</th><th>重点</th></tr>
-          <tr class="next"><td>第1週</td><td>7/21〜7/27</td><td>上智型を体に入れる</td><td>1本</td><td>実物過去問を読み、第2〜5回の模範で4つの型を暗記。事例ストックを10件に</td></tr>
+          <tr><td>第1週</td><td>7/21〜7/27</td><td>上智型を体に入れる</td><td>1本</td><td>実物過去問を読み、第2〜5回の模範で4つの型を暗記。事例ストックを10件に</td></tr>
           <tr><td>第2週</td><td>7/28〜8/3</td><td>事例を厚くする</td><td>2本</td><td>カテゴリー化・南北の事例を調べて追加。2026年型で1本書く</td></tr>
           <tr><td>第3週</td><td>8/4〜8/10</td><td>2026年型（カテゴリー化）</td><td>2本</td><td>類題を反復。「対策」を主体・短期/長期で書く練習</td></tr>
           <tr><td>第4週</td><td>8/11〜8/17</td><td>2024年型（南北・債務）</td><td>2本</td><td>立場選択型。「相互受益」の視点を使いこなす</td></tr>
@@ -382,7 +382,7 @@ label.f{display:block;font-size:12px;color:var(--sub);font-weight:600;margin-bot
           <tr><td>第8週</td><td>9/8〜9/14</td><td>実物過去問3年分を本番形式で</td><td>3本</td><td>2024・2025・2026を時間どおりに手書きで通す</td></tr>
           <tr><td>直前</td><td>9/15〜9/19</td><td>上智直前</td><td>調整</td><td>新しいことをしない。清書練習。面接の志望理由と往復</td></tr>
         </table>
-        <p class="muted" style="margin-top:8px">※本数・回番号は目安です。体調や塾の予定に合わせて前後してOK。週6本ペースなら約8週間で50本に届きます。</p>
+        <p class="muted" style="margin-top:8px">※表の日付・本数は当初の目安です。現在の運用は<b>週5本（型練習3＋実物1＋書き直し1）</b>です。書き直しも1本に数えます。体調に合わせて前後してOK。</p>
       </div>
       <div class="card" style="margin-bottom:16px">
         <h3>🔁 毎日の習慣（各15〜30分・書かない日も続ける）</h3>
@@ -525,7 +525,7 @@ label.f{display:block;font-size:12px;color:var(--sub);font-weight:600;margin-bot
         <div class="card"><h3>採点履歴</h3><div id="fgsHist"></div></div>
       </div>
       <div class="subpage" id="sub-e50">
-        <div class="notice">小論文50本を1本ずつ記録するノートです。<b>進め方：第2〜5回が4つの出題型の見本（実物級の課題文＋模範小論つき）。まずこの4回を順番に書いて、模範と見比べて型を覚える。</b>第6回以降は同じ型の反復練習です（第6〜20回=2026年型／第21〜29回=2024年型／第30〜38回=2025年型／第39〜47回=応用／第48〜50回=実物過去問）。<b>まず自分で書いてから模範を開く</b>のがコツ。<br><b>当面のミッション：まず1本、24点（合格圏）を取る。</b>書き直しも1本に数えます。<br><b>ペースは週2本</b>。書いたら撮影して私（Claude）に送ってください——採点と改善点をお返しします。<b>構成メモの写真と所要時間もひと言添える</b>と、メモ段階の癖と時間配分まで指導できます。送る前に、自分でも6基準で自己採点してみると力がつきます（差は私が伝えます）。1本は番号順の型練習、もう1本は実物過去問（課題文バンクの★実物）への挑戦に充てるのがおすすめです。私が返す「【本文】…[採点]…」ブロックを「一括貼り付け」に貼れば、まとめて登録できます。</div>
+        <div class="notice">小論文50本を1本ずつ記録するノートです。<b>進め方：第2〜5回が4つの出題型の見本（実物級の課題文＋模範小論つき）。まずこの4回を順番に書いて、模範と見比べて型を覚える。</b>第6回以降は同じ型の反復練習です（第6〜20回=2026年型／第21〜29回=2024年型／第30〜38回=2025年型／第39〜47回=応用／第48〜50回=実物過去問）。<b>まず自分で書いてから模範を開く</b>のがコツ。<br><b>当面のミッション：まず1本、24点（合格圏）を取る。</b>書き直しも1本に数えます。<br><b>ペースは週5本</b>（目安：型練習3＋実物1＋書き直し1）。書いたら撮影して私（Claude）に送ってください——採点と改善点をお返しします。<b>構成メモの写真と所要時間もひと言添える</b>と、メモ段階の癖と時間配分まで指導できます。送る前に、自分でも6基準で自己採点してみると力がつきます（差は私が伝えます）。実物過去問は課題文バンクの★実物からどうぞ。私が返す「【本文】…[採点]…」ブロックを「一括貼り付け」に貼れば、まとめて登録できます。</div>
         <div id="e50Head"></div>
         <div class="card">
           <div class="frow">
@@ -789,7 +789,7 @@ const BASE_EVENTS = [
 
 const MONTH_TASKS = {
  "2026-06":["上智 入学センターに電話で出願資格を事前相談（03-3238-3167）","横国 経営学務係へ事前照会（045-339-3663）","明治法向け ETS直送（コード0413）の手配確認","7月TOEFLを申込（無料送付先に横市0416を前日22時までに指定）","上智の要項で各証明書の「直送先（郵送先住所・Email）」と直送手順を確認","LCSへ依頼：在籍期間証明書・卒業見込/成績証明書を、校長署名＋公印入りで作成し、上智へ直接送付（原本郵送 または Email直送）してもらう ※家庭のスキャン/コピーは不可","英語スコア：英検はデジタル証明書のコピー可／TOEFL・IELTS・TOEICは直送手配＋結果コピー同封（TOEFL直送コード0819）","立教の特別入試要項（6月中旬公開）を確認","6/6 TOEFLの結果を確認し、弱点セクションをアプリに記録","小論文：入門レッスン1〜4を読む","小論文：社説要約を週3本","面接：留学エピソードを10個書き出す"],
- "2026-07":["上智 出願（7/7〜7/23・郵送7/24必着）","上智 出願書類チェックリストで全書類を確認（証明書は原本・コピー不可。原本同封 または 在籍校から直送のいずれか）","LCSからの証明書直送が出願期限までに上智へ届く/送信済みかを確認","TOEFL再受験（90点超え目標）","横国・横市・明学の2027年度要項を確認しアプリの日程を更新","横市の出願書類準備を開始","小論文：週2本（社会科学テーマ）＋添削の利用開始","上智 学科試問の過去問を入手","面接：想定問答ノートの共通質問を「完成」にする"],
+ "2026-07":["上智 出願（7/7〜7/23・郵送7/24必着）","上智 出願書類チェックリストで全書類を確認（証明書は原本・コピー不可。原本同封 または 在籍校から直送のいずれか）","LCSからの証明書直送が出願期限までに上智へ届く/送信済みかを確認","TOEFL再受験（90点超え目標）","横国・横市・明学の2027年度要項を確認しアプリの日程を更新","横市の出願書類準備を開始","小論文：週5本（50本ノート・型練習3＋実物1＋書き直し1）","上智 学科試問の過去問を入手","面接：想定問答ノートの共通質問を「完成」にする"],
  "2026-08":["明治法 出願（中旬・要項で確定）","横市 出願書類を完成させる","TOEFL：90未到達なら8月上旬に最終受験→以後終了","小論文：毎日1本ペース（上智学科試問対策中心）","明治法のプレゼン原稿を作成","模擬面接を開始（週1回・録画）","時事問題チェックを日課に"],
  "2026-09":["横市 出願（9/4〜9/8必着）","明治政経 出願（上旬）","明学 一次出願（9/15〜9/24）※入学確約条件を最終判断","立教 出願（要項で確定）","9/20 上智本番（学科試問・面接）","9月下旬 明治法 二次（小論文＋プレゼン＋口頭試問）","横市 過去問演習を開始"],
  "2026-10":["10/1 上智発表→10/15手続の判断（入学金）","10/3 横市本番（小論文・面接）","横国 出願（中旬・志望理由書を最高品質に）","明学 一次通過なら二次出願（10/21〜10/28）","小論文：横国（経営・経済テーマ）へ完全シフト","面接：横国対策を本格化"],
@@ -1148,7 +1148,7 @@ function load(){
   return {studyLog:[], toefl:[], essays:[], qa:[], mocks:[], lessons:{}, tasks:{}, events:[], plan:{}, rdgLog:[], rdgPlan:{}, rdgSteps:{}, fgsScores:[], essay50:{}};
 }
 function save(){ localStorage.setItem(KEY, JSON.stringify(S)); if(typeof scheduleSyncPush==="function") scheduleSyncPush(); }
-const APP_VERSION = "2026.08.23";
+const APP_VERSION = "2026.08.25";
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
 function esc(s){ return (s||"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function ymd(dt){ return dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0")+"-"+String(dt.getDate()).padStart(2,"0"); }
@@ -1178,13 +1178,18 @@ function allEvents(){ return [...BASE_EVENTS, ...S.events].sort((a,b)=>a.d.local
 function renderDash(){
   const d = new Date();
   document.getElementById("todayLabel").textContent = `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（${"日月火水木金土"[d.getDay()]}）`;
-  const up = allEvents().filter(e=>daysTo(e.d)>=0).slice(0,4);
+  const evs = allEvents().filter(e=>daysTo(e.d)>=0);
+  const exam = evs.find(e=>e.t==="試験");
+  let up = evs.slice(0,4);
+  if(exam && !up.includes(exam)) up = [...evs.filter(e=>e!==exam).slice(0,3), exam];
   document.getElementById("cdGrid").innerHTML = up.map(e=>{
     const n = daysTo(e.d);
     const cls = n<=7?"urgent":n<=21?"soon":"";
     return `<div class="card cdcard ${cls}"><div class="muted">${fmtD(e.d)}・${e.t||"予定"}</div><div style="font-weight:600;font-size:13.5px;min-height:40px">${esc(e.l)}</div><div class="days">${n===0?"今日":"あと"+n+"日"}</div></div>`;
   }).join("") || '<div class="empty">予定がありません</div>';
   document.getElementById("dashGreeting").textContent = "今日もこつこつ。合格は毎日の積み重ねから。";
+  const ed=document.getElementById("eroadDays");
+  if(ed){ const n=daysTo("2026-09-20"); ed.textContent = n>=0 ? ("あと"+n+"日（約"+Math.ceil(n/7)+"週間）") : "終了。次は横市（10/3）へ"; }
 
   // TOEFL card
   const tf = [...S.toefl].sort((a,b)=>a.d.localeCompare(b.d));
@@ -2429,7 +2434,7 @@ function renderFGS(){
 <li><b>望月優大『ふたつの日本』</b>（講談社現代新書）——日本の「外国人」問題。2026型の日本事例に</li>
 </ul>
 <p class="muted" style="font-size:12.5px">使い方：本の1〜3ページ（約1500字）を時間内に読み、この画面の設問型（事例→問題→対策）を自分で当てはめて800字書く。お父様が該当ページを指定してくだされば、その範囲に合わせた設問を私が作ります。</p></div>`
-+ `<h3 style="margin:18px 0 10px">A. 本番同型の練習課題文（オリジナル）</h3>`
++ `<h3 style="margin:18px 0 10px">A. 本番同型の練習課題文（オリジナル・短め）</h3><p class="muted" style="margin:0 0 8px">※実物級の長い課題文＋模範解答＋事例解説は「✍️ 50本ノート」第2〜20回に完備。こちらは短時間で回す補助教材です。</p>`
     + FGS_PASSAGES.map((p,i)=>`<div class="card" style="margin-bottom:12px"><h3>課題文${i+1}　${esc(p.th)}</h3>
     <div style="background:#f6f8fb;border-left:4px solid #b9c6da;border-radius:0 8px 8px 0;padding:10px 14px;margin:8px 0;font-size:14px;line-height:1.9">${esc(p.p)}</div>
     <p style="font-weight:600">設問：${esc(p.q)}</p>
