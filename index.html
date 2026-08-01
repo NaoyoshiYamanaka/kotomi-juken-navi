@@ -1148,7 +1148,7 @@ function load(){
   return {studyLog:[], toefl:[], essays:[], qa:[], mocks:[], lessons:{}, tasks:{}, events:[], plan:{}, rdgLog:[], rdgPlan:{}, rdgSteps:{}, fgsScores:[], essay50:{}};
 }
 function save(){ localStorage.setItem(KEY, JSON.stringify(S)); if(typeof scheduleSyncPush==="function") scheduleSyncPush(); }
-const APP_VERSION = "2026.08.30";
+const APP_VERSION = "2026.08.31";
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
 function esc(s){ return (s||"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function ymd(dt){ return dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0")+"-"+String(dt.getDate()).padStart(2,"0"); }
@@ -2735,7 +2735,7 @@ function syncE50ToFgs(n){
   const r=(S.essay50||{})[n]; if(!r) return;
   const pl=ESSAY50_PLAN.find(x=>x.n==n);
   if(!S.fgsScores) S.fgsScores=[];
-  S.fgsScores=S.fgsScores.filter(x=>x.id!=="e50-"+n); // 旧形式(1問1件)を除去
+  S.fgsScores=S.fgsScores.filter(x=>x.id!=="e50-"+n && String(x.id).indexOf("e50-"+n+"-v")!==0); // 旧形式と当該問の版エントリを一旦除去して再構築
   const revs=(r.revs&&r.revs.length)?r.revs:((r.total!=null||r.text)?[{v:1,d:r.d,text:r.text,scores:r.scores,total:r.total,feedback:r.feedback}]:[]);
   revs.forEach(rv=>{
     if(rv.total==null) return;
@@ -2809,7 +2809,7 @@ function e50Fill(){
   FGS_RUBRIC.forEach(c=>{const el=g("e50_"+c.k); if(el) el.value=(r&&r.scores&&r.scores[c.k]!=null)?r.scores[c.k]:0;});
   const revs=e50RevsOf(e50cur);
   const rl=g("e50revList");
-  if(rl) rl.innerHTML= revs.length? revs.map(rv=>`<details style="margin:4px 0"><summary style="cursor:pointer;font-weight:600">第${rv.v}版（${rv.d||""}）<span class="muted">《${(rv.text||"").replace(/\s/g,"").length}字》</span>${rv.total!=null?` <span class="tag" style="background:${fgsBand(rv.total)[1]};color:#fff">${rv.total}/30</span>`:' <span class="tag amber">未採点</span>'}</summary><div style="white-space:pre-wrap;background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:13.5px;line-height:1.8;margin-top:4px">${esc(rv.text||"")}</div>${rv.feedback?`<details style="margin-top:4px"><summary class="muted" style="cursor:pointer;font-size:12.5px">この版への講評</summary><div style="white-space:pre-wrap;font-size:13px;background:#f2f7f2;border-radius:6px;padding:8px 12px;margin-top:4px">${esc(rv.feedback)}</div></details>`:""}</details>`).join("") : '<p class="muted" style="margin:0">まだ版がありません。手書き初稿は、私のテキスト化を「一括貼り付け」すると第1版として入ります。ここに直接書き始めてもOKです。</p>';
+  if(rl) rl.innerHTML= revs.length? revs.map(rv=>`<details style="margin:4px 0"><summary style="cursor:pointer;font-weight:600">第${rv.v}版（${rv.d||""}）<span class="muted">《${(rv.text||"").replace(/\s/g,"").length}字》</span>${rv.total!=null?` <span class="tag" style="background:${fgsBand(rv.total)[1]};color:#fff">${rv.total}/30</span>`:' <span class="tag amber">未採点</span>'} <button class="del" onclick="event.preventDefault();event.stopPropagation();e50DelRev(${rv.v})">削除</button></summary><div style="white-space:pre-wrap;background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:13.5px;line-height:1.8;margin-top:4px">${esc(rv.text||"")}</div>${rv.feedback?`<details style="margin-top:4px"><summary class="muted" style="cursor:pointer;font-size:12.5px">この版への講評</summary><div style="white-space:pre-wrap;font-size:13px;background:#f2f7f2;border-radius:6px;padding:8px 12px;margin-top:4px">${esc(rv.feedback)}</div></details>`:""}</details>`).join("") : '<p class="muted" style="margin:0">まだ版がありません。手書き初稿は、私のテキスト化を「一括貼り付け」すると第1版として入ります。ここに直接書き始めてもOKです。</p>';
   const rt=g("e50revText");
   if(rt&&document.activeElement!==rt){ rt.value=revs.length?revs[revs.length-1].text:((r&&r.text)||""); e50RevCount(); }
 }
@@ -2821,6 +2821,17 @@ function e50RevsOf(n){
     else r.revs=[];
   }
   return r.revs;
+}
+function e50DelRev(v){
+  const r=e50Rec(e50cur); if(!r||!r.revs) return;
+  const rv=r.revs.find(x=>x.v===v); if(!rv) return;
+  if(!confirm("第"+v+"版（"+((rv.text||"").replace(/\s/g,"").length)+"字・"+(rv.total!=null?rv.total+"/30":"未採点")+"）を削除します。よろしいですか？")) return;
+  r.revs=r.revs.filter(x=>x.v!==v);
+  const last=r.revs[r.revs.length-1]||null;
+  r.text=last?last.text:""; r.d=last?last.d:r.d;
+  r.scores=last?last.scores:null; r.total=last?last.total:null; r.feedback=last?last.feedback:"";
+  syncE50ToFgs(e50cur);
+  save(); renderEssay50();
 }
 function e50RevCount(){
   const el=document.getElementById("e50revText"), c=document.getElementById("e50revCount");
