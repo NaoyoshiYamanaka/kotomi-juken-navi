@@ -1148,7 +1148,7 @@ function load(){
   return {studyLog:[], toefl:[], essays:[], qa:[], mocks:[], lessons:{}, tasks:{}, events:[], plan:{}, rdgLog:[], rdgPlan:{}, rdgSteps:{}, fgsScores:[], essay50:{}};
 }
 function save(){ localStorage.setItem(KEY, JSON.stringify(S)); if(typeof scheduleSyncPush==="function") scheduleSyncPush(); }
-const APP_VERSION = "2026.08.31";
+const APP_VERSION = "2026.09.01";
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
 function esc(s){ return (s||"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function ymd(dt){ return dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0")+"-"+String(dt.getDate()).padStart(2,"0"); }
@@ -3040,6 +3040,34 @@ var ghLast = null, ghBusy = false, ghPushTimer = null, ghPullTimer = null;
 
 function persistLocal(){ localStorage.setItem(KEY, JSON.stringify(S)); }
 function ghKeyOf(it){ return (it && it.id!=null) ? ("id:"+it.id) : ("j:"+JSON.stringify(it)); }
+function mergeEssay50(l, r){
+  l=l||{}; r=r||{};
+  const out={};
+  const keys=new Set([].concat(Object.keys(l),Object.keys(r)));
+  keys.forEach(function(k){
+    const a=l[k], b=r[k];
+    if(!a){ out[k]=b; return; }
+    if(!b){ out[k]=a; return; }
+    const toRevs=function(x){ return (x.revs&&x.revs.length)?x.revs:((x.text||x.total!=null)?[{v:1,d:x.d,text:x.text||"",scores:x.scores||null,total:(x.total!=null?x.total:null),feedback:x.feedback||""}]:[]); };
+    const ra=toRevs(a), rb=toRevs(b);
+    const m={};
+    rb.forEach(function(x){ m[x.v]=x; });
+    ra.forEach(function(x){
+      const y=m[x.v];
+      if(!y){ m[x.v]=x; return; }
+      const w=function(z){ return (z.total!=null?2:0)+(((z.feedback||"").length>0)?1:0); };
+      if(w(x)>w(y)) m[x.v]=x;
+      else if(w(x)===w(y)) m[x.v]=(((x.feedback||"").length>=(y.feedback||"").length)?x:y);
+    });
+    const revs=Object.keys(m).map(Number).sort(function(p,q){return p-q;}).map(function(v){return m[v];});
+    const last=revs[revs.length-1]||{};
+    out[k]={d:last.d||a.d||b.d, text:last.text||"", feedback:last.feedback||"", scores:last.scores||null,
+      total:(last.total!=null?last.total:null),
+      min:(a.min!=null?a.min:(b.min!=null?b.min:null)),
+      self:(a.self!=null?a.self:(b.self!=null?b.self:null)), revs:revs};
+  });
+  return out;
+}
 function mergeState(local, remote){
   local = local||{}; remote = remote||{};
   var out = {};
@@ -3049,9 +3077,10 @@ function mergeState(local, remote){
     (local[k]||[]).forEach(function(it){ m[ghKeyOf(it)] = it; }); // 同一はローカル優先
     out[k] = Object.keys(m).map(function(id){ return m[id]; });
   });
-  ["lessons","tasks","plan","rdgPlan","rdgSteps","essay50"].forEach(function(k){
+  ["lessons","tasks","plan","rdgPlan","rdgSteps"].forEach(function(k){
     out[k] = Object.assign({}, remote[k]||{}, local[k]||{}); // キーはローカル優先
   });
+  out.essay50=mergeEssay50(local.essay50, remote.essay50);
   out.nextSet=(function(l,r){ if(!l) return r||null; if(!r) return l; return ((r.upd||0)>(l.upd||0))?r:l; })(local.nextSet, remote.nextSet);
   return out;
 }
