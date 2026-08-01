@@ -649,7 +649,7 @@ label.f{display:block;font-size:12px;color:var(--sub);font-weight:600;margin-bot
       <p class="muted">※「完成」にした想定問答ノートの自作質問も出題に混ざります。本番同様、入室の挨拶から始めるのがおすすめです。</p>
       <div style="border:2px solid var(--mock);border-radius:12px;padding:14px 16px;margin:18px 0">
         <h3>📋 出題セット（石田先生用）— 何パターンでも作れます</h3>
-        <p class="muted" style="margin:4px 0 8px">質問にチェック→名前を付けて「保存する」。<b>未実施のセットは、ことみさんの画面に宿題として表示</b>されます。当日は各セットの「▶ このセットで開始」から。実施後の採点はセットに紐づいて残り、いつでも見返せます。</p>
+        <p class="muted" style="margin:4px 0 8px">質問にチェック→名前を付けて「保存する」。<b>未実施のセットは、ことみさんの画面に宿題として表示</b>されます。当日は各セットの「▶ このセットで開始」から。実施後の採点はセットに紐づいて残り、いつでも見返せます。保存した質問は<b>自動で「面接 → 想定問答ノート」にも追加</b>されるので、ことみさんはそこに答えの骨子を書き込んで準備できます（すでにノートにある質問は重複して増えません）。</p>
         <div id="setList"></div>
         <div id="setForm" style="border-top:1px dashed var(--line);margin-top:12px;padding-top:10px">
           <p style="font-weight:700" id="setEditBanner">新規セットを作成中</p>
@@ -1126,7 +1126,7 @@ function load(){
   return {studyLog:[], toefl:[], essays:[], qa:[], mocks:[], lessons:{}, tasks:{}, events:[], plan:{}, rdgLog:[], rdgPlan:{}, rdgSteps:{}, fgsScores:[], essay50:{}};
 }
 function save(){ localStorage.setItem(KEY, JSON.stringify(S)); if(typeof scheduleSyncPush==="function") scheduleSyncPush(); }
-const APP_VERSION = "2026.08.05";
+const APP_VERSION = "2026.08.08";
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
 function esc(s){ return (s||"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function ymd(dt){ return dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0")+"-"+String(dt.getDate()).padStart(2,"0"); }
@@ -1525,19 +1525,63 @@ function renderIntv(){
       </div>`).join("");
   renderQA();
 }
+function reconcileHomeworkQA(){
+  if(!S.qa) S.qa=[];
+  let changed=false;
+  const played=id=>(S.mocks||[]).some(m=>m.setId===id);
+  (S.mockSets||[]).forEach(st=>{
+    if(played(st.id)) return;
+    (st.items||[]).forEach(x=>{
+      if(!S.qa.some(y=>y.q===x.q)){
+        S.qa.push({id:uid(), q:x.q, univ:"上智大学(総合グローバル)", a:"", status:"未着手"});
+        changed=true;
+      }
+    });
+  });
+  // 同一テキストの重複整理：骨子が長い方（書き込みがある方）を残す
+  const seen={}, keep=[];
+  S.qa.forEach(e=>{
+    const k=e.q, prev=seen[k];
+    if(!prev){ seen[k]=e; keep.push(e); }
+    else{
+      const better=((e.a||"").length>(prev.a||"").length)?e:prev;
+      if(better!==prev){ keep[keep.indexOf(prev)]=better; seen[k]=better; }
+      changed=true;
+    }
+  });
+  if(keep.length!==S.qa.length) S.qa=keep;
+  if(changed) save();
+}
+function homeworkQSet(){
+  const runs=id=>(S.mocks||[]).some(m=>m.setId===id);
+  const hw=new Set();
+  (S.mockSets||[]).filter(st=>!runs(st.id)).forEach(st=>st.items.forEach(x=>hw.add(x.q)));
+  return hw;
+}
 function renderQA(){
   const f=document.getElementById("qaFilter").value;
   const list=S.qa.filter(q=>!f||q.univ===f);
   const stc={"未着手":"red","作成中":"amber","完成":"green"};
-  document.getElementById("qaList").innerHTML = list.length? list.map(q=>
-    `<div class="qaitem">
-      <div class="q"><span class="tag">${esc(q.univ)}</span>${esc(q.q)}
+  const hw=homeworkQSet();
+  const item=(q,isHw)=>`<div class="qaitem" ${isHw?'style="border:2px solid var(--mock);background:#fffafa"':''}>
+      <div class="q">${isHw?'<span class="tag red">📋 宿題</span>':''}<span class="tag">${esc(q.univ)}</span>${esc(q.q)}
         <select class="right" onchange="qaStatus('${q.id}',this.value)" style="font-size:12px;padding:3px 6px">
           ${["未着手","作成中","完成"].map(s=>`<option ${q.status===s?"selected":""}>${s}</option>`).join("")}
         </select><span class="tag ${stc[q.status]}">${q.status}</span>
         <button class="del" onclick="delQA('${q.id}')">削除</button></div>
       <textarea rows="2" placeholder="骨子をメモ：キーワード3つ＋エピソード1つ（丸暗記の文章は書かない）" onchange="qaAnswer('${q.id}',this.value)">${esc(q.a||"")}</textarea>
-    </div>`).join("") : '<div class="empty">まだ問答がありません。質問バンクから追加しましょう。</div>';
+    </div>`;
+  const hwList=list.filter(q=>hw.has(q.q));
+  const rest=list.filter(q=>!hw.has(q.q));
+  let html="";
+  if(hwList.length){
+    const done=hwList.filter(q=>q.status==="完成").length;
+    html+=`<div style="border-left:5px solid var(--mock);padding-left:10px;margin:4px 0 10px"><b style="font-size:15px">📋 次回の模擬面接で聞かれる質問（石田先生の宿題・${hwList.length}問）</b><span class="muted">　骨子を書いて準備 ${done}/${hwList.length} 完成</span></div>`;
+    html+=hwList.map(q=>item(q,true)).join("");
+    if(rest.length) html+=`<div style="border-left:5px solid var(--line);padding-left:10px;margin:18px 0 10px"><b style="color:var(--sub)">その他の質問</b></div>`;
+  }
+  html+=rest.map(q=>item(q,false)).join("");
+  document.getElementById("qaList").innerHTML = (hwList.length+rest.length)? html : '<div class="empty">まだ問答がありません。質問バンクから追加しましょう。</div>';
 }
 function addQA(){
   const q=document.getElementById("qaNewQ").value.trim();
@@ -1672,10 +1716,21 @@ function setFormClear(){
   const b=document.getElementById("setEditBanner"); if(b) b.textContent="新規セットを作成中";
   updateSetCount();
 }
+function seedQAFromQuestions(qs){
+  if(!S.qa) S.qa=[];
+  let n=0;
+  qs.forEach(q=>{
+    if(!S.qa.some(x=>x.q===q)){
+      S.qa.push({id:uid(), q, univ:"上智大学(総合グローバル)", a:"", status:"未着手"});
+      n++;
+    }
+  });
+  return n;
+}
 function saveMockSet(){
   const qs=[...document.querySelectorAll("#setPicker input:checked")].map(x=>x.dataset.q);
   if(!qs.length) return alert("質問を1つ以上チェックしてください");
-  if(!S.mockSets) S.mockSets=[]; if(!S.customQs) S.customQs=[];
+  if(!S.mockSets) S.mockSets=[]; if(!S.customQs) S.customQs=[]; 
   const name=(document.getElementById("setName").value||"").trim()||("セット"+(S.mockSets.length+1));
   const d=document.getElementById("setDate").value||"";
   if(editingSetId){
@@ -1684,8 +1739,9 @@ function saveMockSet(){
   } else {
     S.mockSets.push({id:uid(), name, d, items:qs.map(q=>({q})), upd:Date.now()});
   }
-  save(); renderNextSet();
-  alert("保存しました：『"+name+"』（"+qs.length+"問）。未実施の間は、ことみさんの画面に宿題として表示されます。");
+  const addedN=seedQAFromQuestions(qs);
+  save(); renderAll();
+  alert("保存しました：『"+name+"』（"+qs.length+"問）。"+(addedN?"想定問答ノートに新しい質問を"+addedN+"問追加しました。":"（質問はすべて想定問答ノートに登録済みです）")+"未実施の間は、ことみさんの画面に宿題として表示されます。");
   setFormClear();
 }
 function editMockSet(id){
@@ -2632,7 +2688,7 @@ function addCase(){
   save(); renderCases(); alert("事例を追加しました");
 }
 function delCase(id){ if(!confirm("この事例を削除しますか？")) return; S.cases=(S.cases||[]).filter(c=>c.id!==id); save(); renderCases(); }
-function renderAll(){ if(!S.plan) S.plan={}; if(!S.rdgLog) S.rdgLog=[]; if(!S.rdgPlan) S.rdgPlan={}; if(!S.rdgSteps) S.rdgSteps={}; if(!S.fgsScores) S.fgsScores=[]; if(!S.essay50) S.essay50={}; if(!S.cases) S.cases=[]; if(!S.recs) S.recs=[]; if(!S.mockSets) S.mockSets=[]; if(!S.customQs) S.customQs=[]; if(S.nextSet&&S.nextSet.items&&S.nextSet.items.length){ var migId="mig"+(S.nextSet.upd||0); if(!S.mockSets.some(x=>x.id===migId)) S.mockSets.push({id:migId, name:"引き継ぎセット", d:S.nextSet.d||"", items:S.nextSet.items, upd:S.nextSet.upd||Date.now()}); S.nextSet=null; } renderDash(); renderSched(); renderToefl(); renderReading(); renderEssay(); renderFGS(); renderCases(); renderEssay50(); renderIntv(); renderShigan(); renderRecs(); renderNextSet(); renderMock(); renderPlan(); }
+function renderAll(){ if(!S.plan) S.plan={}; if(!S.rdgLog) S.rdgLog=[]; if(!S.rdgPlan) S.rdgPlan={}; if(!S.rdgSteps) S.rdgSteps={}; if(!S.fgsScores) S.fgsScores=[]; if(!S.essay50) S.essay50={}; if(!S.cases) S.cases=[]; if(!S.recs) S.recs=[]; if(!S.mockSets) S.mockSets=[]; if(!S.customQs) S.customQs=[];  if(S.nextSet&&S.nextSet.items&&S.nextSet.items.length){ var migId="mig"+(S.nextSet.upd||0); if(!S.mockSets.some(x=>x.id===migId)){ S.mockSets.push({id:migId, name:"引き継ぎセット", d:S.nextSet.d||"", items:S.nextSet.items, upd:S.nextSet.upd||Date.now()}); seedQAFromQuestions(S.nextSet.items.map(x=>x.q)); } S.nextSet=null; } reconcileHomeworkQA(); renderDash(); renderSched(); renderToefl(); renderReading(); renderEssay(); renderFGS(); renderCases(); renderEssay50(); renderIntv(); renderShigan(); renderRecs(); renderNextSet(); renderMock(); renderPlan(); }
 ["tfDate","lgDate","hwDate","evDate","rdDate","fgsDate","e50date","recDate"].forEach(id=>{var el=document.getElementById(id); if(el) el.value=today();});
 renderAll();
 
