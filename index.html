@@ -586,6 +586,7 @@ label.f{display:block;font-size:12px;color:var(--sub);font-weight:600;margin-bot
     <div class="subpage" id="sub-irec">
       <div class="notice"><b>面接練習の基本：自分の声を録音して聞き返す。</b>答えを文章に書いて覚えるのは禁止です（棒読みになります）。<b>骨子（キーワードの箇条書き）だけ</b>を見て話し、スマホで録音→聞き返すと、自分では気づかない話し方のクセが見えてきます。</div>
       <div id="recNextSet"></div>
+      <div id="recStage" style="display:none"></div>
       <div class="card" style="margin-bottom:14px"><h3>やり方（1回15〜20分）</h3>
         <ol style="margin:8px 0 0 22px">
           <li>質問を<b>5問</b>選ぶ（「★志願書対策」や「質問バンク」から）</li>
@@ -1126,7 +1127,7 @@ function load(){
   return {studyLog:[], toefl:[], essays:[], qa:[], mocks:[], lessons:{}, tasks:{}, events:[], plan:{}, rdgLog:[], rdgPlan:{}, rdgSteps:{}, fgsScores:[], essay50:{}};
 }
 function save(){ localStorage.setItem(KEY, JSON.stringify(S)); if(typeof scheduleSyncPush==="function") scheduleSyncPush(); }
-const APP_VERSION = "2026.08.08";
+const APP_VERSION = "2026.08.10";
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
 function esc(s){ return (s||"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function ymd(dt){ return dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0")+"-"+String(dt.getDate()).padStart(2,"0"); }
@@ -1761,6 +1762,57 @@ function delMockSet(id){
   if(editingSetId===id) setFormClear();
   save(); renderNextSet();
 }
+function qaByText(q){ return (S.qa||[]).find(x=>x.q===q); }
+function recCountOf(q){ const e=qaByText(q); return (e&&e.rec)||0; }
+function recMark(q){ const e=qaByText(q); if(!e) return; e.rec=(e.rec||0)+1; save(); renderNextSet(); }
+function recEdit(setId,i){
+  const st=(S.mockSets||[]).find(x=>x.id===setId); if(!st||!st.items[i]) return;
+  const q=st.items[i].q; const e=qaByText(q); if(!e) return;
+  const cur=e.rec||0;
+  const v=prompt("この質問の録音回数を修正します（0でリセット）\n\n「"+q+"」", String(cur));
+  if(v===null) return;
+  const n=parseInt(v,10);
+  if(isNaN(n)||n<0) return alert("0以上の数字を入力してください");
+  e.rec=n; save(); renderNextSet();
+}
+function recMarkAt(setId,i){ const st=(S.mockSets||[]).find(x=>x.id===setId); if(st&&st.items[i]) recMark(st.items[i].q); }
+function goQANote(){ document.querySelector(".navbtn[data-page=\u0027intv\u0027]").click(); document.querySelector("[data-group=\u0027intv\u0027] [data-sub=\u0027inote\u0027]").click(); window.scrollTo(0,0); }
+var recSess=null;
+function recStartSet(id){
+  const st=(S.mockSets||[]).find(x=>x.id===id); if(!st||!st.items.length) return;
+  recSess={setId:id, name:st.name, qs:st.items.map(x=>x.q), i:0, done:0, t0:Date.now(), timer:null};
+  const el=document.getElementById("recStage"); if(!el) return;
+  el.style.display="block";
+  recSess.timer=setInterval(()=>{ const sec=Math.floor((Date.now()-recSess.t0)/1000); const t=document.getElementById("recTimer"); if(t) t.textContent=String(Math.floor(sec/60)).padStart(2,"0")+":"+String(sec%60).padStart(2,"0"); },1000);
+  recShowQ(); el.scrollIntoView({behavior:"smooth"});
+}
+function recShowQ(){
+  const el=document.getElementById("recStage"); if(!el||!recSess) return;
+  const q=recSess.qs[recSess.i]; const e=qaByText(q);
+  el.innerHTML=`<div class="card" style="border:2px solid var(--intv)">
+    <div class="flex"><span class="tag green">${recSess.i+1} / ${recSess.qs.length}問</span><span class="tag">${esc(recSess.name)}</span><span class="right kpi" id="recTimer" style="font-size:22px">00:00</span></div>
+    <div style="font-size:26px;font-weight:700;line-height:1.6;margin:18px 0">${esc(q)}</div>
+    <div class="muted" style="margin-bottom:8px">スマホの録音を回したまま、<b>結論→理由→エピソード</b>で30秒〜1分。</div>
+    <div id="recKotsu" style="display:none;background:#f6f8fb;border-radius:8px;padding:10px 14px;margin-bottom:10px;white-space:pre-wrap;font-size:14px">${e&&e.a?esc(e.a):"（骨子は未記入です。先に想定問答ノートで書いておくと話しやすくなります）"}</div>
+    <div class="flex">
+      <button class="btn ghost sm" onclick="var k=document.getElementById(\u0027recKotsu\u0027);k.style.display=k.style.display===\u0027none\u0027?\u0027block\u0027:\u0027none\u0027">骨子を見る／隠す</button>
+      <button class="btn intv" onclick="recMarkAndNext()">🎙 録音した → 次へ</button>
+      <button class="btn ghost" onclick="recNextQ()">スキップ</button>
+      <button class="btn danger right" onclick="recEndSess()">終了</button>
+    </div></div>`;
+}
+function recMarkAndNext(){ if(!recSess) return; recMark(recSess.qs[recSess.i]); recSess.done++; recNextQ(); }
+function recNextQ(){ if(!recSess) return; if(recSess.i<recSess.qs.length-1){ recSess.i++; recShowQ(); } else recEndSess(); }
+function recEndSess(){
+  if(!recSess) return;
+  clearInterval(recSess.timer);
+  const n=recSess.done;
+  const el=document.getElementById("recStage"); if(el){ el.style.display="none"; el.innerHTML=""; }
+  const rn=document.getElementById("recN"); if(rn&&n) rn.value=n;
+  recSess=null; renderNextSet();
+  alert("お疲れさま！録音を聞き返して、記録フォームに「気づいたクセ」を書きましょう。");
+  const f=document.getElementById("recMemo"); if(f){ f.scrollIntoView({behavior:"smooth"}); f.focus(); }
+}
 function goMockSet(){ document.querySelector(".navbtn[data-page=\u0027mock\u0027]").click(); window.scrollTo(0,0); }
 function renderNextSet(){
   const sets=(S.mockSets||[]).slice().sort((a,b)=>(b.upd||0)-(a.upd||0));
@@ -1769,7 +1821,7 @@ function renderNextSet(){
   if(list) list.innerHTML= sets.length? sets.map(st=>{
     const rs=runs(st.id);
     return `<div style="border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:8px 0;background:#fff">
-      <div class="flex"><b>${esc(st.name)}</b>${st.d?`<span class="tag amber">予定 ${st.d}</span>`:""}<span class="tag">${st.items.length}問</span>
+      <div class="flex"><b>${esc(st.name)}</b>${st.d?`<span class="tag amber">予定 ${st.d}</span>`:""}<span class="tag">${st.items.length}問</span><span class="tag blue">🎙 録音 ${st.items.filter(x=>recCountOf(x.q)>0).length}/${st.items.length}</span>
       ${rs.length? rs.map(r=>`<span class="tag green">実施 ${r.d}・平均${r.avg}/5</span>`).join("") : '<span class="tag red">未実施（宿題）</span>'}
       <span class="right flex" style="gap:6px">
         <button class="btn mock sm" onclick="mockStartSet('${st.id}')">▶ このセットで開始</button>
@@ -1782,7 +1834,20 @@ function renderNextSet(){
   const dash=document.getElementById("dashNextSet");
   if(dash) dash.innerHTML= todo.length? `<div class="notice" style="border-color:#f0c4c4;background:#fdf1f1;margin-bottom:16px">🎤 <b>石田先生からの宿題セットが${todo.length}件</b>：${todo.map(st=>`『${esc(st.name)}』（${st.d?st.d+"・":""}${st.items.length}問）`).join("、")} — 骨子を作って録音練習しておこう。<a href="#" onclick="goMockSet();return false"><b>質問を見る →</b></a></div>` : "";
   const rec=document.getElementById("recNextSet");
-  if(rec) rec.innerHTML= todo.length? `<div class="notice" style="border-color:#bfe3d0;background:#effaf4">📋 石田先生の宿題セット（${todo.map(st=>"『"+esc(st.name)+"』").join("")}）の質問で録音練習をすると、そのまま次回の準備になります。<a href="#" onclick="goMockSet();return false">質問を見る →</a></div>` : "";
+  if(rec) rec.innerHTML= todo.length? todo.map(st=>{
+    const done=st.items.filter(x=>recCountOf(x.q)>0).length;
+    return `<div class="card" style="border:2px solid var(--intv);margin-bottom:12px">
+      <div class="flex"><b>📋 宿題『${esc(st.name)}』の録音練習</b>${st.d?`<span class="tag amber">次回 ${st.d}</span>`:""}<span class="tag ${done===st.items.length?"green":"blue"}">録音済み ${done}/${st.items.length}問</span>
+      <button class="btn intv right" onclick="recStartSet('${st.id}')">▶ この宿題で録音練習を開始</button></div>
+      <div style="margin-top:8px">${st.items.map((x,ix)=>{
+        const e=qaByText(x.q); const c=(e&&e.rec)||0;
+        return `<div style="display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px dashed var(--line)">
+          <span class="tag ${c?"green":""}" style="flex-shrink:0;cursor:pointer" title="クリックで回数を修正（0でリセット）" onclick="recEdit(\u0027${st.id}\u0027,${ix})">🎙${c||"—"} ✎</span>
+          <div style="flex:1"><div style="font-size:14px;font-weight:600">${esc(x.q)}</div>
+          ${e&&e.a?`<details style="margin-top:3px"><summary class="muted" style="cursor:pointer;font-size:12.5px">骨子を見る</summary><div style="font-size:13px;background:#f6f8fb;border-radius:6px;padding:6px 10px;margin-top:4px;white-space:pre-wrap">${esc(e.a)}</div></details>`:`<div class="muted" style="font-size:12.5px">骨子が未記入 → <a href="#" onclick="goQANote();return false">想定問答ノートで書く</a></div>`}</div>
+          <button class="btn ghost sm" style="flex-shrink:0" onclick="recMarkAt('${st.id}',${ix})" title="この質問を録音したら押す">🎙 録音した</button>
+        </div>`;}).join("")}</div></div>`;
+  }).join("") : "";
 }
 function mockShow(){
   document.getElementById("mockProg").textContent=`質問 ${mock.i+1} / ${mock.qs.length}`;
