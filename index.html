@@ -1137,7 +1137,7 @@ function load(){
   return {studyLog:[], toefl:[], essays:[], qa:[], mocks:[], lessons:{}, tasks:{}, events:[], plan:{}, rdgLog:[], rdgPlan:{}, rdgSteps:{}, fgsScores:[], essay50:{}};
 }
 function save(){ localStorage.setItem(KEY, JSON.stringify(S)); if(typeof scheduleSyncPush==="function") scheduleSyncPush(); }
-const APP_VERSION = "2026.08.13";
+const APP_VERSION = "2026.08.14";
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
 function esc(s){ return (s||"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function ymd(dt){ return dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0")+"-"+String(dt.getDate()).padStart(2,"0"); }
@@ -2660,6 +2660,9 @@ function e50Fill(){
       html+=`<div style="margin-top:12px;border-top:1px dashed var(--line);padding-top:10px"><button class="btn ghost sm" id="e50modelBtn" data-len="${len}" onclick="e50ToggleModel()">📖 模範小論＋真似るポイントを見る（約${len}字）</button> <span class="muted">まず自分で書いてから開こう</span><div id="e50modelBox" style="display:none;margin-top:10px;background:#fffaf0;border-left:4px solid var(--essay);border-radius:0 8px 8px 0;padding:12px 16px"><div style="white-space:pre-wrap;line-height:1.9;font-size:14px">${esc(mdl)}</div><div class="muted" style="margin-top:8px;border-top:1px dashed #e7d9bb;padding-top:8px">※模範例です。丸写しせず、型と論の運び方を真似て、自分の言葉と経験で書きましょう。</div>${pts?`<div style="margin-top:12px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 14px;font-size:13.5px;line-height:1.7">${pts}</div>`:""}</div></div>`;
     } else {
       html+=`<div style="margin-top:12px;border-top:1px dashed var(--line);padding-top:10px"><span class="muted">📖 この回の模範小論は準備中です（順次追加します）。</span></div>`;
+    }
+    if(r&&(r.feedback||r.total!=null)){
+      html+=`<div style="margin-top:12px;border-top:1px dashed var(--line);padding-top:10px"><b>📝 私（Claude）の講評${r.total!=null?`（${r.total}/30・${fgsBand(r.total)[0]}）`:""}</b><div style="white-space:pre-wrap;background:#f2f7f2;border-left:4px solid var(--ok);border-radius:0 8px 8px 0;padding:10px 14px;margin-top:6px;font-size:13.5px;line-height:1.8">${esc(r.feedback||"（講評はまだありません）")}</div></div>`;
     }
     pr.innerHTML=html;
   }
