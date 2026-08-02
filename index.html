@@ -173,6 +173,7 @@ label.f{display:block;font-size:12px;color:var(--sub);font-weight:600;margin-bot
       </div>
     </div>
     <div id="dashNextSet"></div>
+    <div class="notice" style="border-color:#f3dfbf;background:#fdf8ef;margin-bottom:16px">📇 <b>今日の事例カード5枚（5分）</b>——「使える事例がない」はこれで解消します。<a href="#" onclick="goCards();return false"><b>始める →</b></a></div>
     <div class="grid cols4" id="cdGrid"></div>
     <div class="card" style="margin-bottom:16px"><h3><span class="chip" style="background:#e8a13c">今日のプラン</span><span id="dashPlanPhase" class="muted" style="font-weight:400"></span></h3><div id="dashPlan"></div></div>
     <div class="grid cols3">
@@ -321,6 +322,7 @@ label.f{display:block;font-size:12px;color:var(--sub);font-weight:600;margin-bot
     <div class="subtabs" data-group="essay">
       <button class="subtab active" data-sub="elesson">入門レッスン</button>
       <button class="subtab" data-sub="eroad">📋 2ヶ月ロードマップ</button>
+      <button class="subtab" data-sub="ecards">📇 事例カード</button>
       <button class="subtab" data-sub="ewrite">練習する</button>
       <button class="subtab" data-sub="ehist">練習履歴</button>
       <button class="subtab" data-sub="etheme">テーマバンク</button>
@@ -438,6 +440,12 @@ label.f{display:block;font-size:12px;color:var(--sub);font-weight:600;margin-bot
         </ul>
       </div>
     </div>
+    <div class="subpage" id="sub-ecards">
+      <div class="notice"><b>「使える事例が分からない」を7週間で解消する暗記ループ。</b>1日5枚、カードの表（テーマ）を見て中身を思い出す→「答えを見る」→<b>思い出せたら「知ってた」、無理なら「まだ」</b>。「まだ」のカードは優先的に再登場します。声に出して説明できたら合格です。</div>
+      <div class="grid cols3" id="cardStats"></div>
+      <div id="cardStage"></div>
+      <div class="card"><h3>全カード一覧</h3><div id="cardList"></div></div>
+    </div>
     <div class="subpage" id="sub-ewrite">
       <div class="card">
         <div class="frow">
@@ -497,6 +505,12 @@ label.f{display:block;font-size:12px;color:var(--sub);font-weight:600;margin-bot
           <div><label class="f">中身（いつ・どこで・誰が・何が起きたか・なぜ）</label><textarea id="caseB" rows="3"></textarea></div>
           <div style="margin-top:8px"><label class="f">使える設問タイプ</label><input id="caseU" style="width:100%" placeholder="例：2026年型（カテゴリー化）／南北・貧困"></div>
           <button class="btn essay sm" style="margin-top:8px" onclick="addCase()">追加する</button>
+        </div>
+        <div class="card">
+          <h3>📰 週次の時事を貼り付け（Claudeが渡すブロック用）</h3>
+          <p class="muted" style="margin:2px 0 6px">私（Claude）が週1回お渡しする「今週の時事」ブロックをそのまま貼ると、事例ストックにまとめて追加されます。</p>
+          <textarea id="newsPaste" rows="5" placeholder="【時事】&#10;テーマ: ○○○&#10;内容: いつ・どこで・何が…&#10;使える設問: 2026年型／環境 など&#10;---&#10;【時事】…"></textarea>
+          <button class="btn essay sm" style="margin-top:6px" onclick="pasteNews()">解析して事例ストックに追加</button>
         </div>
         <div id="caseList"></div>
       </div>
@@ -1148,7 +1162,7 @@ function load(){
   return {studyLog:[], toefl:[], essays:[], qa:[], mocks:[], lessons:{}, tasks:{}, events:[], plan:{}, rdgLog:[], rdgPlan:{}, rdgSteps:{}, fgsScores:[], essay50:{}};
 }
 function save(){ localStorage.setItem(KEY, JSON.stringify(S)); if(typeof scheduleSyncPush==="function") scheduleSyncPush(); }
-const APP_VERSION = "2026.09.01";
+const APP_VERSION = "2026.09.03";
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
 function esc(s){ return (s||"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function ymd(dt){ return dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0")+"-"+String(dt.getDate()).padStart(2,"0"); }
@@ -1723,7 +1737,7 @@ function addCustomQ(){
   const inp=document.getElementById("customQ");
   const q=(inp.value||"").trim();
   if(!q) return alert("質問を入力してください");
-  if(!S.customQs) S.customQs=[]; if(!S.goji) S.goji=[];
+  if(!S.customQs) S.customQs=[]; if(!S.goji) S.goji=[]; if(!S.cardStat) S.cardStat={};
   if(S.customQs.some(x=>x.q===q)) return alert("同じ質問がすでにあります");
   S.customQs.push({id:uid(), q});
   inp.value="";
@@ -1758,7 +1772,7 @@ function seedQAFromQuestions(qs){
 function saveMockSet(){
   const qs=[...document.querySelectorAll("#setPicker input:checked")].map(x=>x.dataset.q);
   if(!qs.length) return alert("質問を1つ以上チェックしてください");
-  if(!S.mockSets) S.mockSets=[]; if(!S.customQs) S.customQs=[]; if(!S.goji) S.goji=[]; 
+  if(!S.mockSets) S.mockSets=[]; if(!S.customQs) S.customQs=[]; if(!S.goji) S.goji=[]; if(!S.cardStat) S.cardStat={}; 
   const name=(document.getElementById("setName").value||"").trim()||("セット"+(S.mockSets.length+1));
   const d=document.getElementById("setDate").value||"";
   if(editingSetId){
@@ -2714,7 +2728,7 @@ function e50Label(n){
 let e50cur=1;
 function absorbGoji(t){
   const m=t.match(/誤字[:：]\s*(.+)/); if(!m) return 0;
-  if(!S.goji) S.goji=[];
+  if(!S.goji) S.goji=[]; if(!S.cardStat) S.cardStat={};
   let n=0;
   m[1].split(/[、,，\/]/).forEach(p=>{
     const mm=p.trim().match(/(.+?)→(.+)/);
@@ -2726,7 +2740,7 @@ function absorbGoji(t){
 function addGoji(){
   const w=(document.getElementById("gojiW").value||"").trim(), r=(document.getElementById("gojiR").value||"").trim();
   if(!w||!r) return alert("誤と正の両方を入力してください");
-  if(!S.goji) S.goji=[];
+  if(!S.goji) S.goji=[]; if(!S.cardStat) S.cardStat={};
   if(S.goji.some(x=>x.w===w)) return alert("すでに登録されています");
   S.goji.push({w,r}); save(); renderEssay50();
 }
@@ -2787,6 +2801,8 @@ function e50Fill(){
     if(psg.indexOf("REAL:")===0){ const r=FGS_REAL[+psg.slice(5)]; psg=r?("【課題文の要旨】"+r.gist):""; }
     let html=`<span class="tag">${p.ty}</span>${p.min?` <span class="tag amber">${p.min}分</span>`:""} <b>${esc(p.th)}</b>`;
     if(psg) html+=`<div style="background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin:8px 0;font-size:13.5px;line-height:1.9;white-space:pre-wrap"><b>課題文</b>（練習用）<br>${esc(psg)}<div style="text-align:right;margin-top:6px" class="muted">《本文 ${psg.replace(/\s/g,"").length}字》（空白・改行を除く）</div></div>`;
+    const nts=(typeof PSG_NOTES!=="undefined")?PSG_NOTES[e50cur]:null;
+    if(psg&&nts&&nts.length) html+=`<details style="margin:6px 0"><summary style="cursor:pointer;font-weight:600">📖 課題文の用語・事例ミニ解説（${nts.length}件）</summary><div style="background:#f6f8fb;border-radius:8px;padding:8px 12px;margin-top:4px">${nts.map(x=>`<p style="margin:6px 0;font-size:13.5px;line-height:1.7"><b>${esc(x.w)}</b>：${esc(x.d)}</p>`).join("")}</div></details>`;
     html+=`<div style="margin-top:6px"><b>設問</b>　${esc(p.q)}</div>`;
     const mdl=(typeof ESSAY50_MODEL!=="undefined")?ESSAY50_MODEL[e50cur]:null;
     if(mdl){
@@ -2959,6 +2975,152 @@ function resetData(){
 
 /* ================= 起動 ================= */
 /* ================= 事例ストック（上智：具体例が合否を分ける） ================= */
+const PSG_NOTES = {
+2:[{w:"先住民族の権利に関する国連宣言",d:"2007年に国連総会で採択。土地・言語・文化に対する集団としての権利を認めた。法的拘束力はないが各国政策の基準になっている。"},
+{w:"盗まれた世代",d:"20世紀後半までオーストラリアで、アボリジニの子どもを家族から引き離して白人社会で育てた政策の被害世代。2008年に首相が公式謝罪。"},
+{w:"アイヌ施策推進法",d:"2019年施行の日本の法律。アイヌを「先住民族」と初めて法律に明記した。"},
+{w:"保留地",d:"北米などで先住民の居住用に区切られた土地。保護の形をとった囲い込みでもあった。"}],
+4:[{w:"足尾鉱毒事件",d:"明治期、栃木の銅山の鉱毒が渡良瀬川流域を汚染した日本初の公害事件。田中正造らの抗議運動が政府を動かした。"},
+{w:"水俣病",d:"熊本の化学工場の排水に含まれた水銀による公害病。患者と支援者の長い闘いが企業と国の責任を認めさせた。"},
+{w:"検察庁法改正案への抗議（2020年）",d:"検察幹部の定年延長を可能にする法案に、SNS上で数百万件の抗議投稿が集まり、審議が見送られた出来事。"},
+{w:"エシカル消費",d:"人権や環境に配慮した商品を選んで買うこと。買い物を通じた意思表示。"}],
+5:[{w:"国連開発計画（UNDP）",d:"国連の開発援助機関。1994年の『人間開発報告書』で人間の安全保障を提唱した。"},
+{w:"恐怖からの自由・欠乏からの自由",d:"人間の安全保障の二本柱。紛争や暴力の恐怖と、貧困や飢餓の欠乏の両方から人を守るという考え。"},
+{w:"緒方貞子",d:"国連難民高等弁務官を10年務めた日本人。センと共に人間の安全保障委員会の共同議長を務めた。"},
+{w:"エンパワメント（能力強化）",d:"人々が自らの力で危機に立ち向かえるようにすること。保護と並ぶ人間の安全保障のもう一つの柱。"}],
+6:[{w:"ガストアルバイター",d:"「客人労働者」。戦後西ドイツがトルコ等から受け入れた労働者。帰国前提が定住に変わり、移民政策の原点的事例になった。"},
+{w:"マックス・フリッシュ",d:"スイスの作家。「我々は労働力を呼んだが、来たのは人間だった」という言葉で受け入れ政策の矛盾を突いた。"},
+{w:"雇用許可制（韓国）",d:"韓国が単純労働の受け入れを正面から認めた制度。一定の転職の自由と労働法の適用を保障する。"},
+{w:"送金",d:"海外で働く人が母国の家族に送るお金。多くの途上国で重要な収入源になっている。"}],
+7:[{w:"難民条約（1951年）",d:"迫害のおそれから国を離れた人を難民と定義し、締約国に保護を義務づけた条約。日本は1981年に加入。"},
+{w:"立証責任",d:"難民審査では迫害のおそれを申請者側が示す必要があるが、逃げてきた人が証拠を持つことは難しいという構造問題。"},
+{w:"ドイツの2015年",d:"シリア内戦などからの大量の庇護申請者をドイツが受け入れた年。語学と就労の統合政策とセットで進められた。"},
+{w:"民間スポンサー制度（カナダ）",d:"政府だけでなく市民グループが難民家族の生活を直接支える仕組み。受け入れを社会全体の営みにしている。"}],
+8:[{w:"分割統治",d:"植民地支配の技術。現地の人々を分類し、一方を優遇して対立させることで支配を安定させた。"},
+{w:"ユーゴスラビア",d:"バルカン半島の旧連邦国家。社会主義時代は多民族が共存したが、1990年代の解体期に民族対立が噴出した。"},
+{w:"スレブレニツァ",d:"1995年、ボスニアで約8000人のボシュニャク人男性が殺害された事件。国際法廷がジェノサイドと認定。"},
+{w:"デイトン合意",d:"1995年にボスニア内戦を終わらせた和平合意。民族ごとに権力を分け合う制度を作り、平和と引き換えに区分を固定したと評される。"},
+{w:"国際刑事裁判",d:"戦争犯罪や虐殺を個人の責任として裁く仕組み。憎悪を扇動した者も裁かれる前例を作った。"}],
+9:[{w:"ソウェト蜂起（1976年）",d:"南アフリカで黒人学校へのアフリカーンス語（支配層の言語）強制に生徒が抗議し、警官隊の発砲で多数が犠牲になった事件。"},
+{w:"旧宗主国言語",d:"独立後も公用語であり続ける、かつての植民地支配国の言語。操れる少数層が要職を占める構造を生んだ。"},
+{w:"ユネスコの母語教育勧告",d:"子どもは母語で学ぶのが最も効果的だとする国際機関の一貫した立場。母語の力は第二言語の習得も支える。"}],
+10:[{w:"在留外国人約300万人",d:"日本で暮らす外国籍者の数。過去最多水準で、国籍・在留資格・日本語力は極めて多様。"},
+{w:"不就学",d:"学齢期なのに学校に通っていない状態。外国籍の子は就学義務の対象外という制度の隙間が背景にある。"},
+{w:"ヘイトスピーチ解消法（2016年）",d:"特定の民族への差別的言動の解消を国と自治体の責務とした法律。罰則はない。"},
+{w:"やさしい日本語",d:"難しい語彙を避け、外国人にも伝わるよう整えた日本語。行政情報や災害時の連絡で広がっている。"}],
+11:[{w:"カースト",d:"インドの伝統的身分秩序。職業と結びついた集団に人々が分けられ、外側に置かれた人々（ダリット）は激しい差別を受けてきた。1950年施行の憲法で差別は禁止。"},
+{w:"ダリット",d:"かつて「不可触民」と呼ばれた人々の自称。「抑圧された者」の意。差別禁止後も結婚・就職・暴力の問題が続く。"},
+{w:"留保制度",d:"インドで被差別カースト等に進学・公職の枠を割り当てる積極的差別是正策。効果と「区分の固定」の両面が議論される。"}],
+12:[{w:"ニュージーランドの女性参政権（1893年）",d:"世界で最初に女性が国政の投票権を得た例。日本は1945年の改正で実現し、翌年初めて女性が投票した。"},
+{w:"統計的差別",d:"集団の平均像を理由に個人の扱いを決めること。一見合理的に見えて、個人の道を塞ぎ平均像を固定する。"},
+{w:"クオータ制",d:"議員候補や役員に一定割合の女性を求める制度。北欧などで導入され、意思決定の場の構成を変えてきた。"},
+{w:"ジェンダーギャップ指数",d:"政治・経済・教育・健康の男女格差を測る国際指標。日本は先進国の中で最下位圏が続く。"}],
+13:[{w:"無国籍",d:"どの国の国籍も持たない状態。世界に数百万人いると推計され、教育・医療・移動の権利が保障されにくい。"},
+{w:"ロヒンギャ",d:"ミャンマー西部のイスラム系少数派。1982年の国籍法で事実上国民から除外され、2017年に数十万人が国外へ逃れた。"},
+{w:"権利をもつ権利（アーレント）",d:"哲学者ハンナ・アーレントの言葉。人権を実際に保障されるには、まずどこかの共同体に属する必要があるという逆説。"},
+{w:"出生登録",d:"生まれた事実を公的に記録すること。登録がなければ法的には存在しない人になり、無国籍の入り口になる。"}],
+14:[{w:"スティグマ（烙印）",d:"社会学者ゴッフマンの概念。他者から押しつけられ、その人の全体を覆ってしまう負の印。"},
+{w:"申請主義",d:"支援を受けるには本人の申請が必要という原則。制度を知らない人・ためらう人が取り残される。"},
+{w:"選別主義と普遍主義",d:"対象を絞って手厚く届けるか、全員に一律に届けるか。選別は効率的だが烙印を生み、普遍は烙印がないが費用がかかる。"}],
+15:[{w:"国勢調査の人種欄（米国）",d:"米国の国勢調査には建国以来人種の項目があり、格差の可視化と是正策の根拠になってきた。2000年から複数選択可。"},
+{w:"ナチスの登録名簿",d:"ナチス・ドイツがユダヤ人の登録記録を迫害と移送に利用した歴史。統計と暴力の結びつきを示す。"},
+{w:"フランスの共和主義",d:"市民は皆平等という理念から、公的統計で人種・民族を尋ねない立場。差別が測れないという盲点も指摘される。"},
+{w:"AIバイアス",d:"過去の偏りを学習したAIが、人種欄がなくても住所や名前から事実上の差別的判断を再現してしまう問題。"}],
+16:[{w:"文化的ジェノサイド",d:"民族の物理的抹殺ではなく、言語・宗教・生活様式を消すことで集団を消滅させること。カナダの委員会が寄宿学校をこう総括した。"},
+{w:"真実和解委員会",d:"過去の人権侵害を国家が公式に調査・記録し、和解への道筋を示す仕組み。南アフリカやカナダで設置された。"},
+{w:"サーミ",d:"北欧の先住民族。かつて同化政策の対象となり、現在は独自の議会を持つ。"},
+{w:"マオリ語の復興",d:"ニュージーランドはマオリ語を公用語とし、幼児教育や放送で言語を取り戻す政策を進めてきた。"}],
+17:[{w:"出生地主義と血統主義",d:"生まれた場所で国籍を与えるか（米国など）、親の国籍を継がせるか（日本など）。移民二世の法的地位を分ける。"},
+{w:"2005年フランス暴動",d:"パリ郊外で移民系の若者の死をきっかけに広がった暴動。国籍はあっても日常で排除される二世の不満が背景とされた。"},
+{w:"夜間中学",d:"学齢を過ぎた人が学び直せる公立中学。外国ルーツの若者の重要な受け皿になっている。"},
+{w:"通名",d:"在日コリアンなどが日常で使う日本式の名前。差別を避ける手段であると同時に、名乗りの葛藤の象徴。"}],
+18:[{w:"強制移住（30キロ圏）",d:"チェルノブイリ事故で原発の周囲30キロが立入禁止となり住民が移住させられた。区域の線が生活を分けた。"},
+{w:"被災者証明書",d:"補償や医療の権利の証であると同時に、「汚染された人」という偏見の的にもなった書類。"},
+{w:"関東大震災の流言",d:"1923年の震災の混乱で根拠のない噂が広がり、朝鮮人などが虐殺された。災害時のデマの恐ろしさを示す歴史。"},
+{w:"災害公営住宅",d:"被災者向けの公営住宅。阪神・淡路大震災後には入居した高齢者の孤立と孤独死が長く問題になった。"}],
+19:[{w:"ペスト流行と迫害",d:"中世ヨーロッパの大流行時、「井戸に毒を入れた」という流言でユダヤ人共同体が襲われた。病の恐怖が犯人探しに向かう原型。"},
+{w:"エイズと偏見",d:"1980年代に現れた感染症。感染経路への偏見と結びつき、患者は病気より先に社会の排除と闘わされた。"},
+{w:"行動歴調査",d:"感染経路を追うための聞き取り。烙印を恐れて正直に話せない人が出ると、防疫そのものが崩れる。"}],
+20:[{w:"アイデンティティの複数性（セン）",d:"人は宗教・民族・職業・趣味など無数の帰属を同時に生きるというセンの議論。一枚のラベルへの還元が暴力の温床になる。"},
+{w:"自称と他称",d:"自分が選ぶ名乗りと、他人が貼るラベル。両者のずれが本人を苦しめる。"},
+{w:"エコーチェンバー",d:"SNSで似た意見の人だけがつながり、同じ声が反響し合って先鋭化する現象。ラベルの内側だけで完結する世界を作る。"}],
+21:[{w:"死んだ援助",d:"アフリカ出身の経済学者モヨの著書に由来する言葉。援助が依存と腐敗を生み発展を妨げたという批判の代表。"},
+{w:"オーナーシップ",d:"援助の主導権は受け取る国自身が持つべきだという原則。2000年代に国際的に確認された。"},
+{w:"現金給付",d:"物資の代わりに現金を渡し使い道を本人に委ねる支援。地元経済を潤し尊厳を守る方式として広がった。"}],
+22:[{w:"歴史的責任",d:"産業革命以来の累積排出の大部分を占める先進国が、気候危機の費用も負うべきだという主張。"},
+{w:"共通だが差異ある責任",d:"気候変動対応は全ての国の務めだが、重さは排出の歴史と能力に応じて差をつけるという国際交渉の原則。"},
+{w:"損失と損害",d:"適応の限界を超えて生じる気候被害。2022年の締約国会議で被害国支援の基金設立に合意した。"}],
+23:[{w:"底辺への競争",d:"各国が投資誘致のため減税や規制緩和を競い、労働条件や環境基準が切り下がっていく現象。"},
+{w:"資源の呪い",d:"資源の豊かな国ほど腐敗や紛争に苦しみやすいという逆説。掘って運び出すだけの外資進出が背景になることも。"},
+{w:"人権デューデリジェンス",d:"企業に供給網の末端まで人権侵害がないか調査・是正させる仕組み。欧州で法制化が進む。"}],
+24:[{w:"ポイント制",d:"カナダや豪州が採る、技能・語学力などを点数化して受け入れる移民選抜の仕組み。"},
+{w:"生産年齢人口",d:"15〜64歳の働き手の人口。日本は減少が続き、労働力不足の根本要因になっている。"},
+{w:"統合政策",d:"語学教育や就労支援など、移民が社会の一員になるための受け入れ側の施策。ドイツの統合コースが知られる。"}],
+25:[{w:"エルギン・マーブル",d:"19世紀に英国がパルテノン神殿から持ち出した彫刻群。ギリシャが返還を求め続ける係争の象徴。"},
+{w:"長期貸与・共同管理",d:"所有権を移した上で展示は続けるなど、返還と公開を両立させる折衷の方式。"}],
+26:[{w:"比較優位",d:"各国が得意分野に専念して交換すれば全体の富が増えるという自由貿易の基礎理論。"},
+{w:"幼稚産業保護",d:"産業が幼いうちは関税等で守り、力がついてから開放するという考え。現在の先進国の多くが実際に歩んだ道。"},
+{w:"セーフティネット",d:"貿易自由化で職を失う人への再訓練や生活保障。自由化とセットで語られるべき仕組み。"}],
+27:[{w:"コンディショナリティ",d:"国際機関が融資と引き換えに課す政策条件。緊縮や民営化などが典型。"},
+{w:"緊縮財政",d:"支出削減と増税で財政を立て直す政策。景気を冷やし弱者を直撃する副作用が議論される。"},
+{w:"アジア通貨危機（1997年）",d:"通貨急落が東アジアを襲った危機。IMF支援の条件だった緊縮が失業を深刻化させ、処方への反省を生んだ。"}],
+28:[{w:"グローバル・ケア・チェーン",d:"ケアの担い手が豊かな国へ移動し、その穴をより貧しい地域の女性が埋める連鎖構造。"},
+{w:"家事労働者条約（ILO189号）",d:"2011年採択。家庭内で働く人にも労働時間や休日など労働者の権利を保障する国際基準。"},
+{w:"送金経済",d:"海外労働者からの送金が国の経済を支える構造。フィリピンなどが代表例。"}],
+29:[{w:"ボランツーリズム",d:"観光とボランティアを組み合わせた渡航。善意が現地の負担や歪みを生むという批判が国際的に高まった。"},
+{w:"孤児院ツーリズム",d:"訪問者と寄付が集まるほど「孤児」の需要が生まれ、親のいる子まで施設に集められた倒錯。カンボジア等で報告。"}],
+101:[{w:"グレーバー『負債論』",d:"人類学者による負債の歴史研究。「借りたものは返す」という道徳の自明性を問い直した。2024年度課題文の出典。"},
+{w:"IMF（国際通貨基金）",d:"通貨危機の国に融資する国際機関。融資条件として緊縮を課し、途上国の教育・医療が削られたと批判されてきた。"},
+{w:"構造調整",d:"1980〜90年代にIMF・世銀が融資条件とした改革パッケージ。補助金削減・民営化・市場開放など。"}],
+102:[{w:"チェノウェス『市民的抵抗』",d:"非暴力運動の研究書。3.5%ルールで知られる。2025年度課題文の出典。"},
+{w:"3.5%ルール",d:"人口の3.5%が積極参加した非暴力運動に失敗例が見当たらないという知見。動員は支持の結果、が核心。"},
+{w:"公民権運動",d:"1950〜60年代の米国で人種隔離撤廃を勝ち取った非暴力運動。課題文が挙げる代表例。"}],
+103:[{w:"アパルトヘイト",d:"南アフリカの人種隔離体制。全国民を人種で登録し権利を区分した。1990年代に撤廃。2026年度課題文の題材。"},
+{w:"カラード",d:"アパルトヘイト下の分類の一つで、白人とも黒人とも区分された人々。分類の恣意性を示す存在だった。"},
+{w:"社会的認知による分類",d:"肌の色だけでなく生活様式や周囲の見なしで人種が決められたこと。分類に科学的根拠がなかったことを示す。"}],
+};
+const CARDS = [
+{id:"c01",cat:"カテゴリー化",t:"マヤ先住民とグアテマラ内戦",b:"植民地期の差別が1960〜96年の内戦につながり、80年代前半にマヤ系住民への虐殺が集中。国連のCEH報告は犠牲者約20万人・83%がマヤ系と認定。今もマヤ諸語話者はスペイン語中心の教育で不利。",u:"カテゴリー化・言語・貧困・自分の切り札"},
+{id:"c02",cat:"カテゴリー化",t:"アパルトヘイト（南アフリカ）",b:"20世紀末まで続いた人種隔離の国家制度。全国民を白人・黒人・カラードに登録し、居住・就労・教育を人種で区分。1994年の全人種選挙で終結。2026年度課題文の題材。",u:"カテゴリー化の原型・比較の軸"},
+{id:"c03",cat:"カテゴリー化",t:"印パ分離独立（1947年）",b:"英領インドで国勢調査と宗教別選挙区がヒンドゥー／ムスリムの区分を政治化。分離独立時の衝突で数十万人以上が死亡、1000万人超が移動。対立はカシミール問題として現在も続く。",u:"分類が暴力の設計図になる例"},
+{id:"c04",cat:"カテゴリー化",t:"ボスニア内戦とスレブレニツァ",b:"ユーゴ解体期、政治家が民族カードを切り隣人同士の戦争に。1995年スレブレニツァで約8000人が殺害されジェノサイド認定。「昔からの憎悪」ではなく作られた対立の典型。",u:"民族対立・メディアの扇動"},
+{id:"c05",cat:"カテゴリー化",t:"ルワンダ虐殺と身分証（1994年）",b:"ベルギー統治期に身分証へ民族（フツ／ツチ）を記載させた区分が対立を制度化。1994年、約100日で数十万人が殺害され、検問で身分証が生死を分けた。戦後は民族欄を廃止。",u:"統計・登録の危険性"},
+{id:"c06",cat:"カテゴリー化",t:"ロヒンギャ",b:"ミャンマー西部のイスラム系少数派。1982年国籍法で事実上国民から除外され、2017年の掃討作戦で数十万人がバングラデシュへ。世界最大級の難民キャンプで無国籍のまま暮らす。",u:"無国籍・難民・人間の安全保障"},
+{id:"c07",cat:"カテゴリー化",t:"ドミニカ共和国のハイチ系住民",b:"2013年、憲法裁判所が不法滞在者の子の国籍を遡って否定し、同国生まれの十数万人が無国籍状態に。国際的非難を受け一部回復。多数派の決定が国籍を消した例。",u:"無国籍・ラテンアメリカ"},
+{id:"c08",cat:"日本",t:"在日コリアン",b:"植民地支配の歴史に由来し現在4〜5世代目。日本で生まれ育っても外国籍なら参政権がなく、就職・結婚差別や通名の問題が続いてきた。ヘイトスピーチの主な標的にもされた。",u:"移民二世・帰属・日本の分断"},
+{id:"c09",cat:"日本",t:"日系ブラジル人と外国ルーツの子ども",b:"1990年の制度改正で来日が拡大。子どもは日本語支援の不足で不就学・進学断念が問題化。二言語とも伸びにくいダブルリミテッドや、親の失職による帰国と再来日の繰り返しも課題。",u:"移民の教育・多文化共生"},
+{id:"c10",cat:"日本",t:"部落差別",b:"江戸期の身分制に由来。1871年に制度は廃止されたが結婚・就職差別が続き、1922年に全国水平社が結成。ネットでの地名暴露が新たな問題となり、2016年に解消推進法（罰則なし）。",u:"生まれによる区分・法の限界"},
+{id:"c11",cat:"日本",t:"アイヌと同化政策",b:"1899年の北海道旧土人保護法が生業を制限し日本語教育を進め、アイヌ語は消滅危機に。廃止は1997年。2019年に初めて法律で「先住民族」と明記されたが、検証と格差是正は途上。",u:"同化政策・先住民・言語"},
+{id:"c12",cat:"カテゴリー化",t:"カナダ先住民寄宿学校",b:"19世紀から約100年、先住民の子を家族から引き離し母語を禁じて同化教育。2008年に首相謝罪、2015年に真実和解委員会が「文化的ジェノサイド」と総括。近年跡地から多数の墓が確認。",u:"同化の傷・国家の謝罪と償い"},
+{id:"c13",cat:"日本",t:"技能実習制度",b:"建前は技能移転の国際貢献、実態は人手不足産業の労働力。原則転職不可の構造が失踪（年数千人規模）や賃金未払いの温床とされ、廃止と新制度（育成就労）への移行が決定。",u:"外国人労働者・制度設計"},
+{id:"c14",cat:"カテゴリー化",t:"ガストアルバイター（西ドイツ）",b:"戦後の労働力不足でトルコ等から「客人労働者」を受け入れ。数年で帰る前提だったが人々は定住し家族を育てた。「我々は労働力を呼んだが、来たのは人間だった」（フリッシュ）。",u:"移民政策の原点・労働力と生活者"},
+{id:"c15",cat:"日本",t:"日本の難民認定と補完的保護",b:"日本の難民認定率は主要国比で極端に低いと指摘されてきた。2022年のウクライナ「避難民」は迅速に受け入れ、2023年に紛争避難民を守る補完的保護資格を導入。線の引き方が情勢で変わる例。",u:"難民・保護の線引き"},
+{id:"c16",cat:"日本",t:"ヘイトスピーチ解消法と川崎市条例",b:"特定民族の排斥を叫ぶ街宣が社会問題化し、2016年に解消法（罰則なし）。在日コリアンが多く住む川崎市は2019年、全国初の刑事罰付き条例を制定。表現の自由との線引きが論点。",u:"差別の規制・日本の分断"},
+{id:"c17",cat:"日本",t:"医学部入試の得点操作（2018年発覚）",b:"複数の医大が女子や多浪の受験生の得点を一律に不利に扱っていた。「女性は離職しやすい」という集団の平均像で個人を裁く統計的差別の典型。発覚後、男女別合格率の公表が進んだ。",u:"ジェンダー・統計的差別"},
+{id:"c18",cat:"日本",t:"生活保護とスティグマ",b:"憲法25条に基づく権利だが、資格があっても利用しない人が多い。バッシング報道や恥の意識が申請を抑え、水際作戦も問題化。ゴッフマンの「スティグマ（烙印）」概念で説明できる。",u:"保護と烙印・福祉の設計"},
+{id:"c19",cat:"日本",t:"ハンセン病隔離政策",b:"治療法確立後も隔離を継続（らい予防法は1996年廃止）。2001年熊本地裁が違憲と断じ国が謝罪、2019年には家族への差別も国の責任と認定。烙印が医学を無視し続けた例。",u:"感染症と差別・人権"},
+{id:"c20",cat:"災害",t:"福島第一原発事故の線引き",b:"2011年、避難指示の線と賠償の差が住民間に亀裂を生んだ。避難先での子どものいじめ、農水産物への風評も発生。行政の線が社会の烙印に転化した例。チェルノブイリと比較できる。",u:"災害と分断・風評"},
+{id:"c21",cat:"災害",t:"チェルノブイリ原発事故（1986年）",b:"旧ソ連が30キロ圏の住民を強制移住させ、汚染度で地域と補償を区分。「被災者証明書」は権利の証であると同時に烙印となり、避難者は結婚や就職で忌避された。線引きの功罪の古典例。",u:"災害の線引き・烙印"},
+{id:"c22",cat:"南北・経済",t:"IMF構造調整と第三世界の債務危機",b:"1970年代の産油国資金が途上国融資に回り、80年代初頭の米金利急騰で債務危機に。IMFは再融資の条件に緊縮を課し、無償の教育・医療が削られた国も。2024年度課題文の背景。",u:"債務・援助・緊縮"},
+{id:"c23",cat:"南北・経済",t:"ハイチの独立賠償金",b:"1804年に独立した世界初の黒人共和国が、1825年に旧宗主国フランスへ巨額の賠償金を課され約100年払い続けた。元奴隷が元主人に払う転倒した債務で、長期的貧困の一因とされる。",u:"不当な債務・植民地の清算"},
+{id:"c24",cat:"南北・経済",t:"ギリシャ債務危機と緊縮",b:"2010年代、EU・IMF等の支援条件として厳しい緊縮が課され、経済縮小と若年失業の急騰、医療の崩壊を招いた。後に貸し手側も見通しの誤りを部分的に認めた。融資条件の設計を問う例。",u:"融資条件・緊縮の副作用"},
+{id:"c25",cat:"南北・経済",t:"グラミン銀行とマイクロファイナンス",b:"バングラデシュで担保のない貧困層（特に女性）に少額融資。数人の組で返済を支え合う仕組み。2006年にユヌスと銀行がノーベル平和賞。「施しではなく機会」という援助観の転換点。",u:"援助と自立・当事者主体"},
+{id:"c26",cat:"南北・経済",t:"ラナ・プラザ崩落事故（2013年）",b:"バングラデシュで縫製工場ビルが崩落し1100人以上死亡。世界的ブランドの下請け構造と安い服の人的コストを象徴。事後にブランドと労組の安全協定、欧州の人権デューデリジェンス法制化が進んだ。",u:"多国籍企業・消費者の責任"},
+{id:"c27",cat:"南北・経済",t:"NAFTA後のメキシコ農家",b:"1994年発効の北米自由貿易協定後、補助金付きの安い米国産トウモロコシが流入し小規模農家が困窮、離農や移民につながったと報告される。自由貿易の痛みが偏る例。韓国の成功と対で使う。",u:"自由貿易・設計の重要性"},
+{id:"c28",cat:"南北・経済",t:"韓国の輸出主導成長",b:"最貧国の一つから、幼い産業を保護しつつ輸出で力をつける段階的開放により数十年で先進国入り。「開く順番と速さの設計」が貿易の成否を決める代表例。",u:"貿易と発展・幼稚産業保護"},
+{id:"c29",cat:"南北・経済",t:"ベナン・ブロンズ返還",b:"1897年に英軍がベニン王国（現ナイジェリア）から数千点の工芸品を持ち去り欧米の博物館へ。2021〜22年にドイツが返還を決定し流れが転換。文化財と植民地清算の象徴。",u:"文化財返還・対等な関係"},
+{id:"c30",cat:"南北・経済",t:"家事労働者の国際移動",b:"香港・シンガポール等でインドネシア・フィリピン出身女性が住み込みで家事労働。送金は母国を支えるが、密室の労働環境で虐待も社会問題化。ILOは2011年に家事労働者条約を採択。",u:"ケア労働・送金経済"},
+{id:"c31",cat:"社会運動",t:"米国公民権運動",b:"1950〜60年代、バス・ボイコットや行進などの非暴力直接行動で人種隔離の撤廃へ。1964年公民権法成立。路上の参加者は数十万人でも、背後に圧倒的多数の静かな支持があった。",u:"非暴力・動員は支持の結果"},
+{id:"c32",cat:"社会運動",t:"塩の行進（1930年）",b:"ガンディーが英国の塩の専売に抗議し約380キロを行進、海岸で塩を作った。誰でも真似できる象徴的行動が参加を広げ、国際世論を動かした。争点を生活の言葉に翻訳した古典例。",u:"象徴的行動・動員の設計"},
+{id:"c33",cat:"社会運動",t:"反アパルトヘイト国際圧力",b:"南ア国内の抵抗に加え、各国の経済制裁、企業の投資撤退、スポーツのボイコットが体制を追い詰め、1994年の全人種選挙へ。ローカルの運動とグローバルな圧力の連動例。",u:"国際連帯・制裁の効果"},
+{id:"c34",cat:"社会運動",t:"気候変動の学校ストライキ",b:"スウェーデンの高校生の座り込みから始まり、SNSを通じて世界数百万人規模の若者運動に拡大。明確な争点と国際連帯が強み、政策・選挙への接続が課題。",u:"若者の運動・SNSの力と限界"},
+{id:"c35",cat:"概念",t:"3.5%ルール（チェノウェス）",b:"人口の3.5%が積極参加した非暴力運動に失敗例が見当たらないという研究。核心は「大規模動員は支持の結果であって原因ではない」。2025年度課題文の題材。",u:"社会運動の理論・課題文理解"},
+{id:"c36",cat:"概念",t:"人間の安全保障",b:"国家でなく一人ひとりの生命と尊厳を守る考え方。1994年の国連開発計画報告書が提唱、「恐怖からの自由」と「欠乏からの自由」。保護とエンパワメントの両輪。緒方貞子とセンが委員会を主導。",u:"FGS最頻出概念"},
+{id:"c37",cat:"社会運動",t:"ソウェト蜂起（1976年）",b:"南アで黒人学校へのアフリカーンス語強制に生徒が立ち上がり、警官隊の発砲で多数の子どもが犠牲に。言語の強制が支配の道具であることを世界に示した。",u:"言語と権力・教育"},
+{id:"c38",cat:"環境",t:"2022年パキスタン大洪水",b:"記録的豪雨で国土の広範囲が水没し3300万人規模が被災。排出量は世界の1%未満とされ、「最少の排出国に最大の被害」という気候不正義の象徴。損失と損害基金設立の後押しに。",u:"気候の歴史的責任・不正義"},
+{id:"c39",cat:"環境",t:"損失と損害基金（COP27）",b:"気候変動の被害を受ける途上国を支援する基金の設立に2022年の締約国会議で合意。「共通だが差異ある責任」の原則の具体化だが、拠出の規模と分担は綱引きが続く。",u:"気候交渉・国際協力"},
+{id:"c40",cat:"概念",t:"アイデンティティの複数性（セン）",b:"人は宗教や民族だけでなく無数の帰属を同時に生きる。一枚のラベルへの還元が対立と暴力の温床になるとセンは論じた。共通点の数だけ分断への防波堤がある。",u:"分断への処方・第20回/自分の経験"}
+];
 const CASE_SEED = [
 {cat:"カテゴリー化・分断", t:"グアテマラのマヤ先住民", body:"植民地時代に始まる先住民差別が、1960〜96年の内戦とマヤの人々への虐殺（特に1980年代前半）の背景にある。国連主導の歴史解明委員会（CEH）は死者・行方不明を約20万人、うち83%がマヤ系市民と認定した。今もマヤ諸語（22言語）の話者は、スペイン語中心の教育制度の中で不利を抱える。", use:"2026年型（カテゴリー化・権利制限）／南北・貧困／言語と教育"},
 {cat:"カテゴリー化・分断", t:"米国で「英語が苦手な留学生」と枠づけられた自分の経験", body:"米国の高校で、アジア系の自分は考えを聞かれる前に「英語が苦手な留学生」という枠に入れられ、休み時間も出身ごとに固まっていた。移民政策を扱った授業で当事者としての視点を述べて初めて、級友の見方が変わった。", use:"2026年型（カテゴリー化）／多文化共生／当事者の声"},
@@ -2974,6 +3136,69 @@ const CASE_SEED = [
 {cat:"視点・切り口", t:"「当事者とともに歩む支援」（志願書の中心概念）", body:"外から必要なものを決めて与えるのではなく、何が必要かを住民と一緒に決め、実行の担い手も住民が務める支援。物資や資金を届けて終わる支援は期間が終われば止まるが、担い手が現地に残れば続く。ただし時間がかかること、住民の望みと外部の判断が食い違う場合があることが課題として残る。", use:"あらゆる設問の「対策」パートで使える。特に2024年型（援助のあり方）・2026年型（解決策）"},
 {cat:"視点・切り口", t:"支援の押しつけという自己批判", body:"自分がグアテマラで英語を教えた行為も、求められて行ったものである一方、「良いと思うものを外から与える」構図だった面は否めない。この自覚が「当事者が決めることの大切さ」という考えにつながった。", use:"対策を書くときの「限界にも触れる」部分。面接でも問われる"}
 ];
+var cardSess=null;
+function cardStatOf(id){ if(!S.cardStat) S.cardStat={}; if(!S.cardStat[id]) S.cardStat[id]={ok:0,ng:0,last:""}; return S.cardStat[id]; }
+function cardScore(id){ const st=cardStatOf(id); return st.ok - st.ng*2; }
+function renderCards(){
+  if(!S.cardStat) S.cardStat={};
+  const stats=document.getElementById("cardStats"); if(!stats) return;
+  const learned=CARDS.filter(c=>{const st=S.cardStat[c.id]; return st&&st.ok>=2&&st.ok>st.ng;}).length;
+  const review=CARDS.filter(c=>{const st=S.cardStat[c.id]; return st&&st.ng>st.ok;}).length;
+  const unseen=CARDS.filter(c=>!S.cardStat[c.id]||(S.cardStat[c.id].ok===0&&S.cardStat[c.id].ng===0)).length;
+  stats.innerHTML=`<div class="card"><div class="muted">習得済み（2回以上「知ってた」）</div><div class="kpi" style="color:var(--ok)">${learned}<small>/${CARDS.length}枚</small></div></div>
+    <div class="card"><div class="muted">要復習（「まだ」が多い）</div><div class="kpi" style="color:var(--danger)">${review}<small>枚</small></div></div>
+    <div class="card"><div class="muted">未着手</div><div class="kpi">${unseen}<small>枚</small></div></div>`;
+  const stage=document.getElementById("cardStage");
+  if(stage && !cardSess) stage.innerHTML=`<div class="card" style="text-align:center;padding:26px"><button class="btn essay" style="font-size:17px;padding:14px 30px" onclick="cardStart()">📇 今日の5枚を始める</button><p class="muted" style="margin-top:8px">「まだ」のカードと未着手のカードが優先で出ます（1回5枚・約5分）</p></div>`;
+  const list=document.getElementById("cardList");
+  if(list){
+    const cats=[...new Set(CARDS.map(c=>c.cat))];
+    list.innerHTML=cats.map(cat=>`<h4 style="margin:10px 0 4px">${esc(cat)}</h4>`+CARDS.filter(c=>c.cat===cat).map(c=>{
+      const st=S.cardStat[c.id];
+      const mark=!st||(st.ok===0&&st.ng===0)?"—":(st.ok>=2&&st.ok>st.ng?"✓":(st.ng>st.ok?"！":"…"));
+      return `<details style="margin:3px 0"><summary style="cursor:pointer"><span class="tag ${mark==="✓"?"green":mark==="！"?"red":""}" style="min-width:26px;text-align:center">${mark}</span> ${esc(c.t)}</summary><div style="background:#f6f8fb;border-radius:8px;padding:8px 12px;margin:4px 0;font-size:13.5px;line-height:1.8">${esc(c.b)}<br><span class="muted">使える場面：${esc(c.u)}</span></div></details>`;
+    }).join("")).join("");
+  }
+}
+function cardStart(){
+  const pool=[...CARDS].sort((a,b)=>cardScore(a.id)-cardScore(b.id) || Math.random()-0.5);
+  cardSess={qs:pool.slice(0,5), i:0, ok:0};
+  cardShow();
+}
+function cardShow(){
+  const stage=document.getElementById("cardStage"); if(!stage||!cardSess) return;
+  const c=cardSess.qs[cardSess.i];
+  stage.innerHTML=`<div class="card" style="border:2px solid var(--essay)">
+    <div class="flex"><span class="tag green">${cardSess.i+1} / ${cardSess.qs.length}枚</span><span class="tag">${esc(c.cat)}</span></div>
+    <div style="font-size:24px;font-weight:700;margin:20px 0 6px">${esc(c.t)}</div>
+    <p class="muted">→ いつ・どこで・何が起きた？ 小論文でどう使う？ 声に出して説明してから…</p>
+    <div id="cardBack" style="display:none;background:#fdf6e7;border-left:4px solid var(--essay);border-radius:0 8px 8px 0;padding:12px 16px;margin:10px 0;font-size:14.5px;line-height:1.9">${esc(c.b)}<br><b>使える場面：</b>${esc(c.u)}</div>
+    <div class="flex" id="cardBtns"><button class="btn essay" onclick="cardReveal()">答えを見る</button></div>
+  </div>`;
+}
+function cardReveal(){
+  const back=document.getElementById("cardBack"), btns=document.getElementById("cardBtns");
+  if(back) back.style.display="block";
+  if(btns) btns.innerHTML=`<button class="btn" style="background:var(--ok)" onclick="cardMark(1)">知ってた ○</button><button class="btn danger" onclick="cardMark(0)">まだ ✕</button>`;
+}
+function cardMark(ok){
+  const c=cardSess.qs[cardSess.i];
+  const st=cardStatOf(c.id);
+  if(ok){ st.ok++; cardSess.ok++; } else st.ng++;
+  st.last=today();
+  save();
+  if(cardSess.i<cardSess.qs.length-1){ cardSess.i++; cardShow(); }
+  else{
+    const stage=document.getElementById("cardStage");
+    stage.innerHTML=`<div class="card" style="text-align:center;padding:22px"><b>今日の5枚 完了！</b>（知ってた ${cardSess.ok}/5）<br><p class="muted" style="margin:6px 0">「まだ」のカードは明日また出ます。</p><button class="btn ghost sm" onclick="cardSess=null;renderCards()">閉じる</button> <button class="btn essay sm" onclick="cardStart()">もう5枚</button></div>`;
+    cardSess=null; renderCards();
+  }
+}
+function goCards(){
+  document.querySelector(".navbtn[data-page=\u0027essay\u0027]").click();
+  document.querySelector("[data-group=\u0027essay\u0027] [data-sub=\u0027ecards\u0027]").click();
+  window.scrollTo(0,0);
+}
 function renderCases(){
   if(!S.cases) S.cases=[];
   const el=document.getElementById("caseList"); if(!el) return;
@@ -2996,8 +3221,26 @@ function addCase(){
   ["caseT","caseB","caseU"].forEach(id=>g(id).value="");
   save(); renderCases(); alert("事例を追加しました");
 }
+function pasteNews(){
+  const t=document.getElementById("newsPaste").value;
+  if(!t.trim()) return alert("ブロックを貼り付けてください");
+  if(!S.cases) S.cases=[];
+  let n=0;
+  t.split(/【時事】/).forEach(seg=>{
+    const th=(seg.match(/テーマ[:：]\s*(.+)/)||[])[1];
+    const body=(seg.match(/内容[:：]\s*([\s\S]*?)(?=使える設問[:：]|---|$)/)||[])[1];
+    const use=(seg.match(/使える設問[:：]\s*(.+)/)||[])[1];
+    if(th&&body&&!S.cases.some(c=>c.t===th.trim())){
+      S.cases.push({id:uid(), cat:"時事", t:th.trim(), body:body.trim(), use:(use||"").trim()});
+      n++;
+    }
+  });
+  if(!n) return alert("追加できる項目が見つかりませんでした（重複の可能性）");
+  document.getElementById("newsPaste").value="";
+  save(); renderCases(); alert("時事を"+n+"件、事例ストックに追加しました");
+}
 function delCase(id){ if(!confirm("この事例を削除しますか？")) return; S.cases=(S.cases||[]).filter(c=>c.id!==id); save(); renderCases(); }
-function renderAllCore(){ if(!S.plan) S.plan={}; if(!S.rdgLog) S.rdgLog=[]; if(!S.rdgPlan) S.rdgPlan={}; if(!S.rdgSteps) S.rdgSteps={}; if(!S.fgsScores) S.fgsScores=[]; if(!S.essay50) S.essay50={}; if(!S.cases) S.cases=[]; if(!S.recs) S.recs=[]; if(!S.mockSets) S.mockSets=[]; if(!S.customQs) S.customQs=[]; if(!S.goji) S.goji=[];  if(S.nextSet&&S.nextSet.items&&S.nextSet.items.length){ var migId="mig"+(S.nextSet.upd||0); if(!S.mockSets.some(x=>x.id===migId)){ S.mockSets.push({id:migId, name:"引き継ぎセット", d:S.nextSet.d||"", items:S.nextSet.items, upd:S.nextSet.upd||Date.now()}); seedQAFromQuestions(S.nextSet.items.map(x=>x.q)); } S.nextSet=null; } reconcileHomeworkQA(); reconcileEssay50Scores(); renderDash(); renderSched(); renderToefl(); renderReading(); renderEssay(); renderFGS(); renderCases(); renderEssay50(); renderIntv(); renderShigan(); renderRecs(); renderNextSet(); renderMock(); renderPlan(); }
+function renderAllCore(){ if(!S.plan) S.plan={}; if(!S.rdgLog) S.rdgLog=[]; if(!S.rdgPlan) S.rdgPlan={}; if(!S.rdgSteps) S.rdgSteps={}; if(!S.fgsScores) S.fgsScores=[]; if(!S.essay50) S.essay50={}; if(!S.cases) S.cases=[]; if(!S.recs) S.recs=[]; if(!S.mockSets) S.mockSets=[]; if(!S.customQs) S.customQs=[]; if(!S.goji) S.goji=[]; if(!S.cardStat) S.cardStat={};  if(S.nextSet&&S.nextSet.items&&S.nextSet.items.length){ var migId="mig"+(S.nextSet.upd||0); if(!S.mockSets.some(x=>x.id===migId)){ S.mockSets.push({id:migId, name:"引き継ぎセット", d:S.nextSet.d||"", items:S.nextSet.items, upd:S.nextSet.upd||Date.now()}); seedQAFromQuestions(S.nextSet.items.map(x=>x.q)); } S.nextSet=null; } reconcileHomeworkQA(); reconcileEssay50Scores(); renderDash(); renderSched(); renderToefl(); renderReading(); renderEssay(); renderFGS(); renderCases(); renderCards(); renderEssay50(); renderIntv(); renderShigan(); renderRecs(); renderNextSet(); renderMock(); renderPlan(); }
 function uiSnapshot(){
   const dkey=d=>{
     const anc=d.closest("[id]");
@@ -3077,7 +3320,7 @@ function mergeState(local, remote){
     (local[k]||[]).forEach(function(it){ m[ghKeyOf(it)] = it; }); // 同一はローカル優先
     out[k] = Object.keys(m).map(function(id){ return m[id]; });
   });
-  ["lessons","tasks","plan","rdgPlan","rdgSteps"].forEach(function(k){
+  ["lessons","tasks","plan","rdgPlan","rdgSteps","cardStat"].forEach(function(k){
     out[k] = Object.assign({}, remote[k]||{}, local[k]||{}); // キーはローカル優先
   });
   out.essay50=mergeEssay50(local.essay50, remote.essay50);
