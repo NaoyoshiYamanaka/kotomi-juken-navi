@@ -1169,7 +1169,7 @@ function load(){
   return {studyLog:[], toefl:[], essays:[], qa:[], mocks:[], lessons:{}, tasks:{}, events:[], plan:{}, rdgLog:[], rdgPlan:{}, rdgSteps:{}, fgsScores:[], essay50:{}};
 }
 function save(){ localStorage.setItem(KEY, JSON.stringify(S)); if(typeof scheduleSyncPush==="function") scheduleSyncPush(); }
-const APP_VERSION = "2026.09.05";
+const APP_VERSION = "2026.09.06";
 function fmtStory(t){
   return esc(t).replace(/■ ([^：\n]+)：/g, '<span style="display:block;margin-top:14px;font-weight:800;color:#b45309;border-left:4px solid #b45309;padding-left:8px">■ $1</span>');
 }
@@ -3306,7 +3306,7 @@ function pasteNews(){
   if(!S.cases) S.cases=[];
   let n=0;
   t.split(/【時事】/).forEach(seg=>{
-    const th=(seg.match(/テーマ[:：]\s*(.+)/)||[])[1];
+    const th=(seg.match(/テーマ[:：]\s*(.+)/)||[])[1]||(seg.split("\n")[0]||"").trim();
     const body=(seg.match(/内容[:：]\s*([\s\S]*?)(?=使える設問[:：]|詳細[:：]|---|$)/)||[])[1];
     const detail=(seg.match(/詳細[:：]\s*([\s\S]*?)(?=---|$)/)||[])[1];
     const use=(seg.match(/使える設問[:：]\s*(.+)/)||[])[1];
