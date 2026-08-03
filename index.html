@@ -1169,7 +1169,7 @@ function load(){
   return {studyLog:[], toefl:[], essays:[], qa:[], mocks:[], lessons:{}, tasks:{}, events:[], plan:{}, rdgLog:[], rdgPlan:{}, rdgSteps:{}, fgsScores:[], essay50:{}};
 }
 function save(){ localStorage.setItem(KEY, JSON.stringify(S)); if(typeof scheduleSyncPush==="function") scheduleSyncPush(); }
-const APP_VERSION = "2026.09.08";
+const APP_VERSION = "2026.09.09";
 function fmtStory(t){
   return esc(t).replace(/■ ([^：\n]+)：/g, '<span style="display:block;margin-top:14px;font-weight:800;color:#b45309;border-left:4px solid #b45309;padding-left:8px">■ $1</span>');
 }
@@ -2849,7 +2849,7 @@ function e50Fill(){
   FGS_RUBRIC.forEach(c=>{const el=g("e50_"+c.k); if(el) el.value=(r&&r.scores&&r.scores[c.k]!=null)?r.scores[c.k]:0;});
   const revs=e50RevsOf(e50cur);
   const rl=g("e50revList");
-  if(rl) rl.innerHTML= revs.length? revs.map(rv=>`<details style="margin:4px 0"><summary style="cursor:pointer;font-weight:600">第${rv.v}版（${rv.d||""}）<span class="muted">《${(rv.text||"").replace(/\s/g,"").length}字》</span>${rv.total!=null?` <span class="tag" style="background:${fgsBand(rv.total)[1]};color:#fff">${rv.total}/30</span>`:' <span class="tag amber">未採点</span>'} <button class="del" onclick="event.preventDefault();event.stopPropagation();e50DelRev(${rv.v})">削除</button></summary><div style="white-space:pre-wrap;background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:13.5px;line-height:1.8;margin-top:4px">${esc(rv.text||"")}</div>${rv.feedback?`<details style="margin-top:4px"><summary class="muted" style="cursor:pointer;font-size:12.5px">この版への講評</summary><div style="white-space:pre-wrap;font-size:13px;background:#f2f7f2;border-radius:6px;padding:8px 12px;margin-top:4px">${esc(rv.feedback)}</div></details>`:""}</details>`).join("") : '<p class="muted" style="margin:0">まだ版がありません。手書き初稿は、私のテキスト化を「一括貼り付け」すると第1版として入ります。ここに直接書き始めてもOKです。</p>';
+  if(rl) rl.innerHTML= revs.length? revs.map(rv=>`<details style="margin:4px 0"><summary style="cursor:pointer;font-weight:600">第${rv.v}版（${rv.d||""}）<span class="muted">《${(rv.text||"").replace(/\s/g,"").length}字》</span>${rv.total!=null?` <span class="tag" style="background:${fgsBand(rv.total)[1]};color:#fff">${rv.total}/30</span>`:' <span class="tag amber">未採点</span>'} <button class="del" onclick="event.preventDefault();event.stopPropagation();e50DelRev(${rv.v})">削除</button></summary><div style="white-space:pre-wrap;background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:13.5px;line-height:1.8;margin-top:4px">${esc(rv.text||"")}</div>${rv.scores?`<div style="font-size:12.5px;margin-top:4px;background:#eef3fb;border-radius:6px;padding:6px 10px"><b>内訳</b>：課題文理解 ${rv.scores.r1}・設問対応 ${rv.scores.r2}・主張 ${rv.scores.r3}・論理と根拠 ${rv.scores.r4}・具体性・視野 ${rv.scores.r5}・日本語表現 ${rv.scores.r6}</div>`:""}${rv.goji?`<div style="font-size:12.5px;margin-top:4px;background:#fdf0f0;border-radius:6px;padding:6px 10px"><b>誤字</b>：${esc(rv.goji)}</div>`:""}${rv.feedback?`<details style="margin-top:4px"><summary class="muted" style="cursor:pointer;font-size:12.5px">この版への講評</summary><div style="white-space:pre-wrap;font-size:13px;background:#f2f7f2;border-radius:6px;padding:8px 12px;margin-top:4px">${esc(rv.feedback)}</div></details>`:""}</details>`).join("") : '<p class="muted" style="margin:0">まだ版がありません。手書き初稿は、私のテキスト化を「一括貼り付け」すると第1版として入ります。ここに直接書き始めてもOKです。</p>';
   const rt=g("e50revText");
   if(rt&&document.activeElement!==rt){ rt.value=revs.length?revs[revs.length-1].text:((r&&r.text)||""); e50RevCount(); }
 }
@@ -2971,6 +2971,7 @@ function e50Parse(){
   }
   if(tm&&text) tgt.text=text;
   tgt.d=d; if(found){ tgt.scores=scores; tgt.total=total; } tgt.feedback=fb;
+  const gj=(t.match(/誤字[:：]\s*(.+)/)||[])[1]; if(gj) tgt.goji=gj.trim();
   const lastR=revsA[revsA.length-1];
   S.essay50[e50cur]=Object.assign(S.essay50[e50cur], {d, text:(lastR&&lastR.text)||text, feedback:fb, scores:found?scores:null, total:found?total:null, min:tmin?+tmin:((prev&&prev.min)||null), self:tself?+tself:((prev&&prev.self)||null), revs:revsA});
   syncE50ToFgs(e50cur);
