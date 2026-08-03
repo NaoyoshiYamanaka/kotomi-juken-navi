@@ -330,9 +330,6 @@ label.f{display:block;font-size:12px;color:var(--sub);font-weight:600;margin-bot
       <button class="subtab active" data-sub="elesson">入門レッスン</button>
       <button class="subtab" data-sub="eroad">📋 2ヶ月ロードマップ</button>
       <button class="subtab" data-sub="ecards">📇 事例カード</button>
-      <button class="subtab" data-sub="ewrite">練習する</button>
-      <button class="subtab" data-sub="ehist">練習履歴</button>
-      <button class="subtab" data-sub="etheme">テーマバンク</button>
       <button class="subtab" data-sub="efgs">本番対策(FGS)</button>
       <button class="subtab" data-sub="eref">参考サイト</button>
     </div>
@@ -493,13 +490,13 @@ label.f{display:block;font-size:12px;color:var(--sub);font-weight:600;margin-bot
         <button class="subtab" data-sub="fgskata">書き方の型</button>
         <button class="subtab" data-sub="fgscase">事例ストック</button>
         <button class="subtab" data-sub="fgsconcept">頻出概念・教授陣</button>
-        <button class="subtab" data-sub="fgsscore">採点記録</button>
         <button class="subtab hot-essay" data-sub="e50">✍️ 50本ノート</button>
+        <button class="subtab" data-sub="fgsscore">採点記録</button>
       </div>
       <div class="subpage show" id="sub-fgsrubric"><div id="fgsRubric"></div></div>
       <div class="subpage" id="sub-fgskata"><div id="fgsKata"></div></div>
       <div class="subpage" id="sub-fgscase">
-        <div class="notice">上智の設問は3年とも「<b>あなたが知っている具体的な事例を挙げよ</b>」と要求します。本番でゼロから考えるのは不可能なので、<b>使える事例をここに貯めて</b>おき、設問に合わせて取り出します。ことみさんの持ち駒を標準で入れてあります。調べた事例もどんどん追加してください。</div>
+        <div class="notice">上智の設問は3年とも「<b>あなたが知っている具体的な事例を挙げよ</b>」と要求します。本番でゼロから考えるのは不可能なので、<b>使える事例をここに貯めて</b>おき、設問に合わせて取り出します。<b>事例カード（読む）との分担：</b>カードは「広く覚える」ための教材40枚、このストックは「本番でこれで書く」と決めた持ちネタ帳です。カードで覚えた事例は、全カード一覧の「➕ 本番用の事例ストックへ」ボタンでここに移せます。ことみさんの持ち駒を標準で入れてあります。調べた事例もどんどん追加してください。</div>
         <div class="card">
           <h3>事例を追加する</h3>
           <div class="frow">
@@ -1167,7 +1164,7 @@ function load(){
   return {studyLog:[], toefl:[], essays:[], qa:[], mocks:[], lessons:{}, tasks:{}, events:[], plan:{}, rdgLog:[], rdgPlan:{}, rdgSteps:{}, fgsScores:[], essay50:{}};
 }
 function save(){ localStorage.setItem(KEY, JSON.stringify(S)); if(typeof scheduleSyncPush==="function") scheduleSyncPush(); }
-const APP_VERSION = "2026.09.13";
+const APP_VERSION = "2026.09.16";
 function fmtStory(t){
   return esc(t).replace(/■ ([^：\n]+)：/g, '<span style="display:block;margin-top:14px;font-weight:800;color:#b45309;border-left:4px solid #b45309;padding-left:8px">■ $1</span>');
 }
@@ -1242,10 +1239,11 @@ function renderDash(){
 
   // Essay card
   const m = today().slice(0,7);
-  const em = S.essays.filter(e=>e.d.slice(0,7)===m).length;
+  const e50all=Object.values(S.essay50||{}).reduce((n,r)=>n+((r.revs&&r.revs.length)||((r.text||r.total!=null)?1:0)),0);
+  const e50m=Object.values(S.essay50||{}).reduce((n,r)=>n+((r.revs||[]).filter(v=>(v.d||"").slice(0,7)===m).length),0);
   const lessonsDone = ESSAY_LESSONS.filter((_,i)=>S.lessons["e"+i]).length;
   document.getElementById("dashEssay").innerHTML =
-    `<div class="kpi">${S.essays.length}<small> 本（今月 ${em} 本）</small></div>
+    `<div class="kpi">${e50all}<small> 本（今月 ${e50m} 本・50本ノート）</small></div>
      <div class="muted" style="margin-top:6px">入門レッスン ${lessonsDone}/${ESSAY_LESSONS.length} 完了</div>
      <div class="bar"><i style="width:${lessonsDone/ESSAY_LESSONS.length*100}%;background:var(--essay)"></i></div>`;
 
@@ -3275,7 +3273,7 @@ function renderCards(){
     list.innerHTML=`<p class="muted" style="margin:4px 0 8px">優先度 <b style="color:#dc2626">A</b>=最優先（本番の軸になる9枚）→ <b style="color:#ea580c">B</b>=頻出 → <b style="color:#2563eb">C</b>=補強 → <b style="color:#64748b">D</b>=余裕があれば。Aから覚えよう。</p>`+cats.map(cat=>`<h4 style="margin:10px 0 4px">${esc(cat)}</h4>`+CARDS.filter(c=>c.cat===cat).sort((a,b)=>rk2[cardPr(a.id)]-rk2[cardPr(b.id)]).map(c=>{
       const st=S.cardStat[c.id];
       const mark=!st||(st.ok===0&&st.ng===0)?"—":(st.ok>=2&&st.ok>st.ng?"✓":(st.ng>st.ok?"！":"…"));
-      return `<details style="margin:3px 0"><summary style="cursor:pointer"><span class="tag ${mark==="✓"?"green":mark==="！"?"red":""}" style="min-width:26px;text-align:center">${mark}</span> ${prBadge(c.id)} ${esc(c.t)}</summary><div style="background:#f6f8fb;border-radius:8px;padding:8px 12px;margin:4px 0;font-size:13.5px;line-height:1.8">${esc(c.b)}<br><span class="muted">使える場面：${esc(c.u)}</span>${(typeof CARD_STORIES!=="undefined"&&CARD_STORIES[c.id])?`<details style="margin-top:8px"><summary style="cursor:pointer;font-weight:600">📖 くわしく読む</summary><div style="white-space:pre-wrap;font-size:13.5px;line-height:2;margin-top:6px;background:#fff;border-radius:6px;padding:10px 12px">${fmtStory(CARD_STORIES[c.id])}</div></details>`:""}</div></details>`;
+      return `<details style="margin:3px 0"><summary style="cursor:pointer"><span class="tag ${mark==="✓"?"green":mark==="！"?"red":""}" style="min-width:26px;text-align:center">${mark}</span> ${prBadge(c.id)} ${esc(c.t)}</summary><div style="background:#f6f8fb;border-radius:8px;padding:8px 12px;margin:4px 0;font-size:13.5px;line-height:1.8">${esc(c.b)}<br><span class="muted">使える場面：${esc(c.u)}</span> <button class="btn ghost sm" style="margin-left:6px;font-size:11.5px" onclick="addCaseFromCard(\u0027${c.id}\u0027)">➕ 本番用の事例ストックへ</button>${(typeof CARD_STORIES!=="undefined"&&CARD_STORIES[c.id])?`<details style="margin-top:8px"><summary style="cursor:pointer;font-weight:600">📖 くわしく読む</summary><div style="white-space:pre-wrap;font-size:13.5px;line-height:2;margin-top:6px;background:#fff;border-radius:6px;padding:10px 12px">${fmtStory(CARD_STORIES[c.id])}</div></details>`:""}</div></details>`;
     }).join("")).join("");
   }
 }
@@ -3327,6 +3325,19 @@ function goCards(){
   document.querySelector("[data-group=\u0027essay\u0027] [data-sub=\u0027ecards\u0027]").click();
   window.scrollTo(0,0);
 }
+const CASE_CARD={
+"グアテマラのマヤ先住民":"c01","マヤ諸語とスペイン語教育":"c01","IMFの構造調整と第三世界の債務危機":"c22",
+"米国公民権運動（1964〜65年）":"c31","気候変動をめぐる若者の運動":"c34","南アフリカのアパルトヘイト（課題文の事例）":"c02",
+"インド独立運動「塩の行進」（1930年）":"c32","反アパルトヘイト運動と国際的圧力":"c33"
+};
+function addCaseFromCard(id){
+  const c=CARDS.find(x=>x.id===id); if(!c) return;
+  if(!S.cases) S.cases=[];
+  const dup=CASE_SEED.some(x=>x.t===c.t)||S.cases.some(x=>x.t===c.t);
+  if(dup) return alert("「"+c.t+"」はすでに事例ストックにあります");
+  S.cases.push({id:uid(), cat:c.cat, t:c.t, body:c.b, use:(c.u||"")});
+  save(); renderCases(); alert("「"+c.t+"」を事例ストックに追加しました（小論文タブ→事例ストック）");
+}
 function renderCases(){
   if(!S.cases) S.cases=[];
   const el=document.getElementById("caseList"); if(!el) return;
@@ -3337,7 +3348,7 @@ function renderCases(){
    + all.filter(c=>c.cat===cat).map(c=>`<div class="card" style="margin-bottom:8px;padding:12px 16px">
       <div class="flex"><b>${esc(c.t)}</b>${c.seed?'<span class="tag">標準</span>':'<span class="tag green">自作</span>'}${c.seed?"":`<button class="del right" onclick="delCase('${c.id}')">削除</button>`}</div>
       <p style="margin:6px 0;font-size:14px;line-height:1.8">${esc(c.body)}</p>
-      ${c.use?`<p class="muted">使える設問：${esc(c.use)}</p>`:""}${c.detail?`<details style="margin-top:4px"><summary style="cursor:pointer;font-size:13px;font-weight:600">📖 くわしく読む</summary><div style="white-space:pre-wrap;background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-top:4px;font-size:13.5px;line-height:1.9">${fmtStory(c.detail)}</div></details>`:""}</div>`).join("")).join("");
+      ${c.use?`<p class="muted">使える設問：${esc(c.use)}</p>`:""}${(typeof CASE_CARD!=="undefined"&&CASE_CARD[c.t]&&typeof CARD_STORIES!=="undefined"&&CARD_STORIES[CASE_CARD[c.t]])?`<p style="margin:4px 0"><a href="#" onclick="showStory(\u0027${CASE_CARD[c.t]}\u0027);return false" style="font-size:12.5px">📖 事例カードの読み物を開く</a></p>`:""}${c.detail?`<details style="margin-top:4px"><summary style="cursor:pointer;font-size:13px;font-weight:600">📖 くわしく読む</summary><div style="white-space:pre-wrap;background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-top:4px;font-size:13.5px;line-height:1.9">${fmtStory(c.detail)}</div></details>`:""}</div>`).join("")).join("");
 }
 function addCase(){
   const g=id=>document.getElementById(id);
