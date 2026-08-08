@@ -516,7 +516,7 @@ label.f{display:block;font-size:12px;color:var(--sub);font-weight:600;margin-bot
         </div>
         <div id="caseList"></div>
       </div>
-      <div class="subpage" id="sub-fgsconcept"><div id="fgsConcept"></div></div>
+      <div class="subpage" id="sub-fgsconcept"><div id="fgsConcept"></div><div id="fgsProfDir"></div></div>
       <div class="subpage" id="sub-fgsscore">
         <div class="card">
           <h3>講評を貼り付けて記録（おすすめ）</h3>
@@ -1164,7 +1164,7 @@ function load(){
   return {studyLog:[], toefl:[], essays:[], qa:[], mocks:[], lessons:{}, tasks:{}, events:[], plan:{}, rdgLog:[], rdgPlan:{}, rdgSteps:{}, fgsScores:[], essay50:{}};
 }
 function save(){ localStorage.setItem(KEY, JSON.stringify(S)); if(typeof scheduleSyncPush==="function") scheduleSyncPush(); }
-const APP_VERSION = "2026.09.22";
+const APP_VERSION = "2026.09.24";
 function fmtStory(t){
   return esc(t).replace(/■ ([^：\n]+)：/g, '<span style="display:block;margin-top:14px;font-weight:800;color:#b45309;border-left:4px solid #b45309;padding-left:8px">■ $1</span>');
 }
@@ -2417,6 +2417,34 @@ const FGS_PAST = [
 {y:"2019年度", src:"レポート課題(同学部・練習用)", th:"グローバル・イシュー",
  q:"あなたが現在関心を持ち、大学でさらに学びたいと考えているグローバル・イシュー（地球規模問題）を1つ取り上げ、それがどのような問題なのか説明したうえで、その理解と解決のためにグローバルな視点とローカルな視点がどのように関わるかを800字以内で論じなさい。（この年は課題文のないテーマ型）"}
 ];
+const FGS_PROFS=[
+{nm:"稲葉 奈々子",ti:"教授",sp:"グローバリゼーションの社会学、移民研究、社会運動研究",th:"非正規滞在移民があぶり出す制度の矛盾",msg:"日常の消費が遠い国の生産者の生活とつながる時代に、市民がどう政治的意思を表現し決定に参加できるかを研究。「国境を越えた相互依存のよりよいあり方を模索してみませんか」",memo:"★最重要。移民×社会運動＝ことみさんの答案の中心領域そのもの（第6・10回、2025年型）。志望理由で「移民と市民社会」に触れるなら、この先生の存在が学部選択の根拠になる。",url:"https://fgs.sophia.ac.jp/faculty-and-research/faculty/inaba-nanako",knot:"https://www.sophia.ac.jp/jpn/article/feature/the-knot/the-knot-0256/"},
+{nm:"小林 綾子",ti:"准教授",sp:"国際政治学、紛争解決・平和研究、国際機構、グローバル・ガバナンス",th:"紛争から世界政治を見つめる",msg:"「桃太郎の鬼はどうして戦うのか。理由を知っていたら、戦う以外の解決があったかもしれない」。現地の視点を大事にする支援、グローバルとローカルの視野を併せ持つ人材を求める。",memo:"★過去問2025の課題文『市民的抵抗』（チェノウェス）の訳者。同書を読んで面接で触れられれば、学部研究の深さを示す最強の一手。ワークショップ型授業＝主体的に議論する学生を歓迎。",url:"https://fgs.sophia.ac.jp/faculty-and-research/faculty/kobayashi-ayako",knot:"https://www.sophia.ac.jp/jpn/article/feature/the-knot/the-knot-0188/"},
+{nm:"戸田 美佳子",ti:"准教授",sp:"アフリカ地域研究（中部アフリカ）、生態人類学、障害学",th:"アフリカ熱帯雨林の障害者たちはなぜ生き生きと暮らしているのか",memo:"★ジュリアさん（目の病気・医療から遠い暮らし）の話と最も響き合う教員。「障害＝かわいそう」を現地の暮らしから問い直す視点は、志願書の「支援の押しつけへの自己批判」と直結。",url:"https://fgs.sophia.ac.jp/faculty-and-research/faculty/toda-mikako",knot:"https://www.sophia.ac.jp/jpn/article/feature/the-knot/2422/"},
+{nm:"田中 雅子",ti:"教授",sp:"開発学、国際協力論、ジェンダー論、NGO/NPO論、南アジア地域研究",th:"移民女性の妊娠を巡る問題を明らかにし、すべての人が生きやすい国に",memo:"★ジェンダー×移民×国際協力の交点（第12回と第6回をつなぐ位置）。NGO論はグアテマラのボランティア経験を学問に接続する受け皿。",url:"https://fgs.sophia.ac.jp/faculty-and-research/faculty/tanaka-masako",knot:"https://www.sophia.ac.jp/jpn/article/feature/the-knot/the-knot-0195/"},
+{nm:"下川 雅嗣",ti:"教授",sp:"開発経済学、国際政治経済論、グローバル化と貧困問題",th:"スラムは排除すべき場所なのか。視点を切り替えたとき、闇は光に変わる",memo:"★貧困・南北問題（第3回・第21〜29回）の中心教員。「貧しい人々の側から経済を見る」姿勢は、債務・構造調整の答案の視点と同じ。",url:"https://fgs.sophia.ac.jp/faculty-and-research/faculty/shimokawa-masatsugu",knot:"https://www.sophia.ac.jp/jpn/article/feature/the-knot/the-knot-0249/"},
+{nm:"辻上 奈美江",ti:"教授",sp:"中東地域の比較ジェンダー論、地域研究",th:"中東の女性は「かわいそうな人たち」か。多角的な視点でジェンダーを考える",memo:"「かわいそう」というまなざし自体を疑う視点は、支援・ボランティア（第29回）とジェンダー（第12回）の両方に効く。",url:"https://fgs.sophia.ac.jp/faculty-and-research/faculty/tsujigami-namie",knot:"https://www.sophia.ac.jp/jpn/article/feature/the-knot/the-knot-0049/"},
+{nm:"サリ・アガスティン",ti:"教授",sp:"エスニック政治学、南アジア地域研究",th:"インドのコミュナル紛争から見えた暴動のメカニズム",memo:"民族の分類と対立（第8回）・カースト（第11回）と直結。「対立は作られる」という答案の骨格を専門とする教員。",url:"https://fgs.sophia.ac.jp/faculty-and-research/faculty/sali-augustine",knot:"https://www.sophia.ac.jp/jpn/article/feature/the-knot/the-knot-0033/"},
+{nm:"権 香淑",ti:"准教授",sp:"東北アジア地域研究、マイグレーション研究、中国朝鮮族研究",memo:"移民二世・在日コリアン（第10・17回）のテーマと直結。国境をまたぐ家族と帰属の研究。",url:"https://fgs.sophia.ac.jp/faculty-and-research/faculty/hyangsuk-kwon"},
+{nm:"中内 政貴",ti:"教授",sp:"国際政治学、平和構築、地域統合、地域機構",th:"戦争のない世界へ。多民族国家の平和を維持する政治体制とは何か",memo:"ボスニア（事例カードc04）の答案の学問的な受け皿。平和構築は人間の安全保障とセットで語れる。",url:"https://fgs.sophia.ac.jp/faculty-and-research/faculty/nakauchi-masataka",knot:"https://www.sophia.ac.jp/jpn/article/feature/the-knot/the-knot-0066/"},
+{nm:"丸山 英樹",ti:"教授",sp:"比較国際教育学、国際教育開発論、持続可能な開発のための教育",th:"自分と他者がウェルビーイングであり続けるサステイナビリティ教育とは",memo:"教育×国際協力。マヤの子どもの教育（第9回・志願書の中心）を学問にする道はここ。",url:"https://fgs.sophia.ac.jp/faculty-and-research/faculty/maruyama-hideki",knot:"https://www.sophia.ac.jp/jpn/article/feature/the-knot/the-knot-0262/"},
+{nm:"前嶋 和弘",ti:"教授",sp:"現代アメリカ政治外交",th:"大きく変貌を遂げていくアメリカ政治外交。混迷の時代を読み解くには？",memo:"米国留学3年の経験・公民権運動（c31）の受け皿。面接で「アメリカで見た分断」を語るなら接続先。",url:"https://fgs.sophia.ac.jp/faculty-and-research/faculty/maeshima-kazuhiro",knot:"https://www.sophia.ac.jp/jpn/article/feature/the-knot/the-knot-0039/"},
+{nm:"丸井 雅子",ti:"教授",sp:"東南アジア考古学、文化遺産研究",th:"発掘作業と聞き取り調査から、アンコール遺跡群の歴史をたどっていく",memo:"文化財返還（第25回・ベナンブロンズc29）の隣接分野。",url:"https://fgs.sophia.ac.jp/faculty-and-research/faculty/marui-masako",knot:"https://www.sophia.ac.jp/jpn/article/feature/the-knot/the-knot-0009/"},
+{nm:"赤堀 雅幸",ti:"教授",sp:"人類学、イスラーム地域研究",th:"イスラームのもう一つの顔　個性豊かな聖者たちへの崇敬",url:"https://fgs.sophia.ac.jp/faculty-and-research/faculty/akahori-masayuki",knot:"https://www.sophia.ac.jp/jpn/article/feature/the-knot/the-knot-0082/"},
+{nm:"岸川 毅",ti:"教授",sp:"比較政治学、民主化論",th:"現地に行ってこそ分かる、比較政治学の魅力",url:"https://fgs.sophia.ac.jp/faculty-and-research/faculty/kishikawa-takeshi",knot:"https://www.sophia.ac.jp/jpn/article/feature/the-knot/the-knot-0194/"},
+{nm:"久志本 裕子",ti:"教授",sp:"東南アジアのムスリム社会、文化人類学、比較教育学",url:"https://fgs.sophia.ac.jp/faculty-and-research/faculty/kushimoto-hiroko"},
+{nm:"齊藤 孝祐",ti:"教授",sp:"国際政治学、安全保障論、イノベーション、技術管理",th:"安全保障の観点から科学技術の問題をいかに管理するか",url:"https://fgs.sophia.ac.jp/faculty-and-research/faculty/saito-kousuke",knot:"https://www.sophia.ac.jp/jpn/article/feature/the-knot/the-knot-0125/"},
+{nm:"櫻田 智恵",ti:"助教",sp:"タイ地域研究、現代政治史、君主制",url:"https://fgs.sophia.ac.jp/faculty-and-research/faculty/sakurada-chie"},
+{nm:"澤江 史子",ti:"教授",sp:"トルコ現代政治社会論、イスラーム地域研究、比較政治学",url:"https://fgs.sophia.ac.jp/faculty-and-research/faculty/sawae-fumiko"},
+{nm:"鈴木 一敏",ti:"教授",sp:"国際関係論、国際政治経済学、シミュレーション",th:"国際政治や通商交渉を科学的に分析し、因果メカニズムを解き明かす",url:"https://fgs.sophia.ac.jp/faculty-and-research/faculty/suzuki-kazutoshi",knot:"https://www.sophia.ac.jp/jpn/article/feature/the-knot/the-knot-0247/"},
+{nm:"高島 亮",ti:"教授",sp:"開発経済学、国際貿易論、幸福の経済学",url:"https://fgs.sophia.ac.jp/faculty-and-research/faculty/takashima-ryo"},
+{nm:"トビアス・ヴァイス",ti:"准教授",sp:"政治社会学、界理論、日本学、ジャーナリズム、市民社会・社会運動",th:"社会学理論で日本のジャーナリズムと政治を解き明かす",url:"https://fgs.sophia.ac.jp/faculty-and-research/faculty/tobias-weiss",knot:"https://www.sophia.ac.jp/jpn/article/feature/the-knot/the-knot-0232/"},
+{nm:"福武 慎太郎",ti:"教授",sp:"人類学、東南アジア研究",th:"東ティモールのコーヒー栽培から人の豊かさを考える",url:"https://fgs.sophia.ac.jp/faculty-and-research/faculty/fukutake-shintaro",knot:"https://www.sophia.ac.jp/jpn/article/feature/the-knot/the-knot-0020/"},
+{nm:"眞城 百華",ti:"教授",sp:"アフリカ史、エチオピア・エリトリア研究、国際関係学",th:"アフリカの紛争を内側から探る",url:"https://fgs.sophia.ac.jp/faculty-and-research/faculty/maki-momoka",knot:"https://www.sophia.ac.jp/jpn/article/feature/the-knot/the-knot-2416/"},
+{nm:"李 承赫",ti:"准教授",sp:"国際政治史、アジア太平洋の国際関係、日韓・日朝関係史",url:"https://fgs.sophia.ac.jp/faculty-and-research/faculty/lee-seung-hyok"},
+{nm:"山口 昭彦",ti:"教授",sp:"中東地域研究、近代史、少数派問題",memo:"「少数派問題」はカテゴリー化（2026年型）の中東版。クルドの人々など。",url:"https://fgs.sophia.ac.jp/faculty-and-research/faculty/yamaguchi-akihiko"},
+{nm:"渡辺 紫乃",ti:"教授",sp:"国際関係論、現代中国論、東アジアの国際関係",url:"https://fgs.sophia.ac.jp/faculty-and-research/faculty/shino-watanabe"}
+];
 const FGS_CONCEPTS = [
 {t:"★市民的抵抗と「3.5％ルール」（2025年型の核心・弱点補強）", b:`<p>2025年度の課題文はエリカ・チェノウェス『市民的抵抗』。<b>人口の3.5％が積極的に参加した非暴力運動は成功してきた</b>という経験則を扱う。ただし本文が強調するのは次の点で、ここを取り違えると設問に答えられない。</p>
 <ul><li>3.5％を路上に出せる運動には、<b>実際にはもっと広範な支持基盤</b>がある</li><li>大規模動員は支持を得たことの<b>原因ではなく「結果」</b></li><li>3.5％ルールは運動の<b>最高潮の瞬間</b>を指すもの。一度の出来事で大勢を動員できることはめったにない</li><li>重要なのは<b>継続的でよく組織され、明確な目標を持ち、戦術を変えられる</b>運動</li></ul>
@@ -2439,7 +2467,7 @@ const FGS_CONCEPTS = [
 {t:"開発・貧困と南北問題", b:`<p>豊かな北（先進国）と貧しい南（途上国）の経済格差。援助だけでは解決しない背景に、<b>不公正な国際経済の構造</b>があるという見方（従属論など）と、当事国の制度・ガバナンスを重視する見方がある。持続可能な開発（SDGs）も関連。</p>`},
 {t:"移民・難民と多文化共生", b:`<p>人の国際移動が生む課題。受け入れ社会での<b>多文化共生</b>（異なる文化的背景の人々が対等に暮らす）と、排斥・分断のリスク。ことみさんの米国での少数者経験が活きるテーマ。</p>`},
 {t:"平和構築", b:`<p>紛争後の社会で、和解・制度づくり・復興を通じて<b>持続的な平和</b>を築く営み。国連PKOやNGOが関わる。上智GSが強い分野の一つ。</p>`},
-{t:"学部の4領域と教員（狙いを知る）", b:`<p>総合グローバル学部は<b>国際関係論</b>と<b>地域研究</b>を融合した「グローバル・スタディーズ」を掲げ、次の4領域を置く：<b>国際政治論／市民社会・国際協力論／アジア研究／中東・アフリカ研究</b>。</p><ul><li>例：<b>植木安弘</b>教授は国連で約30年勤務し、国際政治・国連・広報などを専門とする。</li></ul><div class="pt">志望理由書や面接で、関心のある領域（例：市民社会・国際協力）や概念（人間の安全保障）に触れられると、学部理解の深さが伝わる。</div>`}
+{t:"学部の4領域と教員（狙いを知る）", b:`<p>総合グローバル学部は<b>国際関係論</b>と<b>地域研究</b>を融合した「グローバル・スタディーズ」を掲げ、次の4領域を置く：<b>国際政治論／市民社会・国際協力論／アジア研究／中東・アフリカ研究</b>。</p><p>下の<b>教員名鑑（全26名・公式サイトより）</b>で、自分の関心と重なる教員を2〜3人見つけておくこと。</p><div class="pt">志望理由書や面接で、関心のある領域（例：市民社会・国際協力）や概念（人間の安全保障）に触れられると、学部理解の深さが伝わる。</div>`}
 ];
 
 function renderFGS(){
@@ -2469,6 +2497,16 @@ function renderFGS(){
     <p style="margin:8px 0;font-size:14px;font-weight:600">設問：${esc(p.q)}</p>
     <button class="btn essay sm" onclick="fgsUsePast(${i})">この設問で書く（エディタへ）</button></div>`).join("")+`</div></details>`;
   renderLessons("fgsConcept", FGS_CONCEPTS, "fc_");
+  const pd=document.getElementById("fgsProfDir");
+  if(pd) pd.innerHTML=`<h3 style="margin:18px 0 6px">FGS教員名鑑（全${FGS_PROFS.length}名）</h3>
+<p class="muted" style="margin:0 0 10px">専門・研究テーマは<b>学部公式サイト（2026年時点）</b>より。<b>「対策メモ」は私（Claude）の分析</b>です。★＝ことみさんの志願書・答案と特に縁の深い教員。面接前に★の教員の名前と研究を自分の言葉で言えるようにしておくと、「学部を調べてきたか」の質問に実で答えられます。</p>`
+   + FGS_PROFS.map(p=>`<div class="card" style="margin-bottom:8px;padding:12px 16px${p.memo&&p.memo.startsWith("★")?";border-left:5px solid var(--essay)":""}">
+     <div class="flex"><b>${esc(p.nm)}</b><span class="tag">${esc(p.ti)}</span>${p.url?`<a href="${p.url}" target="_blank" rel="noopener" style="font-size:12px">公式ページ</a>`:""}${p.knot?`<a href="${p.knot}" target="_blank" rel="noopener" style="font-size:12px">インタビュー</a>`:""}</div>
+     <p style="margin:4px 0;font-size:13.5px"><b>専門：</b>${esc(p.sp)}</p>
+     ${p.th?`<p style="margin:4px 0;font-size:13px" class="muted"><b>研究の一言：</b>「${esc(p.th)}」（大学公式インタビューより）</p>`:""}
+     ${p.msg?`<p style="margin:4px 0;font-size:13px;background:#f6f8fb;border-radius:6px;padding:6px 10px"><b>学生へのメッセージ（要旨）：</b>${esc(p.msg)}</p>`:""}
+     ${p.memo?`<p style="margin:4px 0;font-size:13px;background:#fdf6e7;border-radius:6px;padding:6px 10px"><b>対策メモ：</b>${esc(p.memo)}</p>`:""}
+   </div>`).join("");
   // score inputs
   const si=document.getElementById("fgsScoreInputs");
   if(si && !si.dataset.built){ si.innerHTML = FGS_RUBRIC.map(c=>`<div><label class="f" title="${c.d}">${c.nm}</label><select id="fs_${c.k}">${[5,4,3,2,1,0].map(v=>`<option>${v}</option>`).join("")}</select></div>`).join(""); si.dataset.built="1"; }
