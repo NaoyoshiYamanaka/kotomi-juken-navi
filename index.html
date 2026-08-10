@@ -1164,7 +1164,7 @@ function load(){
   return {studyLog:[], toefl:[], essays:[], qa:[], mocks:[], lessons:{}, tasks:{}, events:[], plan:{}, rdgLog:[], rdgPlan:{}, rdgSteps:{}, fgsScores:[], essay50:{}};
 }
 function save(){ localStorage.setItem(KEY, JSON.stringify(S)); if(typeof scheduleSyncPush==="function") scheduleSyncPush(); }
-const APP_VERSION = "2026.09.27";
+const APP_VERSION = "2026.09.28";
 function fmtStory(t){
   return esc(t).replace(/■ ([^：\n]+)：/g, '<span style="display:block;margin-top:14px;font-weight:800;color:#b45309;border-left:4px solid #b45309;padding-left:8px">■ $1</span>');
 }
@@ -2996,6 +2996,19 @@ function e50Parse(){
   const t=document.getElementById("e50paste").value;
   if(!t.trim()) return alert("ブロックを貼り付けてください");
   const gm=re=>{const m=t.match(re); return m?m[1].trim():"";};
+  // ブロックの「テーマ:」から回を自動判定（選択中の回に誤登録するのを防ぐ）
+  (function(){
+    const th=(t.match(/テーマ[:：]\s*(.+)/)||[])[1]||"";
+    let n=null;
+    let m=th.match(/第\s*(\d+)\s*回/); if(m) n=+m[1];
+    if(n===null){ m=th.match(/過\s*(\d{2})/); if(m) n={24:101,25:102,26:103}[+m[1]]||null; }
+    if(n===null){ m=th.match(/過去問\s*(\d{4})/); if(m) n={2024:101,2025:102,2026:103}[+m[1]]||null; }
+    if(n!==null && ESSAY50_PLAN.some(x=>x.n===n) && n!==e50cur){
+      const nm=e50Label(n);
+      if(!confirm("貼り付けたブロックは「"+nm+"」のものと判定しました。\n（現在の選択は「"+e50Label(e50cur)+"」）\n\n"+nm+" に登録しますか？")) return;
+      e50cur=n; const sel=document.getElementById("e50sel"); if(sel) sel.value=n;
+    }
+  })();
   const prev=e50Rec(e50cur);
   const tm=t.match(/【本文】\s*([\s\S]*?)(?=\[採点\]|$)/); const text=tm?tm[1].trim():((prev&&prev.text)||"");
   const tmin=(t.match(/所要時間[:：]\s*(\d+)/)||[])[1];
