@@ -87,7 +87,7 @@ a{color:var(--blue)}
 </div>
 <script>
 "use strict";
-const APP_VERSION="2026.09.23-v2.7";
+const APP_VERSION="2026.09.23-v2.7.1";
 const KEY="kotomiNavi_v2";
 const GH_TOKEN_KEY="kotomiNavi_ghToken", GH_GIST_KEY="kotomiNavi_gistId", GIST_FILE="kotomi-navi-v2.json"; // トークン・GistIDは旧版と共用
 
@@ -372,7 +372,7 @@ ${list}
 function vKikoku(){
 let th="";
 THEMES.forEach((x,i)=>{
-th+=`<div class="qa" id="th${i}"><div class="qh"><span class="st ${S.themeChk&&S.themeChk[i]?'s2':''}" onclick="themeChk(event,${i})">${S.themeChk&&S.themeChk[i]?'済':'★'}</span><span class="qt" onclick="document.getElementById('th${i}').classList.toggle('open')">${i+1}. ${x.t}</span></div>
+th+=`<div class="qa" id="th${i}"><div class="qh"><span class="st ${S.themeChk&&S.themeChk[i]?'s2':''}" onclick="themeChk(event,${i})">${S.themeChk&&S.themeChk[i]?'済':'★'}</span><span class="qt">${i+1}. ${x.t}</span></div>
 <div class="body">
 <div class="hint" style="background:#fdf1dc"><b>なぜこのテーマか：</b>${x.why}</div>
 <div style="margin:8px 0"><b style="color:var(--acc)">模範小論</b>　<span class="small">${esc(x.words)}</span><div style="white-space:pre-wrap;background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:11px 13px;margin-top:5px;line-height:1.9">${esc(x.model)}</div></div>
