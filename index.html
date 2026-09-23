@@ -87,7 +87,7 @@ a{color:var(--blue)}
 </div>
 <script>
 "use strict";
-const APP_VERSION="2026.09.23-v3.0";
+const APP_VERSION="2026.09.23-v3.1";
 const KEY="kotomiNavi_v2";
 const GH_TOKEN_KEY="kotomiNavi_ghToken", GH_GIST_KEY="kotomiNavi_gistId", GIST_FILE="kotomi-navi-v2.json"; // トークン・GistIDは旧版と共用
 
@@ -391,19 +391,20 @@ th+=`<div class="qa" id="th${i}"><div class="qh"><span class="st ${S.themeChk&&S
 const done=S.themeChk?Object.values(S.themeChk).filter(Boolean).length:0;
 return `
 <div class="notice"><b>10/3（土）当日</b>：9:10集合・金沢八景キャンパス。小論文 9:30〜11:00（90分）／面接 13:00〜17:00（当日発表の時間割で随時）。<b>受験票（郵送されたもの）を必ず持参</b>。面接終了が何時になるか分からないので一日空けておく。</div>
-<div class="card"><h2>小論文の「型」（過去6年の実物で確定）</h2>
-<div class="small" style="margin-bottom:8px">帰国生・IB・留学生・社会人は<b>同じ共通問題</b>。2021〜2026年度の6年分の実物を確認済み。形式はほぼ固定です。</div>
+<div class="card"><h2>小論文の「型」（過去7年の実物で確定）</h2>
+<div class="small" style="margin-bottom:8px">帰国生・IB・留学生・社会人は<b>同じ共通問題</b>。2020〜2026年度の7年分の実物を確認済み。形式はほぼ固定です。</div>
 <ul>
 <li><b>90分・大問2つ・各2問＝計4問</b>（2026年度のみ〔Ⅱ〕が1問で計3問）。すべて<b>課題文読解型</b>。実物の課題文は新書・論文からの抜粋で<b>1大問あたり2〜3ページと長い</b>（この下の練習題より長い。読む体力は実物過去問で）。</li>
-<li><b>問1＝下線部の説明（60〜150字。100字が最多）</b>。2024年度は「抜き出し」も出た。</li>
-<li><b>問2＝意見論述250〜300字（ほぼ固定）</b>。例外は2026年度〔Ⅱ〕の450〜500字のみ。<b>練習は250〜300字を基準に</b>。</li>
+<li><b>問1＝下線部の説明（60〜150字。100字が最多）</b>。2024年度は「抜き出し」、2020年度は「書き出し指定の75字」という変則も。</li>
+<li><b>問2＝意見論述250〜300字</b>（7年で全14問中10問）。例外は300〜350字（2020Ⅱ）・300字以内（2025Ⅰ）・200〜250字と450〜500字（2026）。<b>練習は250〜300字を基準に</b>。</li>
 <li>問2には決まった型が二つ：<b>A「筆者の主張を簡潔にまとめた上で＋あなたの考え」</b>（要約＋意見）／<b>B「本文で挙げられている以外の事例を1つ挙げて」</b>（自分の例を持ち込む）。設問の指示語は採点基準そのもの。</li>
 <li><b>時間配分</b>：大問1つ45分＝読む12分・問1に8分・問2の構成5分・執筆17分・見直し3分。</li>
 <li>配点は小論文100＋面接100。練習答案は写真でClaudeへ →「検品→減点明細→添削→宿題」。</li>
 </ul>
-<h3>過去6年の出題（実物で確認済み）</h3>
+<h3>過去7年の出題（実物で確認済み）</h3>
 <table>
 <tr><th style="width:52px">年度</th><th>〔Ⅰ〕</th><th>〔Ⅱ〕</th></tr>
+<tr><td>2020</td><td>場所の力と都市景観（ハイデン『場所の力』訳者解説）</td><td>メディア不信（林香里『メディア不信』）</td></tr>
 <tr><td>2021</td><td>戦争と政治（多木浩二『戦争論』）</td><td>都市の孤立（保井美樹『孤立する都市、つながる街』）</td></tr>
 <tr><td>2022</td><td>日本とアジア経済（『現代アジア経済論』）</td><td>コロナ後のデジタル化（米山秀隆）</td></tr>
 <tr><td>2023</td><td><b>教育格差</b>（志水宏吉『ペアレントクラシー』）</td><td>植物の知性（マンクーゾ・本文非公開）</td></tr>
@@ -411,17 +412,18 @@ return `
 <tr><td>2025</td><td>環境問題と不確実性（佐藤仁）</td><td>文学と環境への想像力（結城正美）</td></tr>
 <tr><td>2026</td><td>責任とは何か（戸谷洋志『責任と物語』）</td><td><b>難民の受け入れ</b>（『日本外交の論点』）</td></tr>
 </table>
-<div class="small" style="margin-top:6px">傾向：都市・コミュニティ・福祉・デモクラシーなど<b>社会科学系が最頻</b>。哲学・思想が続き、自然科学は6年で1回。出典は刊行1〜11年以内の日本語の新書・専門書。</div>
+<div class="small" style="margin-top:6px">傾向：都市・コミュニティ・福祉・デモクラシーなど<b>社会科学系が最頻</b>（2020・2021・2022・2024で計5問）。哲学・思想が続き、自然科学は7年で1回。出典は刊行1〜11年以内の日本語の新書・専門書。</div>
 </div>
-<div class="card"><h2>実物の過去問（公式公開・タップで開く）</h2>
-<div class="small" style="margin-bottom:6px">2025・2026は大学サイト、2021〜2024は国立国会図書館アーカイブ。※2023年度〔Ⅱ〕は著作権の関係で本文非掲載。<b>週に1回は実物を90分通しで</b>。</div>
+<div class="card"><h2>実物の過去問 7年分（公式公開・タップで開く）</h2>
+<div class="small" style="margin-bottom:6px">2025・2026は大学サイト、2020〜2024は国立国会図書館アーカイブ（2023のみ大学サイト）。※2023年度〔Ⅱ〕は著作権の関係で本文非掲載。<b>週に1回は実物を90分通しで</b>。</div>
 <ul>
 <li><a href="https://www.yokohama-cu.ac.jp/admissions/admissions/kakomon/j8907d00000005yv-att/2026_kokusaikyouyou_tokubetusenbatu.pdf" target="_blank">2026年度（責任／難民）</a>　←最優先。難民の解答例は対策ノート巻末に掲載</li>
 <li><a href="https://www.yokohama-cu.ac.jp/admissions/admissions/kakomon/j8907d00000005yv-att/2025_kokusaikyouyou_tokubetusenbatu.pdf" target="_blank">2025年度（環境の不確実性／文学と想像力）</a></li>
 <li><a href="https://warp.ndl.go.jp/20241208/20241207120049/https://www.yokohama-cu.ac.jp/admissions/admissions/kakomon/j8907d00000005yv-att/2024_kokusaikyouyou_tokubetsu_QR.pdf" target="_blank">2024年度（福祉と都市／デモクラシー）</a></li>
-<li><a href="https://www.yokohama-cu.ac.jp/admissions/admissions/kakomon/j8907d00000005yv-att/2023_kokusaikyouyou_tokubetsu_QR_2.pdf" target="_blank">2023年度（教育格差／植物の知性）</a></li>
+<li><a href="https://www.yokohama-cu.ac.jp/admissions/admissions/kakomon/j8907d00000005yv-att/2023_kokusaikyouyou_tokubetsu_QR_2.pdf" target="_blank">2023年度（教育格差／植物の知性）</a>　←テーマ1の元</li>
 <li><a href="https://warp.ndl.go.jp/20221210/20221208130825/https://www.yokohama-cu.ac.jp/admissions/admissions/kakomon/j8907d00000005yv-att/2022_kokusaikyouyou_tokubetsu_QR.pdf" target="_blank">2022年度（アジア経済／デジタル化）</a></li>
-<li><a href="https://warp.ndl.go.jp/20220610/20220608232605/https://www.yokohama-cu.ac.jp/admissions/admissions/kakomon/j8907d00000005yv-att/QR_2021_kyoyo_1.pdf" target="_blank">2021年度（戦争と政治／都市の孤立）</a></li>
+<li><a href="https://warp.ndl.go.jp/20220610/20220608232605/https://www.yokohama-cu.ac.jp/admissions/admissions/kakomon/j8907d00000005yv-att/QR_2021_kyoyo_1.pdf" target="_blank">2021年度（戦争と政治／都市の孤立）</a>　←テーマ3の元</li>
+<li><a href="https://warp.ndl.go.jp/20210616/20210614222447/https://www.yokohama-cu.ac.jp/admissions/admissions/kakomon/j8907d00000005yv-att/QR2020_kyoyo_all.pdf" target="_blank">2020年度（場所の力と都市景観／メディア不信）</a></li>
 </ul>
 </div>
 <div class="card"><h2>予想5テーマ（実物の形式で新作） ＋ 解答例・執筆ポイント <span class="small">読んで、同じ型で書けるように（${done}/5 読了）</span></h2>
