@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ことみの受験ナビ v2｜横市集中</title>
+<style>
+:root{
+  --bg:#f4f6fa; --card:#fff; --ink:#1c2430; --sub:#67748a; --line:#e3e8f0;
+  --nav:#1d2a3d; --navink:#aab8cc; --acc:#b45309; --blue:#1d4ed8; --grn:#15803d; --red:#b91c1c;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.7}
+header{background:var(--nav);color:#fff;padding:14px 16px 12px;border-bottom:1px solid #32415a}
+header h1{margin:0;font-size:18px}
+header .sub{color:var(--navink);font-size:12px;margin-top:2px}
+.wrap{display:flex;align-items:stretch;min-height:calc(100vh - 70px)}
+aside{width:180px;flex:0 0 180px;background:var(--nav);padding:10px 0}
+aside button{display:block;width:100%;text-align:left;background:none;border:none;color:var(--navink);padding:12px 18px;font-size:14px;cursor:pointer;border-left:4px solid transparent}
+aside button.on{color:#fff;border-left-color:var(--acc);background:rgba(255,255,255,.07);font-weight:700}
+main{flex:1;max-width:940px;padding:16px;min-width:0}
+@media(max-width:760px){
+  .wrap{display:block}
+  aside{display:flex;width:auto;overflow-x:auto;padding:0 6px}
+  aside button{width:auto;white-space:nowrap;border-left:none;border-bottom:4px solid transparent;padding:10px 12px}
+  aside button.on{border-bottom-color:var(--acc);background:none}
+}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px}
+.card h2{margin:0 0 10px;font-size:16px;color:var(--acc)}
+.card h3{margin:14px 0 6px;font-size:14.5px}
+.small{font-size:12.5px;color:var(--sub)}
+.tag{display:inline-block;font-size:11px;padding:1px 8px;border-radius:10px;background:#eef2f8;color:#41506b;margin-right:6px}
+.tag.red{background:#fde8e8;color:var(--red)} .tag.grn{background:#e6f4ea;color:var(--grn)} .tag.blu{background:#e7edfd;color:var(--blue)} .tag.amb{background:#fdf1dc;color:#92600a}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{border:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:top}
+th{background:#f2f5fa;font-size:12.5px}
+.cd{display:flex;gap:10px;flex-wrap:wrap}
+.cd .b{flex:1;min-width:140px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+.cd .n{font-size:26px;font-weight:800}
+.cd .l{font-size:12px;color:var(--sub)}
+.cd .b.hot{border-color:var(--acc);background:#fff8ef}
+textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:10px;font-size:14px;font-family:inherit;line-height:1.8}
+input[type=text],input[type=date],select{border:1px solid var(--line);border-radius:8px;padding:8px;font-size:14px;font-family:inherit}
+button.btn{background:var(--acc);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:14px;cursor:pointer}
+button.btn.gray{background:#5b6b84} button.btn.sm{padding:4px 10px;font-size:12.5px}
+.qa{border:1px solid var(--line);border-radius:10px;margin-bottom:8px;overflow:hidden}
+.qa.new{border-color:#e0a34a;background:#fffdf7}
+.qa .qh{display:flex;align-items:center;gap:8px;padding:9px 10px;cursor:pointer;background:transparent}
+.qa .qh:hover{background:#f8fafc}
+.qa .st{min-width:34px;text-align:center;font-size:12px;border-radius:8px;padding:2px 4px;background:#eef2f8;color:#67748a;cursor:pointer;user-select:none}
+.qa .st.s1{background:#fdf1dc;color:#92600a}.qa .st.s2{background:#e6f4ea;color:var(--grn);font-weight:700}
+.qa .qt{flex:1;font-size:14px}
+.qa .body{display:none;padding:0 12px 12px;border-top:1px dashed var(--line)}
+.qa.open .body{display:block}
+.hint{background:#f6f8fb;border-radius:8px;padding:9px 11px;font-size:13.5px;margin:9px 0}
+.hint b{color:var(--acc)}
+.timerbox{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+#tdisp{font-size:40px;font-weight:800;font-variant-numeric:tabular-nums;min-width:150px}
+#tdisp.warn{color:var(--red)}
+.log{border-bottom:1px dashed var(--line);padding:7px 2px;font-size:13.5px;display:flex;gap:8px;align-items:baseline}
+.log .d{color:var(--sub);min-width:88px}
+.log button{margin-left:auto}
+.phase{border-left:4px solid var(--acc);padding:6px 10px;margin:8px 0;background:#fffdf8}
+.phase.now{background:#fff3e0}
+ul{margin:6px 0;padding-left:20px} li{margin:3px 0}
+a{color:var(--blue)}
+.notice{background:#fde8e8;border:1px solid #f5b5b5;border-radius:10px;padding:10px 12px;font-size:13.5px;margin-bottom:12px}
+.mq{border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:8px;background:#fff}
+.mq .no{color:var(--acc);font-weight:800;margin-right:8px}
+.mq .mh{display:none;margin-top:8px}
+.showhints .mq .mh{display:block}
+.mq.done{opacity:.45}
+.pick{display:flex;gap:8px;align-items:baseline;font-size:13.5px;padding:3px 2px;cursor:pointer}
+.pick input{transform:scale(1.15)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px}
+</style>
+</head>
+<body>
+<header>
+  <h1>ことみの受験ナビ v2 <span style="font-size:12px;color:#e8b06b">横市集中版</span></h1>
+  <div class="sub">志望順：①横国（12月）②横市 帰国生（10/3）　／　いまは10/3に全集中　APP_VERSION <span id="ver"></span>　<span id="sync" style="color:#7fd39a"></span></div>
+</header>
+<div class="wrap">
+<aside id="nav"></aside>
+<main id="main"></main>
+</div>
+<script>
+"use strict";
+const APP_VERSION="2026.09.26-v3.4";
+const KEY="kotomiNavi_v2";
+const GH_TOKEN_KEY="kotomiNavi_ghToken", GH_GIST_KEY="kotomiNavi_gistId", GIST_FILE="kotomi-navi-v2.json"; // トークン・GistIDは旧版と共用
+
+/* ---------- state ---------- */
+let S={script:"",poster:"",qa:{},qamemo:{},themes:{},themeChk:{},logs:[],notes:"",mock:{sets:[],used:{},sel:{}}};
+try{const raw=localStorage.getItem(KEY); if(raw){const o=JSON.parse(raw);S=Object.assign(S,o);S.mock=Object.assign({sets:[],used:{},sel:{}},o.mock||{});}}catch(e){}
+let saveT=null;
+function save(){S._ts=Date.now();clearTimeout(saveT);saveT=setTimeout(()=>{localStorage.setItem(KEY,JSON.stringify(S));schedulePush();},300);}
+
+/* ---------- 自動同期 ---------- */
+function creds(){return {tk:localStorage.getItem(GH_TOKEN_KEY)||"",id:localStorage.getItem(GH_GIST_KEY)||""};}
+let pushT=null;
+function schedulePush(){const c=creds();if(!c.tk||!c.id)return;clearTimeout(pushT);pushT=setTimeout(()=>{gistPush();},4000);}
+function syncMark(t){const el=document.getElementById("sync");if(el)el.textContent=t||("同期✓ "+new Date().toTimeString().slice(0,5));}
+async function gistPush(){const c=creds();if(!c.tk||!c.id)return false;
+try{const r=await fetch("https://api.github.com/gists/"+c.id,{method:"PATCH",headers:{Authorization:"token "+c.tk,"Content-Type":"application/json"},body:JSON.stringify({files:{[GIST_FILE]:{content:JSON.stringify(S)}}})});
+if(r.ok){syncMark();return true;}syncMark("同期エラー");}catch(e){syncMark("通信エラー");}return false;}
+async function initSync(){const c=creds();if(!c.tk||!c.id)return;
+try{const r=await fetch("https://api.github.com/gists/"+c.id,{headers:{Authorization:"token "+c.tk}});
+if(!r.ok)return;const j=await r.json();const f=j.files&&j.files[GIST_FILE];if(!f||!f.content)return;
+const o=JSON.parse(f.content);
+if((o._ts||0)>(S._ts||0)){S=Object.assign(S,o);S.mock=Object.assign({sets:[],used:{},sel:{}},o.mock||{});localStorage.setItem(KEY,JSON.stringify(S));render();syncMark("最新を取得✓");}
+else if((S._ts||0)>(o._ts||0)){gistPush();}
+else{syncMark();}
+}catch(e){}}
+
+/* ---------- events ---------- */
+const EV=[
+["2026-09-24","明治学院：一次出願締切（Web23:59／郵送消印有効）","出願","red"],
+["2026-09-26","横市帰国生：受験票（受験番号3037）・受験案内 到着","横市",""],
+["2026-10-01","上智：合格発表 10:00（マイページ「合否結果」）","上智","blu"],
+["2026-10-01","横国B(ソクラテス)：検定料払込開始（〜10/13・コンビニ）※Bルート選択時","横国",""],
+["2026-10-03","横市帰国生：試験日 9:10集合・第Ⅰ講堂（金沢八景）小論文9:30-11:00／面接13:00〜（12:45までに戻る）","横市","red"],
+["2026-10-07","横国B(ソクラテス)：出願開始（〜10/13 17時・完全オンライン）※Bルート選択時","横国","red"],
+["2026-10-13","横国B(ソクラテス)：出願締切 17時（SAT直送もこの日必着）","横国","red"],
+["2026-10-15","上智：入学手続締切（消印有効）※押さえるなら納入判断","上智","blu"],
+["2026-10-21","横国A(経営)：出願はじまる（〜10/27必着・郵送のみ・様式PDF印刷・志望理由書自筆）※Aルート選択時","横国","red"],
+["2026-10-21","明治学院：一次結果発表 10:00（UCARO）／二次出願 10/21〜10/28","明学",""],
+["2026-10-27","横国A(経営)：出願締切【必着】（国内書留は10/26消印まで救済あり）","横国","red"],
+["2026-10-28","明治学院：二次出願締切（Web＋15,000円）","明学",""],
+["2026-11-02","横市帰国生：合格発表 10:00（受験生ポータル）","横市","red"],
+["2026-11-06","明治学院：受験票 各自印刷（UCARO）","明学",""],
+["2026-11-11","横国B(ソクラテス)：1次（書類）合格発表","横国",""],
+["2026-11-15","明治学院：二次選考（白金 9:30集合／小論文10:00-11:00・面接13:00〜）","明学",""],
+["2026-11-19","横国B(ソクラテス)：口頭試問 11/19〜20（Zoom・英語30分・スライド1枚プレゼン）","横国","red"],
+["2026-12-04","明治学院：合格発表 10:00","明学",""],
+["2026-12-07","横国A(経営)：試験日（常盤台）小論文10:00-11:00（社会科学テーマ・日本語）／面接12:00〜","横国","red"],
+["2026-12-09","横国B(ソクラテス)：最終合格発表（入学手続 12/10〜22）","横国","red"],
+["2026-12-11","明治学院：入学手続締切（消印）","明学",""],
+["2026-12-17","横国A(経営)：合格発表 12:00頃（Web掲載＋郵送）","横国","red"],
+["2026-12-18","横市：入学手続日（金沢八景・持参可）※横国12/17発表を見て翌日に判断できる","横市",""],
+["2026-12-24","横国A(経営)：入学手続締切（12/18〜24）","横国",""],
+];
+const today=()=>{const d=new Date();return new Date(d.getFullYear(),d.getMonth(),d.getDate());};
+function days(ds){const t=today(),e=new Date(ds+"T00:00:00");return Math.round((e-t)/86400000);}
+
+/* ---------- 想定問答（★=教授指摘の追加想定） ---------- */
+const QA=[
+["A. 書類・体験の深掘り","ボランティア活動の内容を1分で説明してください","母校主催・1週間・小学校で英語の基礎・放課後に貧困家庭へ食料と対話。結論→中身の順で短く。",0],
+["A. 書類・体験の深掘り","この活動が事実であることを示せますか（いつ・どこで・誰と）","★慌てない。最大の証明は細部の即答：訪れた町の名前・滞在日程・引率の先生・一緒に行った人数・泊まった場所。写真や母校の記録も「あります。必要ならお見せできます」と落ち着いて。",1],
+["A. 書類・体験の深掘り","母校（LCS）はこの活動をどういう位置づけで行っているのですか","★母校の毎年のプログラムとしての目的（奉仕活動・国際経験）、希望者参加か全員か、現地の受け入れ先、引率体制を親子で事実確認して即答できるように。キリスト教系の学校の奉仕教育の一環という事実はそのまま話してよい。",1],
+["A. 書類・体験の深掘り","ジュリアさんのことを詳しく教えてください","目の病気・治療費が出せない家庭。それでも「学校に通えることが幸せ」と語り不満を言わなかった。憐れみではなく、彼女の尊厳と強さを語ること。",0],
+["A. 書類・体験の深掘り","「必要な医療費」とは、どんな病気だったのですか","目の病気。医療も教育も、同じ「アクセスの不平等」という構造にある、と一言でつなげられると強い。",0],
+["A. 書類・体験の深掘り","出会った子どもたちの母語は何でしたか","スペイン語。マヤ諸語を話す子どもたちのことは帰国後に調べて知った、と正直に。",0],
+["A. 書類・体験の深掘り","帰国後、何で調べましたか。読んだ本は？","実際に読んだ本・記事の題名を2つ言えるように準備。坪谷先生の論文か上村先生の新書を1冊読んでおくと万全。",0],
+["A. 書類・体験の深掘り","「支援する側の思い込み」とは何ですか","相手の言葉・歴史を知らないまま「与える側」に立ち、自分の価値観を押し付けること。自分の失敗として語る。",0],
+["A. 書類・体験の深掘り","では、支援はしない方がよいのですか","不要ではない。相手の文脈を知り、同じ目線で行う支援へ。だから仕組みを学びに大学へ行く、と返す。",0],
+["B. 書類への追撃","書類の作成にAIを使いましたか","★正直に、堂々と。軸：①経験・考え・最終的な言葉はすべて自分のもの ②AIは調べ物の整理や文章の推敲の相談相手として使い、直す・直さないの判断は自分でした ③これは学部が掲げる「AIを道具として使いこなし、判断は人間が行う」学びの実践だと考えている。最良の証明は、書類の中身を何も見ずに自分の言葉で語れること——この練習アプリ全体がそのための準備。卑屈にならない、隠さない、盛らない。",1],
+["B. 書類への追撃","志願者調書で一番伝えたかったことは何ですか","事前に一文で決めておく（例：壁は個人の努力の問題とは限らず、仕組みを学ばなければ寄り添えない）。",0],
+["B. 書類への追撃","あなたの弱みは何だと思いますか","正直に一つ＋それへの対処をセットで。取り繕わない。",0],
+["B. 書類への追撃","「言葉の壁の内側にいた」経験をもう少し詳しく","ホストファミリーとの食卓の沈黙→相手の立場で考えた→自分から話しかけた→関係が変わった。転機の物語をいつでも2分で話せるように。",0],
+["C. 志望・併願","なぜ横浜市立大学なのですか","グローカル（世界の課題が横浜の足元にある）・現場のフィールドワーク・文理融合・複言語。標語に触れてもよい。",0],
+["C. 志望・併願","他の大学は受けていますか","正直に答える。他大学も受けていると言ってよい。そのうえで、横浜市立大学で学びたい理由（グローカル・現場・多文化共生）を具体的に語れば十分。",0],
+["C. 志望・併願","なぜ国際教養学部なのですか","将来の職業がまだ一つに定まっていないからこそ、幅広い学問と現場の両方に触れて見極めたい、という論理。",0],
+["C. 志望・併願","オープンキャンパスには来ましたか","事実のまま。行っていなければ、調べたこと（新課程・教員の研究）で補う。",0],
+["D. 学びの構想","ドメインは2つありますが、もう一方の名前を知っていますか","「人文学・メディアリテラシー」。即答できると調査の深さが伝わる。",0],
+["D. 学びの構想","坪谷先生の研究をどこまで知っていますか","外国につながる子どもの教育と母語・多文化共生。神奈川県立鶴見総合高校に16年関わり、団地の外国人住民の研究も。論文名を1本言えると強い。",0],
+["D. 学びの構想","書類に名前を挙げた先生が担当でなくなったらどうしますか","★「先生個人ではなく、領域を学びに来ます」。お名前は関心を具体化するために挙げたもので、志望の核は多文化共生・グローカルという領域と、横浜という現場。担当の先生が替わっても学びたいことは変わらない、と即答。新課程でゼミ構成が変わりうることも承知していると添えられれば完璧。",1],
+["D. 学びの構想","フィールドワークは何語で、どのように行うのですか","★横浜での調査は日本語が中心（相手に応じて、やさしい日本語や英語も）。方法は、支援の場に通って話を聞くこと（聞き取り・インタビュー）、活動への参加、アンケートやデータとの突き合わせ。「相手の言葉で聞く」ことを大切にしたいから、スペイン語も学ぶ——将来は中南米での調査もその言葉で、とつなげる。",1],
+["D. 学びの構想","データサイエンスで何を確かめたいのですか","例：外国につながる子どもの就学状況や日本語支援の分布。GIS＝地理情報システム（地図にデータを重ねる）と説明できるように。",0],
+["D. 学びの構想","スペイン語を学んで何をしたいですか","中南米の当事者の声に直接触れる。ジュリアと自分の言葉で話したい、という具体でもよい。",0],
+["D. 学びの構想","横浜のどの地域を想定していますか","鶴見区など外国につながる住民の多い地域。JICA横浜のような機関名も一つ言えるとよい。",0],
+["E. 基礎知識","グアテマラはどこにあり、隣国はどこですか","中米。メキシコ・ベリーズ・ホンジュラス・エルサルバドル。ホンジュラス・エルサルバドルと合わせ「北部三角地帯」＝米国への移民が多い地域。",0],
+["E. 基礎知識","マヤ諸語はいくつくらいあるか知っていますか","グアテマラには22のマヤ系言語（キチェ語など）。数字を一つ持っておく。",0],
+["E. 基礎知識","グアテマラ内戦について知っていますか","1960〜96年の内戦。マヤ先住民に多くの犠牲。1996年和平合意。差別の歴史の核心として1分で。",0],
+["E. 基礎知識","日本の「外国につながる子ども」の課題を知っていますか","不就学の問題、日本語指導が必要な児童生徒の増加。外国人には就学義務が適用されない、という制度の話まで言えると強い。",0],
+["E. 基礎知識","「多文化共生」とはどういう意味だと思いますか","定義暗記でなく自分の言葉で。「助ける／助けられる」でなく対等な関係、という書類の主張と一貫させる。",0],
+["F. 将来・締め","10年後、どうなっていたいですか（将来のビジョン）","★「未定」で終わらせない答え方：①方向は決まっている（言葉や文化の違いで不利な立場に置かれた人の側に立つ）②候補も考えている（国際協力の現場／日本国内で外国につながる人を支える仕事）③大学4年間で現場と学問に触れて決める、という計画まで言う。迷いを「考え続けている証拠」として堂々と示す。",1],
+["F. 将来・締め","将来はどんな職業に就きたいですか","「まだ一つに定まっていない。ただ、不利な立場の人の側に立ち続ける方向は決まっている。それを見極める4年間にしたい」。堂々と。",0],
+["F. 将来・締め","4年間で答えが見つからなかったらどうしますか","探し続ける姿勢＋大学で身につく力（調査力・言語・データ）はどの道でも生きる、と前向きに。",0],
+["F. 将来・締め","最後に何か質問はありますか","逆質問を2つ準備（例：リテラシーゼミの地域調査の実例／新課程1期生としての機会）。「ありません」は避ける。",0],
+];
+
+/* ---------- 帰国生 予想テーマ（模範小論つき） ---------- */
+const THEMES=JSON.parse("[{\"t\": \"教育格差・能力主義\", \"why\": \"2023年度〔Ⅰ〕で実際に出題（志水宏吉『ペアレントクラシー』＝親の格差と能力主義）。設問の形もその年の実物に合わせてある。教育と格差は学部の中心テーマで、再登場が十分ありうる。\", \"psg\": \"　かつて社会は「メリトクラシー（能力主義）」を理想としてきた。生まれや身分ではなく、本人の努力と能力によって評価される社会は、公平で望ましいものと考えられた。\\n　だが近年、この理想には見えにくい落とし穴があることが指摘されている。教育社会学の調査は、親の収入が高い家庭ほど子どもの大学進学率が高いという傾向を、繰り返し確認してきた。塾に通えるか、家に本があるか、親が受験の情報を持ち、進路の相談相手になれるか。こうした条件は、子ども自身が選んだものではない。\\n　問題は、その差が「本人の努力の差」として扱われてしまうことにある。恵まれた環境で成果を上げた子は「頑張った人」として称賛され、そうでない子は「努力が足りなかった人」として自己責任を問われる。勝った側は自分の力を信じ、負けた側は自分を責める。しかし、努力できる条件そのものが、生まれた環境によって最初から不平等に配られているとしたら、その評価は本当に公平だといえるだろうか。\\n　しかも、この格差は目に見えにくい。身分制の時代には、生まれによる差別は誰の目にも明らかだった。だが能力主義のもとでは、差は「試験の点数」という一見公平な形をとって現れる。だからこそ、負けた側は不平等を訴えることさえ難しい。\\n　能力主義は、身分制よりは開かれた仕組みである。しかしそれが、環境の格差を覆い隠し、不平等を「自己責任」として正当化する装置になってしまうとき、私たちは立ち止まって考えなければならない。競争のルールが公平であることと、競争のスタートラインが公平であることは、別の問題なのである。\", \"q1\": \"傍線部「競争のルールが公平であることと、競争のスタートラインが公平であることは、別の問題」とはどういうことか、100字以内で説明しなさい。\", \"a1\": \"試験などの選抜が全員に同じ条件で行われていても、努力できる条件が家庭環境によって不平等に配られていれば、結果の差を本人の努力の差とは言えず、仕組みの公平さだけでは公平と呼べないということ。\", \"q2\": \"筆者は能力主義の「落とし穴」を指摘している。筆者の主張を簡潔にまとめた上で、具体例を挙げてあなたの考えを250〜300字で論じなさい。\", \"model\": \"筆者は、試験というルールが公平でも、努力できる条件が家庭環境によって不平等に配られている以上、結果の差を自己責任とみなす能力主義には落とし穴があると主張する。私はこの指摘を、言葉の壁による格差で考えたい。日本では日本語の支援が必要な子どもが増えている。授業が分からない原因は言葉なのに、周囲からは「勉強ができない子」と見なされ、選べない条件が努力不足として扱われてしまう。必要なのは、差を「自己責任」で片づけず、放課後の学習支援や日本語教室のように、家庭が用意できない条件を社会が補う仕組みである。能力主義を公平に働かせるためにこそ、スタートラインを整える責任を社会が引き受けるべきだと私は考える。\", \"points\": \"【問1のコツ】「ルールの公平」＝選抜が同じ条件で行われること、「スタートラインの公平」＝努力できる条件の配分、と二つに分けて言い換える。「AであってもBでなければ〜ということ。」の型。\\n【問2の型＝要約＋意見】設問の「主張を簡潔にまとめた上で」は採点基準そのもの。最初の2〜3文は筆者の要約にあて、自分の話から始めない。要約を飛ばすと配点を丸ごと落とす。\\n【250〜300字の設計図】①筆者の主張の要約（約80字）→②自分の視点の提示（約20字）→③具体例（約90字）→④対処と結論（約100字）。450字と違い、留保や反対論に割く余裕はない。一番強い例一つに絞る。\\n【自分の武器】言葉の壁と格差の接続。『バイリンガルの壁』で学んだ生活言語と学習言語の差。グアテマラは「帰国後に調べて知った」と正確に書くこと。\", \"words\": \"問1＝100字以内／問2＝250〜300字\", \"ul\": \"競争のルールが公平であることと、競争のスタートラインが公平であることは、別の問題\"}, {\"t\": \"言語・コミュニケーションと他者理解\", \"why\": \"直接の出題はまだないが、2025年度〔Ⅱ〕（文学と共感的想像力＝他者を実感をもって理解する力）と地続きの領域。ことみの経験が最も生きる。下線部(B)を問2で使う形も実物と同じ。\", \"psg\": \"　私たちはふだん、言葉が通じれば相手を理解できると考えている。しかし、言葉が通じることと、相手を理解することは、じつは同じではない。\\n　外国語を学び始めた人は、まず単語や文法を覚え、意味を正しく「翻訳」しようとする。だが、たとえ正しく訳せても、相手が本当に言いたかったことが伝わるとは限らない。言葉の背後には、その人が育った文化や歴史、その場の状況といった、言葉に表れない文脈があるからだ。同じ「大丈夫」という一語でも、それが承諾なのか遠慮なのか拒絶なのかは、文脈を読まなければ分からない。ある文化では沈黙が同意を意味し、別の文化では不満を意味することもある。\\n　むしろ、言葉が完璧に通じるという思い込みは、理解を妨げることさえある。「言葉が通じているのだから、分かり合えているはずだ」という前提が、相手の沈黙や、言いよどみや、表情に隠された本当の思いを見落とさせてしまう。理解できたと思った瞬間に、理解しようとする努力は止まるのである。\\n　だとすれば、他者を理解するとは、正しい言葉を並べることではない。相手がどんな背景を背負い、何を言おうとしているのかを想像し、分からなさに耐えながら、なお歩み寄ろうとすることである。理解とは、到達する地点ではなく、絶えず更新され続ける過程なのだ。\\n　このことは、外国語の場面に限らない。母語で話す家族や友人との間にも、同じ壁はある。言葉は、他者へ近づくための入り口にすぎない。その入り口をくぐった先で、私たちがどれだけ相手に想像力を働かせられるか。そこにこそ、理解の可能性がある。\", \"q1\": \"傍線部「言葉が完璧に通じるという思い込みは、理解を妨げることさえある」とはどういうことか、100字以内で説明しなさい。\", \"a1\": \"言葉の意味が正しく伝わっていると信じ込むと、もう分かり合えているはずだという前提が生まれ、相手の沈黙や表情に隠れた本当の思いや、言葉に表れない文脈を読み取ろうとする努力が止まってしまうということ。\", \"q2\": \"下線部(B)「理解とは、到達する地点ではなく、絶えず更新され続ける過程なのだ」について、あなた自身の経験を挙げて、あなたの考えを250〜300字で述べなさい。\", \"model\": \"筆者は、理解とは正しく訳すことではなく、分からなさに耐えながら歩み寄り続ける過程だと述べる。私も自分の経験からそう考える。十五歳で留学した当初、私は英語がうまく話せず、ホストファミリーとの会話が続かなかった。転機は、完璧な英語をあきらめ、下手でも自分から話しかけると決めたことだった。すると相手からも話しかけてくれるようになった。言葉が通じたから理解が生まれたのではなく、分かろうとして歩み寄ったから、言葉が通じ始めたのだ。理解は言葉の量では測れない。相手に近づこうとする姿勢を持ち続けることが理解そのものであり、それは外国語に限らず、母語で話す相手との間でも同じだと私は考える。\", \"points\": \"【問1のコツ】「思い込み」→「分かり合えているはずだという前提」、「理解を妨げる」→「隠れた思いや文脈を読み取る努力が止まる」。因果（信じ込む→前提→努力が止まる）を一文に。\\n【問2の型＝経験を挙げて】経験は必須。ただし出来事の報告で終わらせず、「だから理解とは何か」という一般化で締める。下線部(B)の「過程」という言葉に正面から応答すること。\\n【250〜300字の設計図】①筆者への応答（約60字）→②経験（約100字）→③経験から取り出した発見（約50字）→④一般化した結論（約80字）。経験の描写は100字までで切り上げる。\\n【この解答例の核心】「歩み寄ったから言葉が通じ始めた」という順序の逆転が、課題文にない自分の発見。ここが「自分の頭で考えた」証拠として採点者に伝わる。\", \"words\": \"問1＝100字以内／問2＝250〜300字\", \"ul\": \"言葉が完璧に通じるという思い込みは、理解を妨げることさえある\", \"ulB\": \"理解とは、到達する地点ではなく、絶えず更新され続ける過程なのだ\"}, {\"t\": \"孤立する都市とコミュニティ\", \"why\": \"6年間で最も繰り返されている軸。2021年度〔Ⅱ〕（保井美樹『孤立する都市、つながる街』）と2024年度〔Ⅰ〕（広井良典＝福祉と都市政策）で出題。「都市」を名に負う市立大学の中核テーマで、問2は2021年度の実物とほぼ同じ形にしてある。\", \"psg\": \"　都市は、人と人との出会いに満ちた場所のはずだった。ところが現代の都市で深刻になっているのは、大勢の人に囲まれながら、誰ともつながっていないという孤立である。\\n　単身世帯は増え続け、大都市では全世帯の半分に近づいている。町内会や自治会の加入率は下がり続け、隣に誰が住んでいるかを知らないことは、もはや珍しくない。かつての住まいには、縁側や井戸端のような、暮らしが外へ開かれる場所があった。現代の住宅は、オートロックと防犯カメラで守られた閉じた箱である。安全と引き換えに、私たちは「気づいてもらえる」機会を失った。\\n　孤立が深刻なのは、本人も気づかないうちに進み、いざというときに初めて姿を現すからである。病気や失業、介護や育児の行き詰まり。困ったときに「助けて」と言える相手がいない人は、行政の窓口にもたどり着けないことが多い。日本の福祉サービスの多くは、本人が申請して初めて動く仕組みだからである。制度はあるのに、届かない。\\n　ここで注意すべきは、孤立は個人の性格や選択の結果ではなく、都市の構造がつくり出すものだ、ということである。人づきあいが苦手だから孤立するのではない。偶然に頼らなければ人と知り合えない環境が、孤立を生むのである。だとすれば、必要なのは「もっと積極的に」と個人を励ますことではなく、構造のほうを変えることだ。\\n　手がかりは、強い絆ではなく、緩やかなつながりにある。毎日顔を合わせる家族や親友でなくてよい。なじみの店の店主、公園で会えば挨拶を交わす人、月に一度の集まりで隣に座る人。そうした「弱いつながり」は、人を縛らずに支え、異変に気づく網の目になる。困ったときに頼れる場が、特別な施設ではなく、暮らしの動線の上に散りばめられていること。助けることと助けられることが、日常の中で自然に行き来すること。都市の孤立への処方箋は、そのような地域社会を意識して設計することにある。\", \"ul\": \"孤立は個人の性格や選択の結果ではなく、都市の構造がつくり出すものだ\", \"q1\": \"下線部「孤立は個人の性格や選択の結果ではなく、都市の構造がつくり出すものだ」とはどういうことか、本文中の言葉を用いて60字以内で説明しなさい。\", \"a1\": \"人づきあいが苦手といった本人の資質のせいではなく、偶然に頼らなければ人と知り合えない都市の環境が孤立を生むということ。\", \"q2\": \"筆者が必要だと考える地域社会の姿を簡単に説明した上で、それを実現するための具体的な方策について、あなたの考えを250〜300字で述べなさい。\", \"model\": \"筆者が必要と考えるのは、強い絆ではなく、暮らしの動線の上に緩やかなつながりの場が散りばめられ、異変に気づき支え合える地域社会である。私が方策として挙げたいのは、放課後の学校を地域に開くことだ。教室を、高齢者が子どもの宿題を見守り、外国につながる住民が自分の文化を教える場にすれば、世代や国籍の違う人々が顔見知りになる入り口が生まれる。私自身、留学先での孤立から抜け出すきっかけは、挨拶を交わす相手が一人できたことだった。偶然に頼らずに顔見知りをつくれる仕組みを、誰もが歩いて行ける場所に用意すること。それが、都市の孤立への現実的な方策だと私は考える。\", \"points\": \"【問1のコツ】60字は短い。「〜のせいではなく、〜が孤立を生むということ。」の対比一文で言い切る。材料は下線部の直後（「人づきあいが苦手だから孤立するのではない」「偶然に頼らなければ〜」）にある。\\n【問2の型＝まとめ＋方策】設問は「姿を説明した上で」＋「具体的な方策」の二段構え。両方に配点がある。方策は「誰が・どこで・何をする」まで具体的に。「意識を変える」だけでは方策にならない。\\n【250〜300字の設計図】①筆者の考える地域社会の姿（約65字）→②方策の提案（約100字）→③自分の経験による裏づけ（約45字）→④結論（約60字）。\\n【自分の武器】留学初期の孤立と、挨拶一つで抜け出した経験は、このテーマの実体験そのもの。「多文化×地域」の組み合わせは横市の看板と直結する。\", \"words\": \"問1＝60字以内／問2＝250〜300字\"}, {\"t\": \"日本で暮らす外国人と共生社会\", \"why\": \"多文化共生は2026年度〔Ⅱ〕で難民として出たばかりだが、「国内で暮らす外国人との共生」という角度は未出。学部の看板テーマで、グアテマラ・『バイリンガルの壁』の材料が最も直接生きる。難民の実物過去問とあわせて両角度を押さえる。\", \"psg\": \"　「私たちは労働力を呼んだが、やってきたのは人間だった」。スイスの作家マックス・フリッシュが、ヨーロッパの外国人労働者受け入れをめぐって残した言葉である。半世紀前に語られたこの一文は、今日の日本にそのまま突き刺さる。\\n　日本で暮らす外国人は三百万人を超え、過去最多を更新し続けている。人手不足を背景に、コンビニ、建設現場、農業、介護と、外国人の働き手はすでに日本の日常を支える存在になった。政府は長く「移民政策はとらない」と説明してきたが、実態として、日本は世界有数の外国人受け入れ国になりつつある。\\n　問題は、制度も社会の意識も、その実態に追いついていないことである。働き手としての在留資格は整えられても、その人が病気になったとき、家族を呼び寄せたとき、地域で歳を重ねていくときの備えは乏しい。日本語を学ぶ機会は自治体やボランティア任せで、住む場所によって大きな差がある。言葉の壁は仕事の場だけでなく、病院で症状を伝えるとき、役所で手続きをするとき、災害の情報を受け取るときにも、その人の生活を脅かす。\\n　「労働力」というまなざしは、人間を、役に立つ機能に切り詰める。そこでは、その人の家族も、故郷も、老後も、夢も、視野の外に置かれる。しかし現実にやってくるのは、笑い、病み、恋をし、子を育てる、まるごとの人間である。まなざしが変わらない限り、制度をいくら継ぎ足しても、受け入れの矛盾は社会の最も弱いところに現れ続ける。\\n　共生とは、外国人の側に一方的な適応を求めることではない。また、善意の「支援」だけで成り立つものでもない。同じ地域で暮らす隣人として、互いの生活を支える仕組みを、社会の当たり前の備えとして整えること。「特別な配慮」が「当たり前の備え」に変わったとき、初めて共生は始まるのである。\", \"ul\": \"「労働力」というまなざしは、人間を、役に立つ機能に切り詰める\", \"q1\": \"下線部「『労働力』というまなざしは、人間を、役に立つ機能に切り詰める」とはどういうことか、本文に即して150字以内で説明しなさい。\", \"a1\": \"働き手としての価値だけで人を捉える見方は、その人が家族や故郷を持ち、病むことも老いることもある、暮らしのまるごとを抱えた一人の人間であることを視野の外に置き、仕事の役に立つかどうかという一面だけに人間を縮めることで、労働以外の生活を支える備えを社会が考えずに済ませてしまうということ。\", \"q2\": \"外国人と共に暮らす社会の課題について、本文で挙げられている以外の事例を1つ挙げてその概要を説明した上で、それにどう対処すべきか、あなたの考えを250〜300字で述べなさい。\", \"model\": \"私が挙げたいのは、外国につながる子どもの教育である。親の来日にともなって日本の学校に入った子どもは、日常会話はできても授業で使う日本語につまずきやすく、内容の分からない教室に座り続けるうちに、学ぶ意欲そのものを失っていく。これは、人を働き手としてだけ迎え、その家族の人生まで想像してこなかったことの帰結である。対処の出発点は、相手を対等な隣人として見るまなざしだと私は考える。私はグアテマラの学校でボランティアをしたとき、子どもたちを「助ける相手」と見ていた自分に気づいた。支援を上からの施しではなく、同じ地域を担う隣人への当たり前の備えとして、日本語教育を社会の仕組みに組み込むべきである。\", \"points\": \"【問1のコツ】150字は長め。「まなざし」の言い換え（働き手としての価値だけで人を捉える見方）＋「切り詰める」の中身（暮らしのまるごとを視野の外に置く）＋その帰結、までを一文に収める。字数の8割（120字）以上は使う。\\n【問2の型＝異なる事例】「本文で挙げられている以外の事例」が絶対条件。本文にある事例（病院・役所・災害・日本語学習の地域差）を挙げると設問違反で大幅減点。子どもの教育は本文にない——これを切り札にする。\\n【250〜300字の設計図】①事例の提示と概要（約100字）→②本文の論理との接続（約45字）→③対処の考えと自分の経験（約90字）→④結論（約60字）。\\n【自分の武器】外国につながる子ども、生活言語と学習言語（『バイリンガルの壁』）、グアテマラでの気づき。すべてここで使える。\", \"words\": \"問1＝150字以内／問2＝250〜300字\"}, {\"t\": \"AI・データと人間の判断\", \"why\": \"2022年度〔Ⅱ〕（コロナ後のデジタル化）の系譜。データサイエンス学部を持つ大学の性格からも、技術と人間はいつ出てもおかしくない定番領域。\", \"psg\": \"　人工知能（AI）の発達は、私たちの社会を大きく変えようとしている。膨大なデータを瞬時に分析し、最適な答えを示すAIは、医療や教育、防災など、さまざまな場面で人間の能力を超えつつある。もはやAIなしの社会は考えにくい。\\n　しかし、ここで立ち止まって考えたいことがある。AIが導く「答え」とは、いったい何か。それは、過去に蓄積されたデータをもとにした、確率的な予測にすぎない。つまり、多数派の傾向や、平均的なパターンを映し出したものである。\\n　このことは、思わぬ結果を生む。ある企業が採用の選考にAIを使ったところ、過去の採用データの偏りをそのまま学習し、特定の性別の応募者を低く評価していたことが明らかになった。AIは差別を「意図」したわけではない。過去の社会にあった偏りを、忠実に再現しただけである。効率を求めて導入した技術が、社会の不公平を自動化してしまったのだ。\\n　そこには、数字に表れにくいものが抜け落ちる危険がある。たとえば、ある地域の教育の状況を平均値だけで見れば、全体としては問題がないように見えるかもしれない。だが、その平均の陰に、支援を最も必要とする少数の子どもが隠れていることがある。AIが示す「全体としての正しさ」は、時に、最も助けを必要とする一人を見えなくしてしまう。\\n　だからこそ、AIを使う人間の側に、その答えをそのまま受け入れず、背景を問い直す力が求められる。この数字は誰を映し、誰を映していないのか。効率という尺度から、こぼれ落ちている人はいないか。技術を賢く使いこなすことと、数字の奥にいる一人ひとりの存在を忘れないこと。その両立こそが、これからの社会に不可欠な姿勢なのである。\", \"q1\": \"傍線部「AIが示す「全体としての正しさ」は、時に、最も助けを必要とする一人を見えなくしてしまう」とはどういうことか、100字以内で説明しなさい。\", \"a1\": \"AIの答えは過去のデータの多数派や平均を映した予測なので、全体としては妥当に見えても、平均から外れた少数の人の事情はデータに表れにくく、最も支援が必要な人ほど見落とされてしまうということ。\", \"q2\": \"筆者の主張を踏まえた上で、AIを社会で活用するときに人間が果たすべき役割について、具体例を挙げてあなたの考えを250〜300字で論じなさい。\", \"model\": \"筆者は、AIの答えは過去のデータが映す多数派の傾向にすぎず、使う人間の側に、その背景を問い直す力が求められると主張する。私は、人間が果たすべき役割は、数字に表れない少数の人を見つけることだと考える。たとえば教育の現場では、学校全体の平均点に問題がなくても、その陰に、日本語の支援が必要で授業についていけない子どもが隠れていることがある。AIが「順調」と示したとき、そこに映っていない一人を探すのは人間の仕事である。AIの答えを結論ではなく仮説として扱い、誰がデータから抜け落ちているかを問い、最後の判断と責任を引き受ける。その役割だけは、人間が手放してはならないと私は考える。\", \"points\": \"【問1のコツ】「全体としての正しさ」＝多数派・平均を映した予測、「一人を見えなくする」＝平均から外れた少数の事情はデータに表れない、と因果で言い換える。「〜なので、〜てしまうということ。」\\n【問2の型＝主張を踏まえて】冒頭で筆者の主張を短く要約してから入る。「役割」を聞かれているので、役割をはっきり名指しする一文（映っていない人を見つける役割）を置く。\\n【250〜300字の設計図】①筆者の主張の要約（約60字）→②役割の提示（約40字）→③具体例（約105字）→④結論（約80字）。\\n【注意】AIの専門知識は不要。技術否定にも礼賛にも走らない。教育の例に引きつければ、他のテーマと同じ武器で書ける。\", \"words\": \"問1＝100字以内／問2＝250〜300字\", \"ul\": \"AIが示す「全体としての正しさ」は、時に、最も助けを必要とする一人を見えなくしてしまう\"}]");
+
+/* ---------- tabs ---------- */
+const TABS=[["home","ホーム","#8ab4f8"],["cal","予定表","#57c08a"],["qa","想定問答","#e8b06b"],["mock","模擬面接","#b795f6"],["kikoku","帰国生 10/3","#5fc9d8"],["log","記録","#9aa8bd"],["set","設定","#7f8ea6"]];
+let cur="home";
+function nav(){document.getElementById("nav").innerHTML=TABS.map(t=>`<button class="${cur===t[0]?'on':''}" style="${cur===t[0]?`border-left-color:${t[2]};border-bottom-color:${t[2]}`:''}" onclick="go('${t[0]}')"><span class="dot" style="background:${t[2]}"></span>${t[1]}</button>`).join("");}
+function go(t){cur=t;nav();render();window.scrollTo(0,0);}
+
+/* ---------- render ---------- */
+function esc(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;");}
+function render(){
+const m=document.getElementById("main");
+if(cur==="home") m.innerHTML=vHome();
+else if(cur==="qa") m.innerHTML=vQA();
+else if(cur==="mock") m.innerHTML=vMock();
+else if(cur==="kikoku") m.innerHTML=vKikoku();
+else if(cur==="cal") m.innerHTML=vCal();
+else if(cur==="log") m.innerHTML=vLog();
+else if(cur==="set") m.innerHTML=vSet();
+afterRender();
+}
+
+function vHome(){
+const cds=[["2026-10-01","上智 合格発表"],["2026-10-03","横市帰国生 試験"],["2026-10-13","横国B 出願締切"],["2026-11-02","横市 合格発表"]];
+const cd=cds.map(c=>{const d=days(c[0]);if(d<0)return"";return `<div class="b ${d<=7?'hot':''}"><div class="n">${d===0?"今日":"あと"+d+"日"}</div><div class="l">${c[1]}<br>${c[0].slice(5).replace("-","/")}</div></div>`;}).join("");
+const t=today(); const ph=(a,b)=>{const s=new Date(a+"T00:00:00"),e=new Date(b+"T23:59:59");return t>=s&&t<=e;};
+return `
+<div class="cd">${cd}</div>
+<div class="card"><h2>出願・受験ステータス</h2>
+<table>
+<tr><th>大学・方式</th><th>志望順</th><th>状況・次の予定</th></tr>
+<tr><td><b>横国（ルート選択中）</b></td><td><span class="tag red">志望1</span></td><td>A 経営・帰国生（出願10/21〜27・試験12/7）／ B ソクラテス＝都市社会共生（出願10/7〜13・英語口頭試問11/19〜20）。<b>併願不可・10/5ごろまでにどちらか選択</b></td></tr>
+<tr><td><b>横市 海外帰国生</b></td><td><span class="tag red">志望2</span><span class="tag amb">いま集中</span></td><td><b>受験番号3037</b>。10/3（土）9:10集合・第Ⅰ講堂。小論文9:30〜11:00、面接13:00〜。併願自由・横国と両立可</td></tr>
+<tr><td>上智 FGS</td><td><span class="tag blu">受験済み</span></td><td>9/20受験完了。発表 10/1・手続締切 10/15（押さえ判断）</td></tr>
+<tr><td>明治学院 国際学科 AO(B)</td><td><span class="tag">滑り止め</span></td><td><b>国際学科に決定・9/24出願（Web23:59・郵送消印）</b>。一次発表10/21→二次11/15（合格したら入学が条件）</td></tr>
+</table></div>
+<div class="card"><h2>併願の構造</h2>
+<ul>
+<li><b>横国はふたつのルートから一つだけ（学内併願不可）</b>：A 経営・帰国生徒選抜（日本語小論＋面接）／ B ソクラテス＝都市社会共生学科の英語プログラム（英語書類＋英語口頭試問。入学確約の縛りなし）。<b>10/5ごろまでに本人が選択</b>（資料「横国_ふたつの道」参照）。どちらも出願は横市発表（11/2）より前なので、結果を待たずに出願しておく（検定料17,000円は保険）。</li>
+<li><b>横市帰国生は併願自由</b>で横国と両立できる。横国の発表（B=12/9、A=12/17）はどちらも横市の入学手続日（12/18・持参可）より前——<b>結果を見てから決められる</b>。</li>
+<li><b>明治学院（滑り止め）は国際学部国際学科AO(B)に決定</b>。TOEFL80で英語100点満点換算。書類＝様式7志望理由書・様式8レポート（本『バイリンガルの壁』に言及）・様式11。<b>9/24 UCARO登録＋郵便局窓口発送</b>。</li>
+<li>対策方針：<b>10/3の帰国生入試に全集中</b>（小論文＝対策ノート＋実物過去問／面接＝想定問答・模擬面接）→ 終了後すぐ横国対策へ。明学の二次出願（10/21〜28・15,000円）は一次通過なら迷わず払う。</li>
+</ul></div>
+<div class="card"><h2>今の作戦（3つの局面）</h2>
+<div class="phase ${ph('2026-09-22','2026-09-25')?'now':''}"><b>〜9/25（明学を出す）</b>：明学＝国際学科AO(B)に決定。様式7・8・11を清書 → 9/24にUCARO登録（検定料20,000円）＋TOEFL直送（DIコード0437）＋郵便局窓口から簡易書留速達で発送。並行して横国のルート（経営 or ソクラテス）を相談。9/25＝横市一次発表。</div>
+<div class="phase ${ph('2026-09-26','2026-10-03')?'now':''}"><b>9/26〜10/3（帰国生試験まで・ここに全集中）</b>：帰国生タブの<b>予想5テーマで型練習（問1＋問2＝250〜300字）</b>→ <b>実物過去問（2026→2023）を90分通しで</b>。答案は写真でClaudeへ送り講評。面接＝想定問答タブ＋石田さんと模擬面接。10/1 上智発表。<b>当日：9:10 第Ⅰ講堂集合／鉛筆・消しゴム・腕時計・昼食を持参</b>。</div>
+<div class="phase ${ph('2026-10-04','2026-10-13')?'now':''}"><b>10/4〜10/13（横国へ切り替え）</b>：ルートを確定（〜10/5）。Bソクラテス＝英語エッセイ・自己推薦書を仕上げ、10/7〜13にオンライン出願（ACSI認定証PDF・TOEFL直送0410・検定料17,000円）。A経営＝志望理由書（自筆）を準備、10/21〜27に郵送出願。</div>
+<div class="phase ${ph('2026-10-14','2026-12-07')?'now':''}"><b>10/14〜（横国本番へ）</b>：Aルート＝志望理由書（自筆）→10/21〜27出願→12/7へ日本語小論文を再開。Bルート＝11/19〜20の英語口頭試問へ、スライド1枚のプレゼン（課題公表済み）と英語Q&A練習。11/2の横市帰国生発表、10/21の明学一次発表で全体が動く。</div>
+</div>
+<div class="card"><h2>メモ</h2><textarea id="homeNotes" rows="4" placeholder="なんでもメモ">${esc(S.notes)}</textarea></div>`;
+}
+
+
+function vQA(){
+let cat="",h="";
+QA.forEach((q,i)=>{
+  if(q[0]!==cat){cat=q[0];h+=`<h3 style="margin:16px 0 8px">${cat}</h3>`;}
+  const st=S.qa[i]||0, cls=st===1?"s1":st===2?"s2":"", lab=st===1?"△":st===2?"◎":"未";
+  h+=`<div class="qa ${q[3]?'new':''}" id="qa${i}">
+  <div class="qh"><span class="st ${cls}" onclick="qaSt(event,${i})">${lab}</span><span class="qt">${q[3]?'<span class="tag amb">★新</span>':''}${q[1]}</span></div>
+  <div class="body"><div class="hint"><b>答えの軸：</b>${q[2]}</div>
+  <textarea rows="2" placeholder="自分の言葉でメモ" oninput="S.qamemo[${i}]=this.value;save()">${esc(S.qamemo[i])}</textarea></div></div>`;
+});
+const done=Object.values(S.qa).filter(v=>v===2).length;
+return `<div class="card"><h2>想定問答 ${QA.length}問 <span class="small">◎=自分の言葉で言える（${done}/${QA.length}）。マークをタップで 未→△→◎</span></h2>
+<div class="small">使い方：質問をタップ→「答えの軸」を読む→<b>声に出して</b>答える→自分の言葉をメモ。丸暗記はしない（軸だけ覚えて毎回言い方を変える）。<span class="tag amb">★新</span>は大学教授の助言による追加想定（優先練習）。帰国生10/3の面接もこの問答で兼用。</div>
+${h}</div>`;
+}
+
+/* ---------- 模擬面接 ---------- */
+function catOrder(c){return ["C","A","B","D","E","F"].indexOf(c[0]);}
+function autoPickIds(){
+const used=S.mock.used||{};
+const byCat={};
+QA.forEach((q,i)=>{const c=q[0][0];(byCat[c]=byCat[c]||[]).push(i);});
+const pick=[];
+Object.keys(byCat).forEach(c=>{
+  const arr=byCat[c].slice().sort((a,b)=>{
+    const ua=used[a]||0, ub=used[b]||0;
+    if(ua!==ub) return ua-ub;
+    const na=QA[a][3]?0:1, nb=QA[b][3]?0:1; // ★新を優先
+    if(na!==nb) return na-nb;
+    return Math.random()-0.5;});
+  pick.push(arr[0]);
+});
+const rest=QA.map((_,i)=>i).filter(i=>!pick.includes(i)).sort((a,b)=>{
+  const ua=used[a]||0, ub=used[b]||0;
+  if(ua!==ub) return ua-ub;
+  const na=QA[a][3]?0:1, nb=QA[b][3]?0:1;
+  if(na!==nb) return na-nb;
+  return Math.random()-0.5;});
+pick.push(rest[0],rest[1]);
+return pick;
+}
+function mockSel(i,on){if(on)S.mock.sel[i]=1;else delete S.mock.sel[i];save();
+const c=document.getElementById("selcount");if(c)c.textContent=Object.keys(S.mock.sel).length;}
+function mockAuto(){S.mock.sel={};autoPickIds().forEach(i=>S.mock.sel[i]=1);save();render();}
+function mockClear(){S.mock.sel={};save();render();}
+function makeSet(){
+const ids=Object.keys(S.mock.sel).map(Number);
+if(!ids.length){alert("質問を選んでください（「おまかせで8問選ぶ」も使えます）");return;}
+ids.sort((a,b)=>catOrder(QA[a][0])-catOrder(QA[b][0])||a-b);
+ids.forEach(i=>{S.mock.used[i]=(S.mock.used[i]||0)+1;});
+S.mock.sets.push({date:new Date().toISOString().slice(0,10),ids:ids,memo:"",done:{}});
+S.mock.sel={};save();render();window.scrollTo(0,0);
+}
+function mockDone(si,qi){const s=S.mock.sets[si];s.done=s.done||{};if(s.done[qi])delete s.done[qi];else s.done[qi]=1;save();render();}
+function mockResetAll(){if(confirm("出題セットの履歴と出題回数をすべて消去します。よろしいですか？")){S.mock={sets:[],used:{},sel:{}};save();render();}}
+function vMock(){
+const sets=S.mock.sets||[];
+const curSet=sets.length?sets[sets.length-1]:null;
+let curH="";
+if(curSet){
+const si=sets.length-1; curSet.done=curSet.done||{};
+curH=`<div class="card" id="mockcard"><h2>出題セット #${sets.length}（${curSet.date}・${curSet.ids.length}問）</h2>
+<div class="small" style="margin-bottom:8px">石田さんへ：上から順に質問してください。<b>聞き終えた質問はタップで消し込み</b>できます。深掘り（「もう少し詳しく」「例えば？」）は自由に。ヒントは面接後の振り返り用です。</div>
+<button class="btn sm gray" onclick="document.getElementById('mockcard').classList.toggle('showhints')">ヒント表示／非表示</button>
+<div style="margin-top:10px">
+${curSet.ids.map((qi,n)=>`<div class="mq ${curSet.done[qi]?'done':''}" onclick="mockDone(${si},${qi})"><span class="no">Q${n+1}</span>${curSet.done[qi]?'✓ ':''}${QA[qi][1]}<div class="mh hint"><b>答えの軸：</b>${QA[qi][2]}</div></div>`).join("")}
+</div>
+<h3>石田さんからの講評・気づき</h3>
+<textarea rows="3" placeholder="面接後に記入（良かった点／直す点）" onclick="event.stopPropagation()" oninput="S.mock.sets[${si}].memo=this.value;save()">${esc(curSet.memo)}</textarea>
+</div>`;
+}
+let pcat="",list="";
+QA.forEach((q,i)=>{
+if(q[0]!==pcat){pcat=q[0];list+=`<h3 style="margin:12px 0 4px">${pcat}</h3>`;}
+list+=`<label class="pick"><input type="checkbox" ${S.mock.sel[i]?"checked":""} onchange="mockSel(${i},this.checked)"><span>${q[3]?'<span class="tag amb">★新</span>':''}${q[1]}</span></label>`;
+});
+const hist=sets.slice(0,-1).reverse().map((s,ri)=>{
+const idx=sets.length-2-ri;
+return `<div class="log"><span class="d">${s.date}</span><span>セット#${idx+1}：${s.ids.length}問</span><span class="small">${esc(s.memo).slice(0,60)}</span></div>`;}).join("")||"<div class='small'>まだ履歴がありません</div>";
+return `
+<div class="card"><h2>模擬面接（石田さんと）</h2>
+<div class="small">進め方：①面接15〜20分（下の出題セットで質疑）→ ②講評5分。評価の観点＝<b>志望動機・関心分野・将来の進路／学習意欲・理解力・表現力</b>（要項の面接評価軸）。</div>
+</div>
+${curH}
+<div class="card"><h2>質問を選んでセットを作る <span class="small">選択中 <b id="selcount">${Object.keys(S.mock.sel).length}</b> 問</span></h2>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+<button class="btn" onclick="makeSet()">選んだ質問でセット作成</button>
+<button class="btn gray" onclick="mockAuto()">おまかせで8問選ぶ</button>
+<button class="btn sm gray" onclick="mockClear()">選択をクリア</button>
+</div>
+<div class="small" style="margin-bottom:6px">想定問答の全${QA.length}問から、石田さんが聞きたい質問を自由に選べます（★新＝優先推奨）。「おまかせ」は未出題・★新を優先して8問選び、チェックを付けます——そのまま作成しても、増減してから作成してもOK。</div>
+${list}
+</div>
+<div class="card"><h3>過去のセット <button class="btn sm gray" style="margin-left:8px" onclick="mockResetAll()">すべて消去してリセット</button></h3>${hist}</div>`;
+}
+
+function vKikoku(){
+let th="";
+THEMES.forEach((x,i)=>{
+th+=`<div class="qa" id="th${i}"><div class="qh"><span class="st ${S.themeChk&&S.themeChk[i]?'s2':''}" onclick="themeChk(event,${i})">${S.themeChk&&S.themeChk[i]?'済':'★'}</span><span class="qt">${i+1}. ${x.t}</span></div>
+<div class="body">
+<div class="hint" style="background:#fdf1dc"><b>なぜこのテーマか：</b>${x.why}</div>
+<div style="margin:10px 0"><b style="color:var(--acc)">■ 課題文</b><div style="white-space:pre-wrap;background:#fff;border:1px solid var(--line);border-radius:8px;padding:11px 13px;margin-top:5px;line-height:1.95">${(t=>{t=t.replace(esc(x.ul),'<u style="text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px;background:#fff8e6">'+esc(x.ul)+'</u>');if(x.ulB)t=t.replace(esc(x.ulB),'<u style="text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px;background:#e9f0fd">'+esc(x.ulB)+'</u>');return t})(esc(x.psg))}</div></div>
+<div style="margin:10px 0"><b style="color:var(--acc)">■ 設問</b>
+<div style="background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:11px 13px;margin-top:5px;line-height:1.9"><b>問1</b>　${esc(x.q1)}<br><br><b>問2</b>　${esc(x.q2)}</div></div>
+<div class="small" style="margin:8px 0">まず<b>自分で問1・問2を書いてみて</b>から、下の解答例を開いて比べましょう（1テーマ＝本番の大問1つ分。目安30分）。いきなり読むと"型"が身につきません。</div>
+<b style="color:var(--blue)">自分で書く構成メモ・下書き</b>
+<textarea rows="4" placeholder="問1＝傍線部の言い換え（〜ということ。）／問2＝主張・反対側・自分の経験・結論" oninput="S.themes[${i}]=this.value;save()">${esc(S.themes[i])}</textarea>
+<div style="margin-top:10px"><span class="chiplike" style="display:inline-block;background:var(--acc);color:#fff;border-radius:8px;padding:5px 12px;font-size:13px;cursor:pointer" onclick="document.getElementById('mdl${i}').style.display=(document.getElementById('mdl${i}').style.display==='block'?'none':'block')">▼ 問1解答例・問2模範小論・執筆ポイントを開く／閉じる</span></div>
+<div id="mdl${i}" style="display:none;margin-top:8px">
+<div style="margin:8px 0"><b style="color:var(--acc)">問1 解答例（100字以内）</b><div style="white-space:pre-wrap;background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:11px 13px;margin-top:5px;line-height:1.95">${esc(x.a1)}</div></div>
+<div style="margin:8px 0"><b style="color:var(--acc)">問2 模範小論（450〜500字）</b>　<span class="small">${esc(x.words)}</span><div style="white-space:pre-wrap;background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:11px 13px;margin-top:5px;line-height:1.95">${esc(x.model)}</div></div>
+<div style="margin:8px 0"><b style="color:var(--grn)">執筆ポイント（なぜこう書いたか）</b><div style="white-space:pre-wrap;background:#f6fbf7;border:1px solid #cfe8d6;border-radius:8px;padding:11px 13px;margin-top:5px;line-height:1.95">${esc(x.points)}</div></div>
+</div>
+</div></div>`;});
+const done=S.themeChk?Object.values(S.themeChk).filter(Boolean).length:0;
+return `
+<div class="notice"><b>10/3（土）当日</b>：9:10集合・金沢八景キャンパス。小論文 9:30〜11:00（90分）／面接 13:00〜17:00（当日発表の時間割で随時）。<b>受験票（郵送されたもの）を必ず持参</b>。面接終了が何時になるか分からないので一日空けておく。</div>
+<div class="card"><h2>小論文の「型」（過去7年の実物で確定）</h2>
+<div class="small" style="margin-bottom:8px">帰国生・IB・留学生・社会人は<b>同じ共通問題</b>。2020〜2026年度の7年分の実物を確認済み。形式はほぼ固定です。</div>
+<ul>
+<li><b>90分・大問2つ・各2問＝計4問</b>（2026年度のみ〔Ⅱ〕が1問で計3問）。すべて<b>課題文読解型</b>。実物の課題文は新書・論文からの抜粋で<b>1大問あたり2〜3ページと長い</b>（この下の練習題より長い。読む体力は実物過去問で）。</li>
+<li><b>問1＝下線部の説明（60〜150字。100字が最多）</b>。2024年度は「抜き出し」、2020年度は「書き出し指定の75字」という変則も。</li>
+<li><b>問2＝意見論述250〜300字</b>（7年で全14問中10問）。例外は300〜350字（2020Ⅱ）・300字以内（2025Ⅰ）・200〜250字と450〜500字（2026）。<b>練習は250〜300字を基準に</b>。</li>
+<li>問2には決まった型が二つ：<b>A「筆者の主張を簡潔にまとめた上で＋あなたの考え」</b>（要約＋意見）／<b>B「本文で挙げられている以外の事例を1つ挙げて」</b>（自分の例を持ち込む）。設問の指示語は採点基準そのもの。</li>
+<li><b>時間配分</b>：大問1つ45分＝読む12分・問1に8分・問2の構成5分・執筆17分・見直し3分。</li>
+<li>配点は小論文100＋面接100。練習答案は写真でClaudeへ →「検品→減点明細→添削→宿題」。</li>
+</ul>
+<h3>過去7年の出題（実物で確認済み）</h3>
+<table>
+<tr><th style="width:52px">年度</th><th>〔Ⅰ〕</th><th>〔Ⅱ〕</th></tr>
+<tr><td>2020</td><td>場所の力と都市景観（ハイデン『場所の力』訳者解説）</td><td>メディア不信（林香里『メディア不信』）</td></tr>
+<tr><td>2021</td><td>戦争と政治（多木浩二『戦争論』）</td><td>都市の孤立（保井美樹『孤立する都市、つながる街』）</td></tr>
+<tr><td>2022</td><td>日本とアジア経済（『現代アジア経済論』）</td><td>コロナ後のデジタル化（米山秀隆）</td></tr>
+<tr><td>2023</td><td><b>教育格差</b>（志水宏吉『ペアレントクラシー』）</td><td>植物の知性（マンクーゾ・本文非公開）</td></tr>
+<tr><td>2024</td><td>福祉と都市政策・表の読み取り（広井良典）</td><td>デモクラシー（宇野重規）</td></tr>
+<tr><td>2025</td><td>環境問題と不確実性（佐藤仁）</td><td>文学と環境への想像力（結城正美）</td></tr>
+<tr><td>2026</td><td>責任とは何か（戸谷洋志『責任と物語』）</td><td><b>難民の受け入れ</b>（『日本外交の論点』）</td></tr>
+</table>
+<div class="small" style="margin-top:6px">傾向：都市・コミュニティ・福祉・デモクラシーなど<b>社会科学系が最頻</b>（2020・2021・2022・2024で計5問）。哲学・思想が続き、自然科学は7年で1回。出典は刊行1〜11年以内の日本語の新書・専門書。</div>
+</div>
+<div class="card"><h2>実物の過去問 7年分（公式公開・タップで開く）</h2>
+<div class="small" style="margin-bottom:6px">2026は大学サイト、2020〜2025は国立国会図書館アーカイブ（大学サイトは直近年度のみ掲載）。※2023年度〔Ⅱ〕は著作権の関係で本文非掲載。<b>週に1回は実物を90分通しで</b>。</div>
+<ul>
+<li><a href="https://www.yokohama-cu.ac.jp/admissions/admissions/kakomon/j8907d00000005yv-att/2026_kokusaikyouyou_tokubetusenbatu.pdf" target="_blank">2026年度（責任／難民）</a>　←最優先。難民の解答例は対策ノート巻末に掲載</li>
+<li><a href="https://warp.ndl.go.jp/20251208/20251207120049/https://www.yokohama-cu.ac.jp/admissions/admissions/kakomon/j8907d00000005yv-att/2025_kokusaikyouyou_tokubetusenbatu.pdf" target="_blank">2025年度（環境の不確実性／文学と想像力）</a></li>
+<li><a href="https://warp.ndl.go.jp/20241208/20241207120049/https://www.yokohama-cu.ac.jp/admissions/admissions/kakomon/j8907d00000005yv-att/2024_kokusaikyouyou_tokubetsu_QR.pdf" target="_blank">2024年度（福祉と都市／デモクラシー）</a></li>
+<li><a href="https://warp.ndl.go.jp/20231208/20231207095450/https://www.yokohama-cu.ac.jp/admissions/admissions/kakomon/j8907d00000005yv-att/2023_kokusaikyouyou_tokubetsu_QR_2.pdf" target="_blank">2023年度（教育格差／植物の知性）</a>　←テーマ1の元</li>
+<li><a href="https://warp.ndl.go.jp/20221210/20221208130825/https://www.yokohama-cu.ac.jp/admissions/admissions/kakomon/j8907d00000005yv-att/2022_kokusaikyouyou_tokubetsu_QR.pdf" target="_blank">2022年度（アジア経済／デジタル化）</a></li>
+<li><a href="https://warp.ndl.go.jp/20220610/20220608232605/https://www.yokohama-cu.ac.jp/admissions/admissions/kakomon/j8907d00000005yv-att/QR_2021_kyoyo_1.pdf" target="_blank">2021年度（戦争と政治／都市の孤立）</a>　←テーマ3の元</li>
+<li><a href="https://warp.ndl.go.jp/20210616/20210614222447/https://www.yokohama-cu.ac.jp/admissions/admissions/kakomon/j8907d00000005yv-att/QR2020_kyoyo_all.pdf" target="_blank">2020年度（場所の力と都市景観／メディア不信）</a></li>
+</ul>
+</div>
+<div class="card"><h2>予想5テーマ（実物の形式で新作） ＋ 解答例・執筆ポイント <span class="small">読んで、同じ型で書けるように（${done}/5 読了）</span></h2>
+<div class="small">使い方：①「なぜこのテーマか」で狙いを知る → ②模範小論を音読して「型」を体に入れる → ③執筆ポイントで"なぜそう書いたか"を理解 → ④自分の構成メモを書く → ⑤★をタップで「済」に。模範を丸暗記するのではなく、<b>型と、自分の経験の当てはめ方</b>を盗むこと。<b>どのテーマでも、留学・グアテマラ・言葉の壁が具体例に使えます。</b></div>
+${th}
+</div>
+<div class="card"><h2>面接（調書ベース）</h2>
+<div class="small">評価軸：志望動機・関心分野・将来の進路／学習意欲・理解力・表現力。<b>「想定問答」タブがそのまま使えます</b>（提出した志願者調書の内容＝ジュリア・転機・二つの学び・標語）。石田さんとの模擬面接も「模擬面接」タブで。</div>
+<h3>持ち物チェック</h3>
+<ul><li>受験票（郵送分）／筆記用具・腕時計（スマホ不可想定）／昼食（面接まで長い待ち時間）／読みかけの本（待ち時間用・面接の話題にもなる）</li></ul>
+</div>`;
+}
+
+function vCal(){
+const rows=EV.map(e=>{const d=days(e[0]);const past=d<0;
+return `<tr style="${past?'opacity:.45':''}"><td>${e[0].slice(5).replace("-","/")}</td><td>${past?"済":d===0?"<b>今日</b>":"あと"+d+"日"}</td><td><span class="tag ${e[3]}">${e[2]}</span>${e[1]}</td></tr>`;}).join("");
+return `<div class="card"><h2>予定表（全体）</h2><table><tr><th style="width:64px">日付</th><th style="width:70px">残り</th><th>予定</th></tr>${rows}</table>
+<div class="small" style="margin-top:8px">※横国の12月日程と上智の入学手続の要否判断（10/15）は、状況が動いたらClaudeに相談して更新。</div></div>`;
+}
+
+function vLog(){
+const list=(S.logs||[]).slice().reverse().map((l,ri)=>{const i=S.logs.length-1-ri;
+return `<div class="log"><span class="d">${l.d}</span><span class="tag">${l.t}</span><span>${esc(l.m)}</span><button class="btn sm gray" onclick="delLog(${i})">削除</button></div>`;}).join("")||"<div class='small'>まだ記録がありません</div>";
+return `<div class="card"><h2>練習・採点の記録</h2>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+<input type="date" id="ld" value="${new Date().toISOString().slice(0,10)}">
+<select id="lt"><option>発表練習</option><option>質疑練習</option><option>模擬面接</option><option>小論文</option><option>その他</option></select>
+<input type="text" id="lm" placeholder="メモ（例：小論文 テーマ2 22/30 講評済）" style="flex:1;min-width:200px">
+<button class="btn" onclick="addLog()">追加</button></div>
+${list}</div>`;
+}
+
+function vSet(){
+return `<div class="card"><h2>データ同期（自動）</h2>
+<div class="small">下の2つを一度入力すれば、以後は<b>全自動</b>：アプリを開いたときに新しい方のデータを採用し、変更は数秒後に自動でGistへ保存されます（ヘッダーに「同期✓」と時刻が出ます）。</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0">
+<input type="text" id="ghtoken" placeholder="GitHubトークン（ghp_...）" value="${esc(localStorage.getItem(GH_TOKEN_KEY)||"")}" style="flex:1;min-width:200px">
+<input type="text" id="ghgist" placeholder="Gist ID" value="${esc(localStorage.getItem(GH_GIST_KEY)||"")}" style="flex:1;min-width:200px">
+</div>
+<button class="btn" onclick="gistSave()">Gistへ保存（初回テスト）</button>
+<button class="btn gray" onclick="gistLoad()">Gistから読込</button>
+<span id="gmsg" class="small"></span>
+<h3>初回設定のしかた（お父様が一度だけ・約5分）</h3>
+<ol style="font-size:13.5px;padding-left:20px;line-height:1.9">
+<li><b>トークンを作る</b>：GitHubにログイン → <a href="https://github.com/settings/tokens" target="_blank">github.com/settings/tokens</a> → 「Generate new token (<b>classic</b>)」→ Note欄に「kotomi-navi」／Expirationは「No expiration」／チェックボックスは<b>「gist」だけ</b>にチェック → 緑のGenerateボタン → 表示された <b>ghp_で始まる文字列をコピー</b>（この画面を閉じると二度と表示されないので注意）。</li>
+<li><b>保存場所（Gist）を作る</b>：<a href="https://gist.github.com" target="_blank">gist.github.com</a> → Filename欄に「kotomi-navi-v2.json」／本文に「{}」とだけ入力 → <b>「Create secret gist」</b>（必ずsecretの方）→ 作成後のページURLの<b>ユーザー名の後ろの英数字がGist ID</b>（例：gist.github.com/NaoyoshiYamanaka/<b>ここの部分</b>）。</li>
+<li>上の2つの欄にトークンとIDを貼り付け →「Gistへ保存（初回テスト）」→「✓ 保存しました」と出れば成功。</li>
+<li><b>ことみさんのスマホでも</b>：同じアプリの設定画面で同じトークンとIDを入力 →「Gistから読込」。以後、両方の端末が自動で揃います。</li>
+</ol>
+<div class="small">※トークンは合鍵のようなものです。この画面と家族以外には教えないでください（保存先は各端末の中だけです）。</div></div>
+<div class="card"><h2>バックアップ</h2>
+<button class="btn" onclick="expJson()">エクスポート(JSON)</button>
+<label class="btn gray" style="display:inline-block">インポート<input type="file" accept=".json" style="display:none" onchange="impJson(this)"></label></div>
+<div class="card"><h2>旧版（上智対策版）</h2>
+<div class="small">これまでの50本ノート・採点記録・事例カードはすべて旧版に残っています。データも独立して保持されます。</div>
+<p><a href="./旧版_上智対策_index.html">→ 旧版を開く</a></p></div>
+<div class="card"><h2>バージョン</h2><div class="small">${APP_VERSION}／v2.2：模擬面接=石田さんが想定問答から質問を選択する方式に／左メニュー色分け／タブ順変更（ホーム→予定表）</div></div>`;
+}
+
+/* ---------- behaviors ---------- */
+function afterRender(){
+const sc=document.getElementById("script");
+if(sc){sc.addEventListener("input",()=>{S.script=sc.value;save();
+const len=sc.value.replace(/\s/g,"").length;
+document.getElementById("slen").textContent=len;
+document.getElementById("smin").textContent=(len/300).toFixed(1);});}
+const po=document.getElementById("poster");
+if(po){po.addEventListener("input",()=>{S.poster=po.value;save();});}
+const hn=document.getElementById("homeNotes");
+if(hn){hn.addEventListener("input",()=>{S.notes=hn.value;save();});}
+document.getElementById("ver").textContent=APP_VERSION;
+document.querySelectorAll(".qa .qh").forEach(el=>{
+  el.addEventListener("click",ev=>{
+    if(ev.target.classList.contains("st"))return;
+    el.parentElement.classList.toggle("open");});});
+}
+function qaSt(ev,i){ev.stopPropagation();S.qa[i]=((S.qa[i]||0)+1)%3;save();render();}
+function themeChk(ev,i){ev.stopPropagation();S.themeChk=S.themeChk||{};S.themeChk[i]=!S.themeChk[i];save();render();}
+function addLog(){const d=document.getElementById("ld").value,t=document.getElementById("lt").value,m=document.getElementById("lm").value.trim();
+if(!m){alert("メモを入力してください");return;}
+S.logs.push({d,t,m});save();render();}
+function delLog(i){if(confirm("削除しますか？")){S.logs.splice(i,1);save();render();}}
+
+/* ---------- timer ---------- */
+let tSec=600,tRun=null,tCount=600;
+function tFmt(s){const m=Math.floor(s/60),x=s%60;return String(m).padStart(2,"0")+":"+String(x).padStart(2,"0");}
+function tShow(){const d=document.getElementById("tdisp");if(!d)return;d.textContent=tFmt(tCount);d.className=tCount<=60?"warn":"";}
+function tSet(s){tStop();tSec=s;tCount=s;tShow();}
+function tGo(){if(tRun){tStop();return;}
+document.getElementById("tgo").textContent="一時停止";
+tRun=setInterval(()=>{tCount--;if(tCount<=0){tStop();tCount=0;tShow();document.title="⏰ 時間です";alert("時間です");return;}tShow();},1000);}
+function tStop(){clearInterval(tRun);tRun=null;const b=document.getElementById("tgo");if(b)b.textContent="スタート";}
+function tReset(){tStop();tCount=tSec;tShow();}
+
+/* ---------- gist sync ---------- */
+async function gistSave(){
+const tk=document.getElementById("ghtoken").value.trim(),id=document.getElementById("ghgist").value.trim(),msg=document.getElementById("gmsg");
+if(!tk||!id){msg.textContent="トークンとGist IDを入力";return;}
+localStorage.setItem(GH_TOKEN_KEY,tk);localStorage.setItem(GH_GIST_KEY,id);
+msg.textContent="保存中…";
+try{const r=await fetch("https://api.github.com/gists/"+id,{method:"PATCH",headers:{Authorization:"token "+tk,"Content-Type":"application/json"},body:JSON.stringify({files:{[GIST_FILE]:{content:JSON.stringify(S)}}})});
+msg.textContent=r.ok?"✓ 保存しました "+new Date().toLocaleTimeString():"エラー: "+r.status;}catch(e){msg.textContent="通信エラー";}}
+async function gistLoad(){
+const tk=document.getElementById("ghtoken").value.trim(),id=document.getElementById("ghgist").value.trim(),msg=document.getElementById("gmsg");
+if(!tk||!id){msg.textContent="トークンとGist IDを入力";return;}
+localStorage.setItem(GH_TOKEN_KEY,tk);localStorage.setItem(GH_GIST_KEY,id);
+msg.textContent="読込中…";
+try{const r=await fetch("https://api.github.com/gists/"+id,{headers:{Authorization:"token "+tk}});
+if(!r.ok){msg.textContent="エラー: "+r.status;return;}
+const j=await r.json();const f=j.files&&j.files[GIST_FILE];
+if(!f){msg.textContent="Gist内にv2データがまだありません（初回は先に保存を）";return;}
+const o=JSON.parse(f.content);S=Object.assign(S,o);S.mock=Object.assign({sets:[],used:{},sel:{}},o.mock||{});
+localStorage.setItem(KEY,JSON.stringify(S));
+msg.textContent="✓ 読み込みました";render();}catch(e){msg.textContent="通信エラー";}}
+
+/* ---------- export/import ---------- */
+function expJson(){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(S,null,1)],{type:"application/json"}));a.download="kotomi-navi-v2-backup.json";a.click();}
+function impJson(inp){const f=inp.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const o=JSON.parse(rd.result);S=Object.assign(S,o);S.mock=Object.assign({sets:[],used:{},sel:{}},o.mock||{});localStorage.setItem(KEY,JSON.stringify(S));render();alert("読み込みました");}catch(e){alert("読み込み失敗");}};rd.readAsText(f);}
+
+nav();render();initSync();
+</script>
+</body>
+</html>
